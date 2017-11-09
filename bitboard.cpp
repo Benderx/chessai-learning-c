@@ -404,73 +404,59 @@ int get_file(self,num)
         case 2305843009213693952:
             return(5);
 
-        // 2^[]
-        case :
-        case :
-        case :
-        case :
-        case :
-        case :
-        case :
-        case :
+        // 2^[6, 14, 22, 30, 38, 46, 54, 62]
+        case 64:
+        case 16384:
+        case 4194304:
+        case 1073741824:
+        case 274877906944:
+        case 70368744177664:
+        case 18014398509481984:
+        case 4611686018427387904:
             return(6);
+
+        // 2^[7,15,23,31,39,47,55,63]
+        case 128:
+        case 32768:
+        case 8388608:
+        case 2147483648:
+        case 549755813888:
+        case 140737488355328:
+        case 36028797018963968:
+        case 9223372036854775808:
+            return(7);
+
+        default:
+            return(-1);
     }
 }
-    file6 = [64, 16384, 4194304, 1073741824, 274877906944, 70368744177664, 18014398509481984, 4611686018427387904]#2^{6, 14, 22, 30, 38, 46, 54, 62}
-    if num in file6
-        {
 
-        } return(6)
+// Takes in a rank, and file
+// Returns the left and right diagonal mask indexes as [left,right]
+// Alters nothing 
 
-    file7 = [128, 32768, 8388608, 2147483648, 549755813888, 140737488355328, 36028797018963968, 9223372036854775808] #2^[7,15,23,31,39,47,55,63]
-    if num in file7
-        {
-
-        } return(7)
-
-
-#Takes in a rank, file, and direction bool
-#Returns the left diagonal number if direction is true. Right otherwise
-#Alters nothing 
-void get_diag(self, rank, file, direction)
+int get_diag(self, rank, file)
 {
+    int total_val = rank+file;
+    //Total val also equals left diag index
 
+    if(rank > file) //Above the middle diagonal line r = 7
+    {
+        int right =7+(total_val-2*file);
+    }
+    else //Below middle line
+    {
+        int right = 7-(total_val-2*rank);
+    }
+
+    int diag[2] = {total_val,right};
+
+    return(diag);
 }
-    total_val = rank + file
-
-    #Left index
-    left = total_val
-
-    #Determine right index
-    if rank > file
-        {
-
-        } #above middle right diagonal line r = 7
-        right = 7+(total_val-2*file)
-    else
-        {
-
-        } #below r = 7 line
-        right = 7-(total_val-2*rank)
-
-    diag = [left,right]
-
-    #Which diag to return, left or right, could be expanded for both
-    #Direction should probably just be an int and return diag[int] or ful diag
-    if direction
-    {
-
-    }
-        return(diag[0])
-    else
-    {
-
-    }
-        return(diag[1])
 
 
-// Takes in move information
-//     start 
+Takes in move information
+    start 
         {
 
         } int 0-63 
