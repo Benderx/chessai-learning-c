@@ -49,6 +49,8 @@ class Engine
         bool in_check;
         position pos;
 
+        unsigned long long move_stack[max_move_length] = {0};
+
         unsigned long long *row_mask;
         unsigned long long *col_mask;
         unsigned long long *diag_left_mask;
@@ -250,6 +252,11 @@ void Engine::fill_diag_right_mask_arr()
         self.diag_right_mask[j] = make_diag_right_mask(start);
         start = start << 8;
     }          
+}
+
+int Engine::get_max_move_length()
+{
+    return(self.max_move_length)
 }
 
 
