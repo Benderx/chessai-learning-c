@@ -46,6 +46,8 @@ class Engine
 
     private: 
         int max_move_length;
+        int stack_index;
+        unsigned long long move_stack[]; 
         bool in_check;
         position pos;
 
@@ -81,6 +83,10 @@ void Enigne::Engine(unsigned long long *board_data)
 void Enigne::init_engine()
 {
     max_move_length = 500; // This assumes there are only 500 possible legal moves at any one time (affects move array intilization)
+    
+    move_stack[max_move_length] = {0};
+    int stack_index = -1;
+
     in_check = false;
     init_masks();
 }
@@ -252,6 +258,10 @@ void Engine::fill_diag_right_mask_arr()
     }          
 }
 
+int Engine::get_max_move_length()
+{
+    return(self.max_move_length)
+}
 
 unsigned long long Engine::get_all_white()
 {
@@ -328,97 +338,126 @@ int get_rank(int num)
 }
 
 
-// REWRITE
 // Takes in a 64 bit number with single bit
 // Returns the file piece is on 0-7, left to right
 // Alters nothing 
-// void Engine::get_file(int num)
-// {
-//     file0 = [1, 256, 65536, 16777216, 4294967296, 1099511627776, 281474976710656, 72057594037927936]  // 2^({0, 8, 16, 24, 32, 40, 48, 56})
-//     if num in file0
-//     {
-//         return(0);
-//     }
-
-//     file1 = [2, 512, 131072, 33554432, 8589934592, 2199023255552, 562949953421312, 144115188075855872]  // 2^[1,9,17,25,33,41,49,57]
-//     if num in file1
-//     {
-//         return(1);
-//     }
-
-//     file2 = [4, 1024, 262144, 67108864, 17179869184, 4398046511104, 1125899906842624, 288230376151711744]  // 2^[2,10,18,26,34,42,50,58]
-//     if num in file2
-//     {
-//         return(2);
-//     } 
-
-//     file3 = [8, 2048, 524288, 134217728, 34359738368, 8796093022208, 2251799813685248, 576460752303423488]  // 2^[3,11,19,27,35,43,51,59]
-//     if num in file3
-//     {
-//         return(3);
-//     } 
-
-//     file4 = [16, 4096, 1048576, 268435456, 68719476736, 17592186044416, 4503599627370496, 1152921504606846976]  // 2^[4,12,20,28,36,44,52,60]
-//     if num in file4
-//     {
-//         return(4);
-//     }
-
-//     file5 = [32, 8192, 2097152, 536870912, 137438953472, 35184372088832, 9007199254740992, 2305843009213693952]  // 2^[5,13,21,29,37,45,53,61]
-//     if num in file5
-//     {
-//         return(5);
-//     }
-
-//     file6 = [64, 16384, 4194304, 1073741824, 274877906944, 70368744177664, 18014398509481984, 4611686018427387904] // 2^{6, 14, 22, 30, 38, 46, 54, 62}
-//     if num in file6
-//     {
-//         return(6);
-//     }
-
-//     file7 = [128, 32768, 8388608, 2147483648, 549755813888, 140737488355328, 36028797018963968, 9223372036854775808]  // 2^[7,15,23,31,39,47,55,63]
-//     if num in file7
-//     {
-//         return(7);
-//     } 
-// }
-
-
-// Takes in a rank, file, and direction bool
-// Returns the left diagonal number if direction is true. Right otherwise
-// Alters nothing 
-int Engine::get_diag(int rank, int file, int direction)
+int get_file(self,num)
 {
-    int total_val = rank + file;
-
-    // Left index
-    int left = total_val;
-
-    // Determine right index
-    if(rank > file)
+    switch(num)
     {
-        right = 7+(total_val-2*file);
-    } 
-    // above middle right diagonal line r = 7
-    else
-    {
-        right = 7-(total_val-2*rank);
-    } 
+        //2^[0, 8, 16, 24, 32, 40, 48, 56]
+        case 1:
+        case 256:
+        case 65536:
+        case 16777216:
+        case 4294967296:
+        case 1099511627776:
+        case 281474976710656:
+        case 72057594037927936:
+            return(0);
 
-    // below r = 7 line
+        //2^[1,9,17,25,33,41,49,57]
+        case 2:
+        case 512:
+        case 131072:
+        case 33554432:
+        case 8589934592:
+        case 2199023255552:
+        case 562949953421312:
+        case 144115188075855872:
+            return(1);
 
-    // Which diag to return, left or right, could be expanded for both
-    // Direction should probably just be an int and return diag[int] or ful diag
-    if(direction)
-    {
-        return(left);
-    }
-    else
-    {
-        return(right);
+        // 2^[2,10,18,26,34,42,50,58]
+        case 4:
+        case 1024:
+        case 262144:
+        case 67108864:
+        case 17179869184:
+        case 4398046511104:
+        case 1125899906842624:
+        case 288230376151711744:
+            return(2);
+
+        // 2^[3,11,19,27,35,43,51,59]    
+        case 8:
+        case 2048:
+        case 524288:
+        case 134217728:
+        case 34359738368:
+        case 8796093022208:
+        case 2251799813685248:
+        case 576460752303423488:
+            return(3);
+
+        // 2^[4,12,20,28,36,44,52,60]
+        case 16:
+        case 4096:
+        case 1048576:
+        case 268435456:
+        case 68719476736:
+        case 17592186044416:
+        case 4503599627370496:
+        case 1152921504606846976:
+            return(4);
+
+        // 2^[5,13,21,29,37,45,53,61]
+        case 32:
+        case 8192:
+        case 2097152:
+        case 536870912:
+        case 137438953472:
+        case 35184372088832:
+        case 9007199254740992:
+        case 2305843009213693952:
+            return(5);
+
+        // 2^[6, 14, 22, 30, 38, 46, 54, 62]
+        case 64:
+        case 16384:
+        case 4194304:
+        case 1073741824:
+        case 274877906944:
+        case 70368744177664:
+        case 18014398509481984:
+        case 4611686018427387904:
+            return(6);
+
+        // 2^[7,15,23,31,39,47,55,63]
+        case 128:
+        case 32768:
+        case 8388608:
+        case 2147483648:
+        case 549755813888:
+        case 140737488355328:
+        case 36028797018963968:
+        case 9223372036854775808:
+            return(7);
+
+        default:
+            return(-1);
     }
 }
 
+// Takes in a rank, and file
+// Returns the left and right diagonal mask indexes as [left,right]
+// Alters nothing 
+
+int get_diag(self, rank, file)
+{
+    int total_val = rank+file;
+    //Total val also equals left diag index
+
+    if(rank > file) //Above the middle diagonal line r = 7
+    {
+        int right =7+(total_val-2*file);
+    }
+    else //Below middle line
+    {
+        int right = 7-(total_val-2*rank);
+    }
+        return(diag[1])
+
+    int diag[2] = {total_val,right};
 
 // Takes in move information
 //     start int 0-63 
@@ -442,6 +481,12 @@ int Engine::encode_move(int start, int end, int m_type, int piece, int promotion
     int encode_promotion = promotion << 17;
     return(encode_start & encode_end & encode_type & encode_piece & encode_promotion);
 }
+    encode_start = np.uint8(start)
+    encode_end = np.uint16(end) << np.uint8(6)
+    encode_type = np.uint32(m_type) << np.uint8(12)
+    encode_piece = np.uint32(piece) << np.uint8(14)
+    encode_promotion = np.uint32(promotion) << np.uint(17)
+    return(encode_start & encode_end & encode_type & encode_piece & encode_promotion)
 
     
 // Takes in a np.uint32 move
@@ -451,6 +496,7 @@ void Engine::decode_from(int move)
 {
     return(move & 63);
 }
+    return(move & np.uint8(63))
 
 
 // Takes in a np.uint32 move
@@ -460,6 +506,7 @@ int Engine::decode_to(int move)
 {
     return((move >> 6) & 63);
 }
+    return((move >> np.uint8(6)) & np.uint8(63))
 
 
 // Takes in a np.uint32 move
@@ -479,6 +526,7 @@ int Engine::decode_piece(int move)
 {
     return((move >> 14) & 7);
 }
+    return((move >> np.uint8(14)) & np.uint8(7)) 
 
 // Takes in a np.uint32 move
 // Returns new piece pawn promoted to
@@ -487,8 +535,59 @@ int Engine::decode_promo(int move)
 {
     return((move >> 17) & 3);
 }
+    return((move >> np.uint8(17)) & np.uint8(3))
 
-//REWRITE
+
+ // Takes in a move to be added to the move stack
+ // Returns nothing
+ // Alters the move stack and stack_index value
+void stack_push(self, move)
+{
+    // get pointer to stack index
+    // get pointer to move_stack
+    move_stack[++(*stack_index)] = move;
+}
+
+
+ // Takes in nothing
+ // Returns the last move in the move stack
+ // Alters the stack_index value
+unsigned long long stack_pop(self)
+{
+    // get pointer to stack index
+    // get pointer to move_stack
+    return(move_stack[(*stack_index)--]);
+}
+
+
+ // Takes in a move, alters the BitboardEngine's representation to the NEXT state based on the CURRENT move action
+ // Currently 
+void push_move(move)
+{
+    stack_push(move);
+    int start = decode_from();
+    int end = decode_from();
+    int taken = decode_piece();
+
+    unsigned long long bb_start = 2^start;
+    unsigned long long bb_end = 2^end;
+
+    curr_piece = // LOOKUP VAL -> pointer to piece val on that square
+    curr_piece = (curr_piece | bb_end) & (self.get_uint64_max()-bb_start)
+
+    // EDIT LOOKUP TABLE THAT THE USED SQUARE IS NOW EMPTY
+    // self.edit_lookup(start,None)
+
+    if taken:
+        taken_piece = //LOOKUP VAL -> pointer to piece val on that square
+        taken_piece = taken_piece & (self.get_uint64_max()-bb_end)
+
+    // EDIT LOOKUP TABLE THAT THE FINAL SQUARE IS NOW NEW PIECE
+    // self.edit_lookup(end,curr_piece)
+
+
+}
+
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
 // Example: the initial white_nights bitboard, the least significant 1 occurs at index 1 (...00001000010)
 // therefore simply return ((lots of zeros)00000000000010)
@@ -535,7 +634,6 @@ void Engine::reverse_8_bit(int row)
     reverse_num = reverse_num << count
     return reverse_num
     // return ~(np.uint8(255) - np.uint8(row))
-}
 
 
 //REWRITE
@@ -543,13 +641,12 @@ void Engine::print_chess_rep(unsigned long long num)
 {
     for i in range(7, -1, -1)
     {
-        shifter = np.uint64(8 * i)
+	shifter = np.uint64(8 * i)
         row = (num & self.row_mask[i]) >> shifter
         rev = self.reverse_8_bit(row)
         print('{0}'.format(rev))
     }
 }
-
 
 void Engine::print_chess_rep_byteswap(unsigned long long num)
 {
@@ -561,7 +658,6 @@ void Engine::print_chess_rep_byteswap(unsigned long long num)
         print('{08b}'.format(rev))
     }
 }
-
 
 unsigned long long Engine::reverse_8_bits(unsigned long long x)
 {
@@ -627,6 +723,7 @@ int Engine::get_square(int piece, int color)
         {
             return pos.white_kings;
         }
+            return self.white_kings
         else
         {
             //
@@ -639,6 +736,7 @@ int Engine::get_square(int piece, int color)
         {
             return pos.black_kings;
         }
+            return self.black_kings
         else
         {
             //
