@@ -193,7 +193,7 @@ unsigned long long Engine::make_diag_left_mask(unsigned long long mask)
     unsigned long long BR_mask = ~(row_mask[0] | col_mask[7]);
     for(int i = 0; i < 8; i++)
     {
-        mask = mask | ((mask & BR_mask) >> np.uint64(7));
+        mask = mask | ((mask & BR_mask) >> 7);
     }
     return(mask);
 }
@@ -253,33 +253,30 @@ void Engine::fill_diag_right_mask_arr()
 }
 
 
-unsigned long long get_all_white()
+unsigned long long Engine::get_all_white()
 {
-    all_white = white_pawns | white_rooks | white_nights | white_bishops | white_kings | white_queens;
-    return(all_white);
+    return(pos.white_pawns | pos.white_rooks | pos.white_nights | pos.white_bishops | pos.white_kings | pos.white_queens);
 }
 
 
-unsigned long long get_all_black()
+unsigned long long Engine::get_all_black()
 {
-    all_black = black_pawns | black_rooks | black_nights | black_bishops | black_kings | black_queens;
-    return(all_black);
+    return(pos.black_pawns | pos.black_rooks | pos.black_nights | pos.black_bishops | pos.black_kings | pos.black_queens);
 }
 
 
-void get_all(self)
+unsigned long long Engine::get_all()
 {
-    white = self.get_all_white();
-    black = self.get_all_black();
-    all_pieces = white | black;
-    return(all_pieces);
+    unsigned long long white = get_all_white();
+    unsigned long long black = get_all_black();
+    return(white | black);
 }
 
 
 // Takes in a 64 bit number with single bit
 // Returns the rank piece is on 0-7, bottom to top
 // Alters nothing
-void get_rank(self,num)
+int get_rank(int num)
 {
     unsigned long long max0 = 128; // 2^7
     if(num <= max0)
@@ -331,239 +328,197 @@ void get_rank(self,num)
 }
 
 
-#Takes in a 64 bit number with single bit
-#Returns the file piece is on 0-7, left to right
-#Alters nothing 
-void get_file(self,num)
+// REWRITE
+// Takes in a 64 bit number with single bit
+// Returns the file piece is on 0-7, left to right
+// Alters nothing 
+// void Engine::get_file(int num)
+// {
+//     file0 = [1, 256, 65536, 16777216, 4294967296, 1099511627776, 281474976710656, 72057594037927936]  // 2^({0, 8, 16, 24, 32, 40, 48, 56})
+//     if num in file0
+//     {
+//         return(0);
+//     }
+
+//     file1 = [2, 512, 131072, 33554432, 8589934592, 2199023255552, 562949953421312, 144115188075855872]  // 2^[1,9,17,25,33,41,49,57]
+//     if num in file1
+//     {
+//         return(1);
+//     }
+
+//     file2 = [4, 1024, 262144, 67108864, 17179869184, 4398046511104, 1125899906842624, 288230376151711744]  // 2^[2,10,18,26,34,42,50,58]
+//     if num in file2
+//     {
+//         return(2);
+//     } 
+
+//     file3 = [8, 2048, 524288, 134217728, 34359738368, 8796093022208, 2251799813685248, 576460752303423488]  // 2^[3,11,19,27,35,43,51,59]
+//     if num in file3
+//     {
+//         return(3);
+//     } 
+
+//     file4 = [16, 4096, 1048576, 268435456, 68719476736, 17592186044416, 4503599627370496, 1152921504606846976]  // 2^[4,12,20,28,36,44,52,60]
+//     if num in file4
+//     {
+//         return(4);
+//     }
+
+//     file5 = [32, 8192, 2097152, 536870912, 137438953472, 35184372088832, 9007199254740992, 2305843009213693952]  // 2^[5,13,21,29,37,45,53,61]
+//     if num in file5
+//     {
+//         return(5);
+//     }
+
+//     file6 = [64, 16384, 4194304, 1073741824, 274877906944, 70368744177664, 18014398509481984, 4611686018427387904] // 2^{6, 14, 22, 30, 38, 46, 54, 62}
+//     if num in file6
+//     {
+//         return(6);
+//     }
+
+//     file7 = [128, 32768, 8388608, 2147483648, 549755813888, 140737488355328, 36028797018963968, 9223372036854775808]  // 2^[7,15,23,31,39,47,55,63]
+//     if num in file7
+//     {
+//         return(7);
+//     } 
+// }
+
+
+// Takes in a rank, file, and direction bool
+// Returns the left diagonal number if direction is true. Right otherwise
+// Alters nothing 
+int Engine::get_diag(int rank, int file, int direction)
 {
+    int total_val = rank + file;
 
-}
-    file0 = [1, 256, 65536, 16777216, 4294967296, 1099511627776, 281474976710656, 72057594037927936] #2^({0, 8, 16, 24, 32, 40, 48, 56})
-    if num in file0
-        {
+    // Left index
+    int left = total_val;
 
-        } return(0)
-
-    file1 = [2, 512, 131072, 33554432, 8589934592, 2199023255552, 562949953421312, 144115188075855872] #2^[1,9,17,25,33,41,49,57]
-    if num in file1
-        {
-
-        } return(1)
-
-    file2 = [4, 1024, 262144, 67108864, 17179869184, 4398046511104, 1125899906842624, 288230376151711744] #2^[2,10,18,26,34,42,50,58]
-    if num in file2
-        {
-
-        } return(2)
-
-    file3 = [8, 2048, 524288, 134217728, 34359738368, 8796093022208, 2251799813685248, 576460752303423488] #2^[3,11,19,27,35,43,51,59]
-    if num in file3
-        {
-
-        } return(3)
-
-    file4 = [16, 4096, 1048576, 268435456, 68719476736, 17592186044416, 4503599627370496, 1152921504606846976] #2^[4,12,20,28,36,44,52,60]
-    if num in file4
-        {
-
-        } return(4)
-
-    file5 = [32, 8192, 2097152, 536870912, 137438953472, 35184372088832, 9007199254740992, 2305843009213693952] #2^[5,13,21,29,37,45,53,61]
-    if num in file5
-        {
-
-        } return(5)
-
-    file6 = [64, 16384, 4194304, 1073741824, 274877906944, 70368744177664, 18014398509481984, 4611686018427387904]#2^{6, 14, 22, 30, 38, 46, 54, 62}
-    if num in file6
-        {
-
-        } return(6)
-
-    file7 = [128, 32768, 8388608, 2147483648, 549755813888, 140737488355328, 36028797018963968, 9223372036854775808] #2^[7,15,23,31,39,47,55,63]
-    if num in file7
-        {
-
-        } return(7)
-
-
-#Takes in a rank, file, and direction bool
-#Returns the left diagonal number if direction is true. Right otherwise
-#Alters nothing 
-void get_diag(self, rank, file, direction)
-{
-
-}
-    total_val = rank + file
-
-    #Left index
-    left = total_val
-
-    #Determine right index
-    if rank > file
-        {
-
-        } #above middle right diagonal line r = 7
-        right = 7+(total_val-2*file)
-    else
-        {
-
-        } #below r = 7 line
-        right = 7-(total_val-2*rank)
-
-    diag = [left,right]
-
-    #Which diag to return, left or right, could be expanded for both
-    #Direction should probably just be an int and return diag[int] or ful diag
-    if direction
+    // Determine right index
+    if(rank > file)
     {
-
-    }
-        return(diag[0])
+        right = 7+(total_val-2*file);
+    } 
+    // above middle right diagonal line r = 7
     else
     {
+        right = 7-(total_val-2*rank);
+    } 
 
+    // below r = 7 line
+
+    // Which diag to return, left or right, could be expanded for both
+    // Direction should probably just be an int and return diag[int] or ful diag
+    if(direction)
+    {
+        return(left);
     }
-        return(diag[1])
+    else
+    {
+        return(right);
+    }
+}
 
 
 // Takes in move information
-//     start 
-        {
-
-        } int 0-63 
-{
-
-} Square moved piece started on
-//     end 
-{
-
-} int 0-63 
-{
-
-} Square moved piece ended on
-//     m_type
-{
-
-} int 0-3 
-{
-
-} Type of move made
-//     piece
-{
-
-} int 0-4 
-{
-
-} Piece taken in move
-//     promotion
-{
-
-} int 2-5 
-{
-
-} Piece to promote pawn to
+//     start int 0-63 
+// Square moved piece started on
+// //     end int 0-63 
+// Square moved piece ended on
+// //     m_type int 0-3 
+//Type of move made
+// //     piece int 0-4 
+// Piece taken in move
+// //     promotion int 2-5 
+// Piece to promote pawn to
 // Return a np.uint32 representing all above info
 // Alters nothing
-void encode_move(self, start, end, m_type, piece, promotion)
+int Engine::encode_move(int start, int end, int m_type, int piece, int promotion)
 {
-
+    int encode_start = start;
+    int encode_end = end << 6;
+    int encode_type = m_type << 12;
+    int encode_piece = piece << 14;
+    int encode_promotion = promotion << 17;
+    return(encode_start & encode_end & encode_type & encode_piece & encode_promotion);
 }
-    encode_start = np.uint8(start)
-    encode_end = np.uint16(end) << np.uint8(6)
-    encode_type = np.uint32(m_type) << np.uint8(12)
-    encode_piece = np.uint32(piece) << np.uint8(14)
-    encode_promotion = np.uint32(promotion) << np.uint(17)
-    return(encode_start & encode_end & encode_type & encode_piece & encode_promotion)
 
     
 // Takes in a np.uint32 move
 // Returns square number moved piece originated from
 // Alters nothing
-void decode_from(self,move)
+void Engine::decode_from(int move)
 {
-
+    return(move & 63);
 }
-    return(move & np.uint8(63))
 
 
 // Takes in a np.uint32 move
 // Returns square number moved piece travels to
 // Alters nothing
-void decode_to(self,move)
+int Engine::decode_to(int move)
 {
-
+    return((move >> 6) & 63);
 }
-    return((move >> np.uint8(6)) & np.uint8(63))
 
 
 // Takes in a np.uint32 move
 // Returns type of move made
 // Alters nothing
-void decode_type(self,move)
+int Engine::decode_type(int move)
 {
 
 }
-    return((move >> np.uint8(12)) & np.uint8(3)) 
+    return((move >> 12) & 3);
 
 
 // Takes in a np.uint32 move
 // Returns any piece taken by move
 // Alters nothing
-void decode_piece(self,move)
+int Engine::decode_piece(int move)
 {
-
+    return((move >> 14) & 7);
 }
-    return((move >> np.uint8(14)) & np.uint8(7)) 
 
 // Takes in a np.uint32 move
 // Returns new piece pawn promoted to
 // Alters nothing
-void decode_promo(self,move)
+int Engine::decode_promo(int move)
 {
-
+    return((move >> 17) & 3);
 }
-    return((move >> np.uint8(17)) & np.uint8(3))
 
-
+//REWRITE
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
-// Example
-    {
-
-    } the initial white_nights bitboard, the least significant 1 occurs at index 1 (...00001000010)
+// Example: the initial white_nights bitboard, the least significant 1 occurs at index 1 (...00001000010)
 // therefore simply return ((lots of zeros)00000000000010)
 // YOU MAY ASSUME A 1 EXISTS, (0000000000000000000) will not be given
-void lsb_digit(self)
+unsigned long long Engine::lsb_digit(unsigned long long num)
 {
-
+    return((num & -num).bit_length()-1);
 }
-    return((num & -num).bit_length()-1)
 
 // Takes in a bitboard
 // Returns a bitboard with soley the least significant bit = 1
 // All other bits = 0
 // Alters nothing
-void lsb_board(self)
+unsigned long long Engine::lsb_board(unsigned long long num)
 {
-
+    return(num & -num);
 }
-    return(num & -num)
 
 
 // See above, except return the move_list significant bit bitboard
-void msb(self)
+void Engine::msb(self)
 {
-
+    //
 }
-    pass
 
 
+// REWRITE
 // Reverses a uint8 number, like this (00110000 -> 00001100)
-// To improve, possibly just not(11111111 - num)??? 
-void reverse_8_bit(self, row)
+void Engine::reverse_8_bit(int row)
 {
-
-}
     num = np.uint8(row)
     reverse_num = np.uint8(row)
     one_8 = np.uint8(1)
@@ -572,218 +527,176 @@ void reverse_8_bit(self, row)
     num = num >> one_8
     while(num)
     {
-
+        reverse_num = reverse_num << one_8;
+        reverse_num = reverse_num | (num & one_8);
+        num = num >> one_8;
+        count -= one_8;
     }
-        reverse_num = reverse_num << one_8    
-        reverse_num = reverse_num | (num & one_8)
-        num = num >> one_8
-        count -= one_8
     reverse_num = reverse_num << count
     return reverse_num
     // return ~(np.uint8(255) - np.uint8(row))
-
-
-void print_chess_rep(self, num)
-{
-
 }
+
+
+//REWRITE
+void Engine::print_chess_rep(unsigned long long num)
+{
     for i in range(7, -1, -1)
     {
-
-    }
         shifter = np.uint64(8 * i)
         row = (num & self.row_mask[i]) >> shifter
         rev = self.reverse_8_bit(row)
-        print('{0
-            {
-
-            }08b}'.format(rev))
-
-
-void print_chess_rep_byteswap(self, num)
-{
-
+        print('{0}'.format(rev))
+    }
 }
+
+
+void Engine::print_chess_rep_byteswap(unsigned long long num)
+{
     for i in range(7, -1, -1)
     {
-
-    }
         shifter = np.uint64(8 * i)
         row = (num & self.row_mask[i]) >> shifter
         rev = (row.byteswap() >> np.uint64(56))
-        print('{0
-            {
-
-            }08b}'.format(rev))
-
-
-void reverse_8_bits(self, x)
-{
-
+        print('{08b}'.format(rev))
+    }
 }
-    return (x * np.uint64(0x0202020202) & np.uint64(0x010884422010)) % np.uint64(1023)
 
 
-void reverse_64_bits(self, x)
+unsigned long long Engine::reverse_8_bits(unsigned long long x)
 {
-
+    return (x * 0x0202020202 & 0x010884422010) % 1023;
 }
-    return self.vertical_flip(self.horizontal_flip(x))
+
+
+unsigned long long Engine::reverse_64_bits(unsigned long long x)
+{
+    return vertical_flip(horizontal_flip(x));
     // return (x * np.uint64(0x0202020202) & np.uint64(0x010884422010)) % np.uint64(1023);
-
-
-void horizontal_flip(self, x)
-{
-
 }
-    k1 = np.uint64(0x5555555555555555)
-    k2 = np.uint64(0x3333333333333333)
-    k4 = np.uint64(0x0f0f0f0f0f0f0f0f)
-    x = ((x >> np.uint64(1)) & k1) + np.uint64(2) * (x & k1);
-    x = ((x >> np.uint64(2)) & k2) + np.uint64(4) * (x & k2);
-    x = ((x >> np.uint64(4)) & k4) + np.uint64(16) * (x & k4);
+
+unsigned long long Engine::horizontal_flip(self, x)
+{
+    unsigned long long k1 = 0x5555555555555555;
+    unsigned long long k2 = 0x3333333333333333;
+    unsigned long long k4 = 0x0f0f0f0f0f0f0f0f;
+    unsigned long long x = ((x >> 1) & k1) + 2 * (x & k1);
+    x = ((x >> 2) & k2) + 4 * (x & k2);
+    x = ((x >> 4) & k4) + 16 * (x & k4);
     return x;
-
-
-void vertical_flip(self, x)
-{
-
 }
-    return x.byteswap()
 
 
-// East
-    {
-
-    }      << 1
-// Southeast
+//REWRITE
+unsigned long long Engine::vertical_flip(unsigned long long x)
 {
+    return x.byteswap();
+}
 
-} >> 7
-// South
-{
 
-}     >> 8
-// Southwest
-{
-
-} >> 9
-// West
-{
-
-}      >> 1
-// Northwest
-{
-
-} << 7
-// North
-{
-
-}     << 8
-// Northeast
-{
-
-} << 9
+// East << 1
+// Southeast >> 7
+// South >> 8
+// Southwest >> 9
+// West >> 1
+// Northwest << 7
+// North << 8
+// Northeast << 9
 
 
 // Takes in a move, alters the BitboardEngine's representation to the NEXT state based on the CURRENT move action
-void push_move(self, move)
+void Engine::push_move(int move)
 {
-
+    //
 }
-    pass
 
 
 // Takes in a move, alters the BitboardEngine's representation to the PREVIOUS state based on the LAST move action
-void push_move(self, move)
+void Engine::pop_move(int move)
 {
-
+    //
 }
-    pass
 
 
-void get_square(self, piece, color)
+int Engine::get_square(int piece, int color)
 {
-
-}
-    if color
+    // white
+    if(color)
     {
-
-    } // white
-        if piece == Piece.KING
+        if(piece == Piece.KING)
         {
-
+            return pos.white_kings;
         }
-            return self.white_kings
         else
         {
-
+            //
         }
-            pass
+    }
+    // black
     else
     {
-
-    } // black
-        if piece == Piece.KING
+        if(piece == Piece.KING)
         {
-
+            return pos.black_kings;
         }
-            return self.black_kings
         else
         {
-
+            //
         }
-            pass
+    } 
+}
 
 
 // Some hueristics have been met, the only way to check if a move is legal or not, we must make it.
-void check_legal(self, move)
+bool Engine::check_legal(int move)
 {
-
+    //
 }
-    pass
 
 
 // Returns a bitboard of pieces that are pinned against their king 
-void pinned_pieces(self, color)
+unsigned long long pinned_pieces(int color)
 {
+    unsigned long long defenders;
+    unsigned long long enemy_rook;
+    unsigned long long enemy_bishop;
+    unsigned long long enemy_queen;
+    unsigned long long enemy_color;
 
-}
-    #Replace king with enemy queen
-    #Find kings defenders
-    #Declare enemy
-    if color
+    // Replace king with enemy queen
+    // Find kings defenders
+    // Declare enemy
+    // white
+    if(color)
     {
-
-    } // white
-        defenders = self.queen_attacks(self.white_kings,0)
-        enemy_rook = self.black_rooks
-        enemy_bishop = self.black_bishops
-        enemy_queen = self.black_queens
-        enemy_color = 0
+        defenders = queen_attacks(pos.white_kings, 0);
+        enemy_rook = pos.black_rooks;
+        enemy_bishop = pos.black_bishops;
+        enemy_queen = pos.black_queens;
+        enemy_color = 0;
+    }
+    // black
     else
     {
-
-    } // black
-        defenders = self.queen_attacks(self.black_kings,1)
-        enemy_rook = self.white_rooks
-        enemy_bishop = self.white_bishops
-        enemy_queen = self.white_queens
-        enemy_color = 1
-
-    #Compile all squares under attack from enemy
-    attacker_squares = self.rook_attacks(enemy_rook,enemy_color) | self.bishop_attacks(enemy_bishop,enemy_color) | self.queen_attacks(enemy_queen,enemy_color)
-    #Defenders in attacker squares are pinned pieces
-    return(defenders & attacker_squares)
+        defenders = queen_attacks(pos.black_kings, 1);
+        enemy_rook = pos.white_rooks;
+        enemy_bishop = pos.white_bishops;
+        enemy_queen = pos.white_queens;
+        enemy_color = 1;
+    }
+    // Compile all squares under attack from enemy
+    unsigned long long attacker_squares = rook_attacks(enemy_rook, enemy_color) | bishop_attacks(enemy_bishop, enemy_color) | queen_attacks(enemy_queen, enemy_color);
+    // Defenders in attacker squares are pinned pieces
+    return(defenders & attacker_squares);
+}
 
 
 // Generates and fills move_list for a color before checking checks
-void generate_pre_check_moves(self, color, move_list)
+void generate_pre_check_moves(int color, int* move_list)
 {
-
+    // king_loc = pre_check_king_bitboard();
+    // return(all_pre_check_moves);
 }
-    king_loc = self.pre_check_king_bitboard()
-    return all_pre_check_moves
 
 
 // Generates and returns a list of legal moves for a color
