@@ -554,6 +554,7 @@ void decode_piece(self,move)
 
 }
     return((move >> np.uint8(14)) & np.uint8(7)) 
+    
 
 // Takes in a np.uint32 move
 // Returns new piece pawn promoted to
@@ -564,6 +565,7 @@ void decode_promo(self,move)
 }
     return((move >> np.uint8(17)) & np.uint8(3))
 
+
  // Takes in a move to be added to the move stack
  // Returns nothing
  // Alters the move stack and stack_index value
@@ -573,6 +575,7 @@ void stack_push(self, move)
     // get pointer to move_stack
     move_stack[++(*stack_index)] = move;
 }
+
 
  // Takes in nothing
  // Returns the last move in the move stack
@@ -585,6 +588,33 @@ unsigned long long stack_pop(self)
 }
 
 
+ // Takes in a move, alters the BitboardEngine's representation to the NEXT state based on the CURRENT move action
+ // Currently 
+void push_move(move)
+{
+    stack_push(move);
+    int start = decode_from();
+    int end = decode_from();
+    int taken = decode_piece();
+
+    unsigned long long bb_start = 2^start;
+    unsigned long long bb_end = 2^end;
+
+    curr_piece = // LOOKUP VAL -> pointer to piece val on that square
+    curr_piece = (curr_piece | bb_end) & (self.get_uint64_max()-bb_start)
+
+    // EDIT LOOKUP TABLE THAT THE USED SQUARE IS NOW EMPTY
+    // self.edit_lookup(start,None)
+
+    if taken:
+        taken_piece = //LOOKUP VAL -> pointer to piece val on that square
+        taken_piece = taken_piece & (self.get_uint64_max()-bb_end)
+
+    // EDIT LOOKUP TABLE THAT THE FINAL SQUARE IS NOW NEW PIECE
+    // self.edit_lookup(end,curr_piece)
+
+
+}
 
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
 // Example
