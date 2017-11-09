@@ -267,7 +267,7 @@ unsigned long long get_all_black()
 }
 
 
-void get_all(self)
+unsigned long long get_all(self)
 {
     white = self.get_all_white();
     black = self.get_all_black();
@@ -279,7 +279,7 @@ void get_all(self)
 // Takes in a 64 bit number with single bit
 // Returns the rank piece is on 0-7, bottom to top
 // Alters nothing
-void get_rank(self,num)
+int get_rank(self,num)
 {
     unsigned long long max0 = 128; // 2^7
     if(num <= max0)
@@ -331,49 +331,91 @@ void get_rank(self,num)
 }
 
 
-#Takes in a 64 bit number with single bit
-#Returns the file piece is on 0-7, left to right
-#Alters nothing 
-void get_file(self,num)
+// Takes in a 64 bit number with single bit
+// Returns the file piece is on 0-7, left to right
+// Alters nothing 
+int get_file(self,num)
 {
+    switch(num)
+    {
+        //2^[0, 8, 16, 24, 32, 40, 48, 56]
+        case 1:
+        case 256:
+        case 65536:
+        case 16777216:
+        case 4294967296:
+        case 1099511627776:
+        case 281474976710656:
+        case 72057594037927936:
+            return(0);
 
+        //2^[1,9,17,25,33,41,49,57]
+        case 2:
+        case 512:
+        case 131072:
+        case 33554432:
+        case 8589934592:
+        case 2199023255552:
+        case 562949953421312:
+        case 144115188075855872:
+            return(1);
+
+        // 2^[2,10,18,26,34,42,50,58]
+        case 4:
+        case 1024:
+        case 262144:
+        case 67108864:
+        case 17179869184:
+        case 4398046511104:
+        case 1125899906842624:
+        case 288230376151711744:
+            return(2);
+
+        // 2^[3,11,19,27,35,43,51,59]    
+        case 8:
+        case 2048:
+        case 524288:
+        case 134217728:
+        case 34359738368:
+        case 8796093022208:
+        case 2251799813685248:
+        case 576460752303423488:
+            return(3);
+
+        // 2^[4,12,20,28,36,44,52,60]
+        case 16:
+        case 4096:
+        case 1048576:
+        case 268435456:
+        case 68719476736:
+        case 17592186044416:
+        case 4503599627370496:
+        case 1152921504606846976:
+            return(4);
+
+        // 2^[5,13,21,29,37,45,53,61]
+        case 32:
+        case 8192:
+        case 2097152:
+        case 536870912:
+        case 137438953472:
+        case 35184372088832:
+        case 9007199254740992:
+        case 2305843009213693952:
+            return(5);
+
+        // 2^[]
+        case :
+        case :
+        case :
+        case :
+        case :
+        case :
+        case :
+        case :
+            return(6);
+    }
 }
-    file0 = [1, 256, 65536, 16777216, 4294967296, 1099511627776, 281474976710656, 72057594037927936] #2^({0, 8, 16, 24, 32, 40, 48, 56})
-    if num in file0
-        {
-
-        } return(0)
-
-    file1 = [2, 512, 131072, 33554432, 8589934592, 2199023255552, 562949953421312, 144115188075855872] #2^[1,9,17,25,33,41,49,57]
-    if num in file1
-        {
-
-        } return(1)
-
-    file2 = [4, 1024, 262144, 67108864, 17179869184, 4398046511104, 1125899906842624, 288230376151711744] #2^[2,10,18,26,34,42,50,58]
-    if num in file2
-        {
-
-        } return(2)
-
-    file3 = [8, 2048, 524288, 134217728, 34359738368, 8796093022208, 2251799813685248, 576460752303423488] #2^[3,11,19,27,35,43,51,59]
-    if num in file3
-        {
-
-        } return(3)
-
-    file4 = [16, 4096, 1048576, 268435456, 68719476736, 17592186044416, 4503599627370496, 1152921504606846976] #2^[4,12,20,28,36,44,52,60]
-    if num in file4
-        {
-
-        } return(4)
-
-    file5 = [32, 8192, 2097152, 536870912, 137438953472, 35184372088832, 9007199254740992, 2305843009213693952] #2^[5,13,21,29,37,45,53,61]
-    if num in file5
-        {
-
-        } return(5)
-
     file6 = [64, 16384, 4194304, 1073741824, 274877906944, 70368744177664, 18014398509481984, 4611686018427387904]#2^{6, 14, 22, 30, 38, 46, 54, 62}
     if num in file6
         {
