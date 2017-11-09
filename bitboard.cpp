@@ -46,10 +46,10 @@ class Engine
 
     private: 
         int max_move_length;
+        int stack_index;
+        unsigned long long move_stack[]; 
         bool in_check;
         position pos;
-
-        unsigned long long move_stack[max_move_length] = {0};
 
         unsigned long long *row_mask;
         unsigned long long *col_mask;
@@ -83,6 +83,10 @@ void Enigne::Engine(unsigned long long *board_data)
 void Enigne::init_engine()
 {
     max_move_length = 500; // This assumes there are only 500 possible legal moves at any one time (affects move array intilization)
+    
+    move_stack[max_move_length] = {0};
+    int stack_index = -1;
+
     in_check = false;
     init_masks();
 }
@@ -559,6 +563,27 @@ void decode_promo(self,move)
 
 }
     return((move >> np.uint8(17)) & np.uint8(3))
+
+ // Takes in a move to be added to the move stack
+ // Returns nothing
+ // Alters the move stack and stack_index value
+void stack_push(self, move)
+{
+    // get pointer to stack index
+    // get pointer to move_stack
+    move_stack[++(*stack_index)] = move;
+}
+
+ // Takes in nothing
+ // Returns the last move in the move stack
+ // Alters the stack_index value
+unsigned long long stack_pop(self)
+{
+    // get pointer to stack index
+    // get pointer to move_stack
+    return(move_stack[(*stack_index)--]);
+}
+
 
 
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
