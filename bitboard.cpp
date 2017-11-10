@@ -44,8 +44,83 @@ class Engine
         void Engine();
         void Engine(unsigned long long *board_data);
 
+        // Get piece bitboards
+        unsigned long long get_all_white();
+        unsigned long long get_all_black();
+        unsigned long long get_all();
+
+        // pushing and popping moves from stack
+        void push_move(int move);
+        void pop_move(int move);
+
+        //printing
+        void print_chess_rep(unsigned long long num);
+
+        //move gen
+        int* generate_legal_moves(int color);
+
+
+        // TEMPORARILY PUBLIC
+
+
+        void init_engine();
+        void init_position();
+        void init_position(unsigned long long *board_data);
+        
+        // masks
+        void init_masks();
+        unsigned long long make_col_mask(unsigned long long mask);
+        void fill_col_mask_arr();
+        unsigned long long make_row_mask(unsigned long long mask);
+        void fill_row_mask_arr();
+        unsigned long long make_diag_left_mask(unsigned long long mask);
+        void fill_diag_left_mask_arr();
+        unsigned long long make_diag_right_mask(unsigned long long mask);
+        void fill_diag_right_mask_arr();
+
+        // maximum number of moves allowed in the game
+        int get_max_move_length();
+
+        // get rank/file/diag info
+        int get_rank(unsigned long long num);
+        int get_file(unsigned long long num);
+        int get_diag(int rank, int file);
+
+        // move encoding and decoding
+        int encode_move(int start, int end, int m_type, int piece, int promotion);
+        int decode_from(int move);
+        int decode_to(int move);
+        int decode_piece(int move);
+        int decode_promo(int move);
+
+        // pushing and popping moves from stack
+        void stack_push(move);
+        unsigned long long stack_pop();
+
+        // bitboard tricks
+        int lsb_digit(unsigned long long board);
+        unsigned long long lsb_board(unsigned long long board);
+        unsigned long long void msb(self);
+
+        // reversing and flipping
+        unsigned long long reverse_8_bits(unsigned long long x);
+        unsigned long long reverse_64_bits(unsigned long long x);
+        unsigned long long horizontal_flip(unsigned long long x);
+        unsigned long long vertical_flip(unsigned long long x);
+
+        // board helper functions
+        int get_square(int piece, int color);
+
+        //move gen helpers
+        bool check_legal(int move);
+        unsigned long long pinned_pieces(int color);
+        void generate_pre_check_moves(int color, int* move_list);
+        void extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo);
+
     private: 
         int max_move_length;
+        int move_arr_size;
+
         int stack_index;
         unsigned long long move_stack[]; 
         bool in_check;
@@ -55,15 +130,6 @@ class Engine
         unsigned long long *col_mask;
         unsigned long long *diag_left_mask;
         unsigned long long *diag_right_mask;
-
-        void init_engine();
-        void init_position();
-        void init_position(unsigned long long *board_data);
-        void init_masks();
-        void make_col_mask(unsigned long long mask);
-        void fill_col_mask_arr();
-        void make_row_mask(unsigned long long mask);
-        void fill_row_mask_arr();
 }
 
 void Engine::Engine()
@@ -72,25 +138,23 @@ void Engine::Engine()
     init_engine();
 }
 
-
-void Enigne::Engine(unsigned long long *board_data)
+void Engine::Engine(unsigned long long *board_data)
 {
     init_position(board_data);
     init_engine();
 }
 
-
-void Enigne::init_engine()
+void Engine::init_engine()
 {
     max_move_length = 500; // This assumes there are only 500 possible legal moves at any one time (affects move array intilization)
-    
+    move_arr_size = 500;
+
     move_stack[max_move_length] = {0};
     int stack_index = -1;
 
     in_check = false;
     init_masks();
 }
-
 
 void Engine::init_position()
 {
@@ -109,7 +173,6 @@ void Engine::init_position()
     pos.black_kings = 0b0001000000000000000000000000000000000000000000000000000000000000;
 }
 
-
 void Engine::init_position(unsigned long long *board_data)
 {
     pos.white_pawns = board_data[0];
@@ -126,7 +189,6 @@ void Engine::init_position(unsigned long long *board_data)
     pos.black_queens = board_data[10]; 
     pos.black_kings = board_data[11];
 }
-
 
 void Engine::init_masks()
 {
@@ -155,7 +217,6 @@ void Engine::init_masks()
     // [14] is top left corner
 }
 
-
 unsigned long long Engine::make_col_mask(unsigned long long mask)
 {
     for(int i = 0; i < 7; i++)
@@ -165,7 +226,6 @@ unsigned long long Engine::make_col_mask(unsigned long long mask)
     return(mask);
 }
 
-
 void Engine::fill_col_mask_arr()
 {
     for(int i = 0; i < 8; i++)
@@ -174,8 +234,7 @@ void Engine::fill_col_mask_arr()
     }
 }
 
-
-void Engine::make_row_mask(unsigned long long mask)
+unsigned long long Engine::make_row_mask(unsigned long long mask)
 {
     for(int i = 0; i < 7; i++)
     {
@@ -184,7 +243,6 @@ void Engine::make_row_mask(unsigned long long mask)
     return(mask);
 }
 
-
 void Engine::fill_row_mask_arr()
 {
     for(int i = 0; i < 8; i++)
@@ -192,7 +250,6 @@ void Engine::fill_row_mask_arr()
         row_mask[i] = make_row_mask(1ULL << 8*i);
     }
 }
-
 
 unsigned long long Engine::make_diag_left_mask(unsigned long long mask)
 {
@@ -260,7 +317,7 @@ void Engine::fill_diag_right_mask_arr()
 
 int Engine::get_max_move_length()
 {
-    return(self.max_move_length)
+    return(max_move_length)
 }
 
 unsigned long long Engine::get_all_white()
@@ -277,16 +334,14 @@ unsigned long long Engine::get_all_black()
 
 unsigned long long Engine::get_all()
 {
-    unsigned long long white = get_all_white();
-    unsigned long long black = get_all_black();
-    return(white | black);
+    return(get_all_white() | get_all_black());
 }
 
 
 // Takes in a 64 bit number with single bit
 // Returns the rank piece is on 0-7, bottom to top
 // Alters nothing
-int get_rank(int num)
+int get_rank(unsigned long long num)
 {
     unsigned long long max0 = 128; // 2^7
     if(num <= max0)
@@ -341,7 +396,7 @@ int get_rank(int num)
 // Takes in a 64 bit number with single bit
 // Returns the file piece is on 0-7, left to right
 // Alters nothing 
-int get_file(self,num)
+int get_file(unsigned long long num)
 {
     switch(num)
     {
@@ -442,7 +497,7 @@ int get_file(self,num)
 // Returns the left and right diagonal mask indexes as [left,right]
 // Alters nothing 
 
-int get_diag(self, rank, file)
+int get_diag(unsigned long long rank, unsigned long long file)
 {
     int total_val = rank+file;
     //Total val also equals left diag index
@@ -458,6 +513,7 @@ int get_diag(self, rank, file)
         return(diag[1])
 
     int diag[2] = {total_val,right};
+}
 
 // Takes in move information
 //     start int 0-63 
@@ -481,14 +537,7 @@ int Engine::encode_move(int start, int end, int m_type, int piece, int promotion
     int encode_promotion = promotion << 17;
     return(encode_start & encode_end & encode_type & encode_piece & encode_promotion);
 }
-    encode_start = np.uint8(start)
-    encode_end = np.uint16(end) << np.uint8(6)
-    encode_type = np.uint32(m_type) << np.uint8(12)
-    encode_piece = np.uint32(piece) << np.uint8(14)
-    encode_promotion = np.uint32(promotion) << np.uint(17)
-    return(encode_start & encode_end & encode_type & encode_piece & encode_promotion)
 
-    
 // Takes in a np.uint32 move
 // Returns square number moved piece originated from
 // Alters nothing
@@ -496,8 +545,6 @@ void Engine::decode_from(int move)
 {
     return(move & 63);
 }
-    return(move & np.uint8(63))
-
 
 // Takes in a np.uint32 move
 // Returns square number moved piece travels to
@@ -506,18 +553,14 @@ int Engine::decode_to(int move)
 {
     return((move >> 6) & 63);
 }
-    return((move >> np.uint8(6)) & np.uint8(63))
-
 
 // Takes in a np.uint32 move
 // Returns type of move made
 // Alters nothing
 int Engine::decode_type(int move)
 {
-
-}
     return((move >> 12) & 3);
-
+}   
 
 // Takes in a np.uint32 move
 // Returns any piece taken by move
@@ -526,7 +569,6 @@ int Engine::decode_piece(int move)
 {
     return((move >> 14) & 7);
 }
-    return((move >> np.uint8(14)) & np.uint8(7)) 
 
 // Takes in a np.uint32 move
 // Returns new piece pawn promoted to
@@ -535,34 +577,30 @@ int Engine::decode_promo(int move)
 {
     return((move >> 17) & 3);
 }
-    return((move >> np.uint8(17)) & np.uint8(3))
 
-
- // Takes in a move to be added to the move stack
- // Returns nothing
- // Alters the move stack and stack_index value
-void stack_push(self, move)
+// Takes in a move to be added to the move stack
+// Returns nothing
+// Alters the move stack and stack_index value
+void stack_push(int move)
 {
     // get pointer to stack index
     // get pointer to move_stack
     move_stack[++(*stack_index)] = move;
 }
 
-
- // Takes in nothing
- // Returns the last move in the move stack
- // Alters the stack_index value
-unsigned long long stack_pop(self)
+// Takes in nothing
+// Returns the last move in the move stack
+// Alters the stack_index value
+unsigned long long stack_pop()
 {
     // get pointer to stack index
     // get pointer to move_stack
     return(move_stack[(*stack_index)--]);
 }
 
-
- // Takes in a move, alters the BitboardEngine's representation to the NEXT state based on the CURRENT move action
- // Currently 
-void push_move(move)
+// Takes in a move, alters the BitboardEngine's representation to the NEXT state based on the CURRENT move action
+// Currently 
+void push_move(int move)
 {
     stack_push(move);
     int start = decode_from();
@@ -584,31 +622,36 @@ void push_move(move)
 
     // EDIT LOOKUP TABLE THAT THE FINAL SQUARE IS NOW NEW PIECE
     // self.edit_lookup(end,curr_piece)
-
-
 }
 
+// Takes in a move, alters the BitboardEngine's representation to the PREVIOUS state based on the LAST move action
+void Engine::pop_move(int move)
+{
+    //
+}
+
+//REWRITE
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
 // Example: the initial white_nights bitboard, the least significant 1 occurs at index 1 (...00001000010)
 // therefore simply return ((lots of zeros)00000000000010)
 // YOU MAY ASSUME A 1 EXISTS, (0000000000000000000) will not be given
-unsigned long long Engine::lsb_digit(unsigned long long num)
+int Engine::lsb_digit(unsigned long long board)
 {
-    return((num & -num).bit_length()-1);
+    return((board & -board).bit_length()-1);
 }
 
 // Takes in a bitboard
 // Returns a bitboard with soley the least significant bit = 1
 // All other bits = 0
 // Alters nothing
-unsigned long long Engine::lsb_board(unsigned long long num)
+unsigned long long Engine::lsb_board(unsigned long long board)
 {
-    return(num & -num);
+    return(board & -board);
 }
 
 
 // See above, except return the move_list significant bit bitboard
-void Engine::msb(self)
+void Engine::msb(unsigned long long board)
 {
     //
 }
@@ -616,48 +659,25 @@ void Engine::msb(self)
 
 // REWRITE
 // Reverses a uint8 number, like this (00110000 -> 00001100)
-void Engine::reverse_8_bit(int row)
-{
-    num = np.uint8(row)
-    reverse_num = np.uint8(row)
-    one_8 = np.uint8(1)
-    count = np.uint8(7);
+// void Engine::reverse_8_bit(int row)
+// {
+//     num = np.uint8(row)
+//     reverse_num = np.uint8(row)
+//     one_8 = np.uint8(1)
+//     count = np.uint8(7);
      
-    num = num >> one_8
-    while(num)
-    {
-        reverse_num = reverse_num << one_8;
-        reverse_num = reverse_num | (num & one_8);
-        num = num >> one_8;
-        count -= one_8;
-    }
-    reverse_num = reverse_num << count
-    return reverse_num
-    // return ~(np.uint8(255) - np.uint8(row))
-
-
-//REWRITE
-void Engine::print_chess_rep(unsigned long long num)
-{
-    for i in range(7, -1, -1)
-    {
-	shifter = np.uint64(8 * i)
-        row = (num & self.row_mask[i]) >> shifter
-        rev = self.reverse_8_bit(row)
-        print('{0}'.format(rev))
-    }
-}
-
-void Engine::print_chess_rep_byteswap(unsigned long long num)
-{
-    for i in range(7, -1, -1)
-    {
-        shifter = np.uint64(8 * i)
-        row = (num & self.row_mask[i]) >> shifter
-        rev = (row.byteswap() >> np.uint64(56))
-        print('{08b}'.format(rev))
-    }
-}
+//     num = num >> one_8
+//     while(num)
+//     {
+//         reverse_num = reverse_num << one_8;
+//         reverse_num = reverse_num | (num & one_8);
+//         num = num >> one_8;
+//         count -= one_8;
+//     }
+//     reverse_num = reverse_num << count
+//     return reverse_num
+//     // return ~(np.uint8(255) - np.uint8(row))
+// }
 
 unsigned long long Engine::reverse_8_bits(unsigned long long x)
 {
@@ -689,6 +709,17 @@ unsigned long long Engine::vertical_flip(unsigned long long x)
     return x.byteswap();
 }
 
+//REWRITE
+void Engine::print_chess_rep(unsigned long long board)
+{
+    for i in range(7, -1, -1)
+    {
+	   shifter = i * 8;
+        row = (board & self.row_mask[i]) >> shifter;
+        rev = self.reverse_8_bits(row);
+        print('{0}'.format(rev));
+    }
+}
 
 // East << 1
 // Southeast >> 7
@@ -698,21 +729,6 @@ unsigned long long Engine::vertical_flip(unsigned long long x)
 // Northwest << 7
 // North << 8
 // Northeast << 9
-
-
-// Takes in a move, alters the BitboardEngine's representation to the NEXT state based on the CURRENT move action
-void Engine::push_move(int move)
-{
-    //
-}
-
-
-// Takes in a move, alters the BitboardEngine's representation to the PREVIOUS state based on the LAST move action
-void Engine::pop_move(int move)
-{
-    //
-}
-
 
 int Engine::get_square(int piece, int color)
 {
@@ -753,7 +769,7 @@ bool Engine::check_legal(int move)
 
 
 // Returns a bitboard of pieces that are pinned against their king 
-unsigned long long pinned_pieces(int color)
+unsigned long long Engine::pinned_pieces(int color)
 {
     unsigned long long defenders;
     unsigned long long enemy_rook;
@@ -790,7 +806,7 @@ unsigned long long pinned_pieces(int color)
 
 
 // Generates and fills move_list for a color before checking checks
-void generate_pre_check_moves(int color, int* move_list)
+void Engine::generate_pre_check_moves(int color, int* move_list)
 {
     // king_loc = pre_check_king_bitboard();
     // return(all_pre_check_moves);
@@ -798,63 +814,50 @@ void generate_pre_check_moves(int color, int* move_list)
 
 
 // Generates and returns a list of legal moves for a color
-void generate_legal_moves(self, color)
+int* Engine::generate_legal_moves(int color)
 {
+    int *all_legal_moves = (int*) malloc(move_arr_size * sizeof(int)); 
+    int last_move_index = 0;
 
-}
-    all_legal_moves = np.zeros((self.max_move_length,), dtype='uint32')
-    last_move_index = 0
+    pinned = self.pinned_pieces(color);;
+    king_square = self.get_square(Piece.KING, color);
 
-    pinned = self.pinned_pieces(color);
-    king_square = self.get_square(Piece.KING, color)
-
-    if self.in_check
+    if(in_check)
     {
-
-    }
-        pass
         // generate<EVASIONS>(pos, moveList)         last_move_index returned
+    }
     else
     {
-
-    }
-        pass
         // generate<NON_EVASIONS>(pos, moveList)     last_move_index returned
-
-    move_iter = 0
-    while move_iter < last_move_index
-    {
-
     }
+
+    int move_iter = 0;
+    while(move_iter < last_move_index)
+    {
         move = all_legal_moves[move_iter]
         if (pinned or self.decode_from(move) == king_square or self.decode_type(move) == MoveType.ENPASSANT) and not self.check_legal(move)
         {
-
-        }
             last_move_index -= 1
             all_legal_moves[move_iter] = all_legal_moves[last_move_index]
-
+        }
+    }
     return all_legal_moves
-
-
-void pop_moves(self, moves, move_board, curr_pos, t, piece, promo)
-{
-
 }
+
+
+void Engine::extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo)
+{
     while(board)
     {
-
-    }
         move = self.lsb_board(board)
-        self.encode_move(self.lsb_digit(curr_pos), self.lsb_digit(move_board), t, piece, promo)
+        self.encode_move(lsb_digit(curr_pos), lsb_digit(move_board), t, piece, promo)
         board = board & (~move)
-
-
-void one_rook_attack(self, board, color)
-{
-
+    }
 }
-    pass
+
+
+unsigned long long Engine::one_rook_attack(self, board, color)
+{
     // row = np.uint64(2)
     // col = np.uint64(6)
 
@@ -863,15 +866,9 @@ void one_rook_attack(self, board, color)
 
     // // white
     // if color == 1
-    {
-
-    }
     //     own = self.get_all_white()
     // // black
     // else
-    {
-
-    }
     //     own = self.get_all_black()
 
     // o_rev = self.reverse_64_bits(o)
@@ -889,17 +886,12 @@ void one_rook_attack(self, board, color)
 
     // res = hori | vert
     // return res & ~own
+}
 
 
-// void rook_attacks(self, board, color)
-    {
-
-    }
+// void Engine::rook_attacks(self, board, color)
 //     new = np.uint64(0)
 //     while board
-{
-
-}
 //         s = self.lsb_board(board)
 //         p = (o - s - s) ^ self.reverse_64_bits((~o) - (~s) - (~s))
 //         new = new | p
@@ -907,39 +899,8 @@ void one_rook_attack(self, board, color)
 //     return new
 
 
-void one_bishop_attack(self, board, color)
+unsigned long long Engine::one_bishop_attack(self, board, color)
 {
-
-}
-    row = self.get_rank(board)
-    col = self.get_file(board)
-    line1_mask = self.get_diag(row, col, 0)
-    line2_mask = self.get_diag(row, col, 1)
-
-    s = board
-    o = self.get_all()
-
-    // white
-    if color == 1
-    {
-
-    }
-        own = self.get_all_white()
-    // black
-    else
-    {
-
-    }
-        own = self.get_all_black()
-
-    forward = o & self.diag_left_mask[line1_mask]
-    reverse = self.reverse_64_bits(forward)
-    forward = forward - s
-    reverse = reverse - self.reverse_64_bits(s)
-    forward = forward ^ self.reverse_64_bits(reverse)
-
-    return forward & self.diag_left_mask[line1_mask] & ~own
-
     // lineMask = diagonalMaskEx[sqOfSlider]; // excludes square of slider
     // slider   = singleBitboard[sqOfSlider]; // single bit 1 << sq, 2^sq
 
@@ -949,70 +910,64 @@ void one_bishop_attack(self, board, color)
     // reverse -= byteswap( slider  ); // o'-2s'
     // forward ^= byteswap( reverse );
     // return forward & lineMask;      // mask the line again
-
-
-void bishop_attacks(self, board, color)
-{
-
 }
-    pass
 
 
-void queen_attacks(self, board, color)
+
+// unsigned long long Engine::bishop_attacks(board, color)
+// {
+//     //
+// }
+
+
+unsigned long long Engine::queen_attacks(board, color)
 {
-
+    return(self.rook_attacks(board,color) | self.bishop_attacks(board,color));
 }
-    return(self.rook_attacks(board,color) | self.bishop_attacks(board,color))
 
 
 // Takes in king_rep (bitboad representing that colors king location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
 // Returns bitboard representing all possible pre_check moves that the king can make
-void pre_check_king_bitboard(self, king_rep, same_occupied)
+unsigned long long Engine::pre_check_king_bitboard(unsigned long long king_rep, same_occupied)
 {
+    unsigned long long king_mask_file_0 = king_rep & ~self.col_mask[0];
+    unsigned long long king_mask_file_7 = king_rep & ~self.col_mask[7];
 
-}
-    king_mask_file_0 = king_rep & ~self.col_mask[0]
-    king_mask_file_7 = king_rep & ~self.col_mask[7] 
+    unsigned long long spot_0 = king_mask_file_7 >> 7; // Southeast
+    unsigned long long spot_1 = king_rep >> 8; // South
+    unsigned long long spot_2 = king_mask_file_7 >> 9; // Southwest
+    unsigned long long spot_3 = king_mask_file_7 >> 1; // West
 
-    spot_0 = king_mask_file_7 >> np.uint64(7) // Southeast
-    spot_1 = king_rep >> np.uint64(8) // South
-    spot_2 = king_mask_file_7 >> np.uint64(9) // Southwest
-    spot_3 = king_mask_file_7 >> np.uint64(1) // West
+    unsigned long long spot_4 = king_mask_file_0 << 7; // Northwest
+    unsigned long long spot_5 = king_rep << 8; // North
+    unsigned long long spot_6 = king_mask_file_0 << 9; // Northeast
+    unsigned long long spot_7 = king_rep << 1; // East
 
-    spot_4 = king_mask_file_0 << np.uint64(7) // Northwest
-    spot_5 = king_rep << np.uint64(8) // North
-    spot_6 = king_mask_file_0 << np.uint64(9) // Northeast
-    spot_7 = king_rep << np.uint64(1) // East
-
-    king_moves = spot_0 | spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 | spot_7 
+    unsigned long long king_moves = spot_0 | spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 | spot_7;
 
     return king_moves & ~same_occupied;
-
-
-void get_king_moves(self, color)
-{
-
 }
-    if color == 1
-    {
 
+
+unsigned long long Engine::get_king_moves(int color)
+{
+    if(color == 1)
+    {
+        return(self.pre_check_king_bitboard(self.white_kings, self.get_all_white()));
     }
-        return self.pre_check_king_bitboard(self.white_kings, self.get_all_white())
     else
     {
-
+        return(self.pre_check_king_bitboard(self.black_kings, self.get_all_black()));
     }
-        return self.pre_check_king_bitboard(self.black_kings, self.get_all_black())
+}
 
 
 // Takes in night_rep (bitboad representing that colors night location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
 // Returns bitboard representing all possible pre_check moves that that night can make
-void pre_check_night(self, king_rep, same_occupied)
+void Engine::pre_check_night(unsigned long long king_rep, unsigned long long same_occupied)
 {
-
-}
     // pass
     // // spot_1_clip = tbls->ClearFile[FILE_A] & tbls->ClearFile[FILE_B];
     // // spot_2_clip = tbls->ClearFile[FILE_A];
@@ -1040,3 +995,4 @@ void pre_check_night(self, king_rep, same_occupied)
     // // /* compute only the places where the night can move and attack. The
     // //     caller will determine if this is a white or black night. */
     // // return nightValid & ~own_side;
+}
