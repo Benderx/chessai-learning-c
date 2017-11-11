@@ -482,15 +482,16 @@ void Engine::push_move(int move)
     unsigned long long bb_start = 2^start;
     unsigned long long bb_end = 2^end;
 
-    curr_piece = // LOOKUP VAL -> pointer to piece val on that square
-    curr_piece = (curr_piece | bb_end) & (get_uint64_max()-bb_start)
+    // curr_piece = // LOOKUP VAL -> pointer to piece val on that square
+    int curr_piece = (curr_piece | bb_end) & (get_uint64_max()-bb_start);
 
     // EDIT LOOKUP TABLE THAT THE USED SQUARE IS NOW EMPTY
     // self.edit_lookup(start,None)
 
-    if taken:
-        taken_piece = //LOOKUP VAL -> pointer to piece val on that square
-        taken_piece = taken_piece & (get_uint64_max()-bb_end)
+    int taken_piece;
+    if(taken):
+        // taken_piece = //LOOKUP VAL -> pointer to piece val on that square
+        taken_piece = taken_piece & (get_uint64_max()-bb_end);
 
     // EDIT LOOKUP TABLE THAT THE FINAL SQUARE IS NOW NEW PIECE
     // self.edit_lookup(end,curr_piece)
