@@ -1,144 +1,14 @@
-#include <iostream>
+#include "bitboard.hpp"
 
 
-enum Piece(Enum)
-{   NONE,
-    PAWN,
-    ROOK,
-    NIGHT,
-    BISHOP,
-    QUEEN,
-    KING
-};
 
-enum MoveType(Enum)
-{
-    REGULAR,
-    CASTLE,
-    ENPASSANT,
-    PROMOTION
-};
-
-
-struct position
-{
-    unsigned long long white_pawns; // 65280
-    unsigned long long white_rooks; // 129
-    unsigned long long white_nights; // 66
-    unsigned long long white_bishops;
-    unsigned long long white_queens;
-    unsigned long long white_kings;
-
-    unsigned long long black_pawns; // 71776119061217280
-    unsigned long long black_rooks; // 9295429630892703744
-    unsigned long long black_nights; // 4755801206503243776
-    unsigned long long black_bishops;
-    unsigned long long black_queens;
-    unsigned long long black_kings;
-};
-
-
-class Engine
-{
-    public:
-        void Engine();
-        void Engine(unsigned long long *board_data);
-
-        // Get piece bitboards
-        unsigned long long get_all_white();
-        unsigned long long get_all_black();
-        unsigned long long get_all();
-
-        // pushing and popping moves from stack
-        void push_move(int move);
-        void pop_move(int move);
-
-        //printing
-        void print_chess_rep(unsigned long long num);
-
-        //move gen
-        int* generate_legal_moves(int color);
-
-
-        // TEMPORARILY PUBLIC
-
-
-        void init_engine();
-        void init_position();
-        void init_position(unsigned long long *board_data);
-        
-        // masks
-        void init_masks();
-        unsigned long long make_col_mask(unsigned long long mask);
-        void fill_col_mask_arr();
-        unsigned long long make_row_mask(unsigned long long mask);
-        void fill_row_mask_arr();
-        unsigned long long make_diag_left_mask(unsigned long long mask);
-        void fill_diag_left_mask_arr();
-        unsigned long long make_diag_right_mask(unsigned long long mask);
-        void fill_diag_right_mask_arr();
-
-        // maximum number of moves allowed in the game
-        int get_max_move_length();
-
-        // get rank/file/diag info
-        int get_rank(unsigned long long num);
-        int get_file(unsigned long long num);
-        int get_diag(int rank, int file);
-
-        // move encoding and decoding
-        int encode_move(int start, int end, int m_type, int piece, int promotion);
-        int decode_from(int move);
-        int decode_to(int move);
-        int decode_piece(int move);
-        int decode_promo(int move);
-
-        // pushing and popping moves from stack
-        void stack_push(move);
-        unsigned long long stack_pop();
-
-        // bitboard tricks
-        int lsb_digit(unsigned long long board);
-        unsigned long long lsb_board(unsigned long long board);
-        unsigned long long void msb(self);
-
-        // reversing and flipping
-        unsigned long long reverse_8_bits(unsigned long long x);
-        unsigned long long reverse_64_bits(unsigned long long x);
-        unsigned long long horizontal_flip(unsigned long long x);
-        unsigned long long vertical_flip(unsigned long long x);
-
-        // board helper functions
-        int get_square(int piece, int color);
-
-        //move gen helpers
-        bool check_legal(int move);
-        unsigned long long pinned_pieces(int color);
-        void generate_pre_check_moves(int color, int* move_list);
-        void extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo);
-
-    private: 
-        int max_move_length;
-        int move_arr_size;
-
-        int stack_index;
-        unsigned long long move_stack[]; 
-        bool in_check;
-        position pos;
-
-        unsigned long long *row_mask;
-        unsigned long long *col_mask;
-        unsigned long long *diag_left_mask;
-        unsigned long long *diag_right_mask;
-}
-
-void Engine::Engine()
+Engine::Engine()
 {
     init_position();
     init_engine();
 }
 
-void Engine::Engine(unsigned long long *board_data)
+Engine::Engine(unsigned long long *board_data)
 {
     init_position(board_data);
     init_engine();
@@ -149,8 +19,8 @@ void Engine::init_engine()
     max_move_length = 500; // This assumes there are only 500 possible legal moves at any one time (affects move array intilization)
     move_arr_size = 500;
 
-    move_stack[max_move_length] = {0};
-    int stack_index = -1;
+    move_stack = (int*) malloc(max_move_length * sizeof(int));
+    stack_index = -1;
 
     in_check = false;
     init_masks();
@@ -286,7 +156,7 @@ void Engine::fill_diag_left_mask_arr()
 
 unsigned long long Engine::make_diag_right_mask(unsigned long long mask)
 {
-    unsigned long long TR_mask = ~((self.row_mask[7]) | (self.col_mask[7]));
+    unsigned long long TR_mask = ~((row_mask[7]) | (col_mask[7]));
     for(int i = 0; i < 8; i++)
     {
         mask = mask | ((mask & TR_mask) << 9);
@@ -310,14 +180,14 @@ void Engine::fill_diag_right_mask_arr()
 
     for(int j = 8; j < 15; j++)
     {
-        self.diag_right_mask[j] = make_diag_right_mask(start);
+        diag_right_mask[j] = make_diag_right_mask(start);
         start = start << 8;
     }          
 }
 
 int Engine::get_max_move_length()
 {
-    return(max_move_length)
+    return(max_move_length);
 }
 
 unsigned long long Engine::get_all_white()
@@ -343,49 +213,49 @@ unsigned long long Engine::get_all()
 // Alters nothing
 int get_rank(unsigned long long num)
 {
-    unsigned long long max0 = 128; // 2^7
+    unsigned long long max0 = 128ULL; // 2^7
     if(num <= max0)
     {
         return(0);
     }
 
-    unsigned long long max1 = 32768; // 2^15
+    unsigned long long max1 = 32768ULL; // 2^15
     if(num <= max1)
     {
         return(1);
     }
 
-    unsigned long long max2 = 8388608; // 2^23
+    unsigned long long max2 = 8388608ULL; // 2^23
     if(num <= max2)
     {
         return(2);
     }
 
-    unsigned long long max3 = 2147483648; // 2^31
+    unsigned long long max3 = 2147483648ULL; // 2^31
     if(num <= max3)
     {
         return(3);
     }
 
-    unsigned long long max4 = 549755813888; // 2^39
+    unsigned long long max4 = 549755813888ULL; // 2^39
     if(num <= max4)
     {
         return(4);
     }
 
-    unsigned long long max5 = 140737488355328; // 2^47
+    unsigned long long max5 = 140737488355328ULL; // 2^47
     if(num <= max5)
     {
         return(5);
     }
 
-    unsigned long long max6 = 36028797018963968; // 2^55
+    unsigned long long max6 = 36028797018963968ULL; // 2^55
     if(num <= max6)
     {
         return(6);
     }
 
-    unsigned long long max7 = 9223372036854775808; // 2^63
+    unsigned long long max7 = 9223372036854775808ULL; // 2^63
     if(num <= max7)
     {
         return(7);
@@ -401,91 +271,91 @@ int get_file(unsigned long long num)
     switch(num)
     {
         //2^[0, 8, 16, 24, 32, 40, 48, 56]
-        case 1:
-        case 256:
-        case 65536:
-        case 16777216:
-        case 4294967296:
-        case 1099511627776:
-        case 281474976710656:
-        case 72057594037927936:
+        case 1ULL:
+        case 256ULL:
+        case 65536ULL:
+        case 16777216ULL:
+        case 4294967296ULL:
+        case 1099511627776ULL:
+        case 281474976710656ULL:
+        case 72057594037927936ULL:
             return(0);
 
         //2^[1,9,17,25,33,41,49,57]
-        case 2:
-        case 512:
-        case 131072:
-        case 33554432:
-        case 8589934592:
-        case 2199023255552:
-        case 562949953421312:
-        case 144115188075855872:
+        case 2ULL:
+        case 512ULL:
+        case 131072ULL:
+        case 33554432ULL:
+        case 8589934592ULL:
+        case 2199023255552ULL:
+        case 562949953421312ULL:
+        case 144115188075855872ULL:
             return(1);
 
         // 2^[2,10,18,26,34,42,50,58]
-        case 4:
-        case 1024:
-        case 262144:
-        case 67108864:
-        case 17179869184:
-        case 4398046511104:
-        case 1125899906842624:
-        case 288230376151711744:
+        case 4ULL:
+        case 1024ULL:
+        case 262144ULL:
+        case 67108864ULL:
+        case 17179869184ULL:
+        case 4398046511104ULL:
+        case 1125899906842624ULL:
+        case 288230376151711744ULL:
             return(2);
 
         // 2^[3,11,19,27,35,43,51,59]    
-        case 8:
-        case 2048:
-        case 524288:
-        case 134217728:
-        case 34359738368:
-        case 8796093022208:
-        case 2251799813685248:
-        case 576460752303423488:
+        case 8ULL:
+        case 2048ULL:
+        case 524288ULL:
+        case 134217728ULL:
+        case 34359738368ULL:
+        case 8796093022208ULL:
+        case 2251799813685248ULL:
+        case 576460752303423488ULL:
             return(3);
 
         // 2^[4,12,20,28,36,44,52,60]
-        case 16:
-        case 4096:
-        case 1048576:
-        case 268435456:
-        case 68719476736:
-        case 17592186044416:
-        case 4503599627370496:
-        case 1152921504606846976:
+        case 16ULL:
+        case 4096ULL:
+        case 1048576ULL:
+        case 268435456ULL:
+        case 68719476736ULL:
+        case 17592186044416ULL:
+        case 4503599627370496ULL:
+        case 1152921504606846976ULL:
             return(4);
 
         // 2^[5,13,21,29,37,45,53,61]
-        case 32:
-        case 8192:
-        case 2097152:
-        case 536870912:
-        case 137438953472:
-        case 35184372088832:
-        case 9007199254740992:
-        case 2305843009213693952:
+        case 32ULL:
+        case 8192ULL:
+        case 2097152ULL:
+        case 536870912ULL:
+        case 137438953472ULL:
+        case 35184372088832ULL:
+        case 9007199254740992ULL:
+        case 2305843009213693952ULL:
             return(5);
 
         // 2^[6, 14, 22, 30, 38, 46, 54, 62]
-        case 64:
-        case 16384:
-        case 4194304:
-        case 1073741824:
-        case 274877906944:
-        case 70368744177664:
-        case 18014398509481984:
-        case 4611686018427387904:
+        case 64ULL:
+        case 16384ULL:
+        case 4194304ULL:
+        case 1073741824ULL:
+        case 274877906944ULL:
+        case 70368744177664ULL:
+        case 18014398509481984ULL:
+        case 4611686018427387904ULL:
             return(6);
 
         // 2^[7,15,23,31,39,47,55,63]
-        case 128:
-        case 32768:
-        case 8388608:
-        case 2147483648:
-        case 549755813888:
-        case 140737488355328:
-        case 36028797018963968:
-        case 9223372036854775808:
+        case 128ULL:
+        case 32768ULL:
+        case 8388608ULL:
+        case 2147483648ULL:
+        case 549755813888ULL:
+        case 140737488355328ULL:
+        case 36028797018963968ULL:
+        case 9223372036854775808ULL:
             return(7);
 
         default:
@@ -500,19 +370,21 @@ int get_file(unsigned long long num)
 int get_diag(unsigned long long rank, unsigned long long file)
 {
     int total_val = rank+file;
+    int right;
+
     //Total val also equals left diag index
 
     if(rank > file) //Above the middle diagonal line r = 7
     {
-        int right =7+(total_val-2*file);
+        right = 7+(total_val-2*file);
     }
     else //Below middle line
     {
-        int right = 7-(total_val-2*rank);
+        right = 7-(total_val-2*rank);
     }
-        return(diag[1])
 
-    int diag[2] = {total_val,right};
+    return(right);
+    // int diag[2] = {total_val,right};
 }
 
 // Takes in move information
@@ -541,7 +413,7 @@ int Engine::encode_move(int start, int end, int m_type, int piece, int promotion
 // Takes in a np.uint32 move
 // Returns square number moved piece originated from
 // Alters nothing
-void Engine::decode_from(int move)
+int Engine::decode_from(int move)
 {
     return(move & 63);
 }
@@ -581,44 +453,44 @@ int Engine::decode_promo(int move)
 // Takes in a move to be added to the move stack
 // Returns nothing
 // Alters the move stack and stack_index value
-void stack_push(int move)
+void Engine::stack_push(int move)
 {
     // get pointer to stack index
     // get pointer to move_stack
-    move_stack[++(*stack_index)] = move;
+    move_stack[++stack_index] = move;
 }
 
 // Takes in nothing
 // Returns the last move in the move stack
 // Alters the stack_index value
-unsigned long long stack_pop()
+unsigned long long Engine::stack_pop()
 {
     // get pointer to stack index
     // get pointer to move_stack
-    return(move_stack[(*stack_index)--]);
+    return(move_stack[stack_index--]);
 }
 
 // Takes in a move, alters the BitboardEngine's representation to the NEXT state based on the CURRENT move action
 // Currently 
-void push_move(int move)
+void Engine::push_move(int move)
 {
     stack_push(move);
-    int start = decode_from();
-    int end = decode_from();
-    int taken = decode_piece();
+    int start = decode_from(move);
+    int end = decode_from(move);
+    int taken = decode_piece(move);
 
     unsigned long long bb_start = 2^start;
     unsigned long long bb_end = 2^end;
 
     curr_piece = // LOOKUP VAL -> pointer to piece val on that square
-    curr_piece = (curr_piece | bb_end) & (self.get_uint64_max()-bb_start)
+    curr_piece = (curr_piece | bb_end) & (get_uint64_max()-bb_start)
 
     // EDIT LOOKUP TABLE THAT THE USED SQUARE IS NOW EMPTY
     // self.edit_lookup(start,None)
 
     if taken:
         taken_piece = //LOOKUP VAL -> pointer to piece val on that square
-        taken_piece = taken_piece & (self.get_uint64_max()-bb_end)
+        taken_piece = taken_piece & (get_uint64_max()-bb_end)
 
     // EDIT LOOKUP TABLE THAT THE FINAL SQUARE IS NOW NEW PIECE
     // self.edit_lookup(end,curr_piece)
@@ -691,7 +563,7 @@ unsigned long long Engine::reverse_64_bits(unsigned long long x)
     // return (x * np.uint64(0x0202020202) & np.uint64(0x010884422010)) % np.uint64(1023);
 }
 
-unsigned long long Engine::horizontal_flip(self, x)
+unsigned long long Engine::horizontal_flip(unsigned long long x)
 {
     unsigned long long k1 = 0x5555555555555555;
     unsigned long long k2 = 0x3333333333333333;
@@ -706,18 +578,27 @@ unsigned long long Engine::horizontal_flip(self, x)
 //REWRITE
 unsigned long long Engine::vertical_flip(unsigned long long x)
 {
-    return x.byteswap();
+    return _byteswap_uint64(x);
 }
 
 //REWRITE
 void Engine::print_chess_rep(unsigned long long board)
 {
-    for i in range(7, -1, -1)
+    // for i in range(7, -1, -1)
+    // {
+    //     shifter = i * 8;
+    //     row = (board & self.row_mask[i]) >> shifter;
+    //     rev = reverse_8_bits(row);
+    //     // print('{0}'.format(rev));
+    // }
+    unsigned long long to_print = horizontal_flip(board);
+    unsigned long long row;
+    for(int i = 7; i > -1; i--)
     {
-	   shifter = i * 8;
-        row = (board & self.row_mask[i]) >> shifter;
-        rev = self.reverse_8_bits(row);
-        print('{0}'.format(rev));
+        shifter = i * 8;
+        row = (to_print & row_mask[i]) >> shifter;
+        std::bitset<8> lol(row);
+        std::cout << lol << std::endl;
     }
 }
 
@@ -835,7 +716,7 @@ int* Engine::generate_legal_moves(int color)
     while(move_iter < last_move_index)
     {
         move = all_legal_moves[move_iter]
-        if (pinned or self.decode_from(move) == king_square or self.decode_type(move) == MoveType.ENPASSANT) and not self.check_legal(move)
+        if (pinned or decode_from(move) == king_square or self.decode_type(move) == MoveType.ENPASSANT) and not self.check_legal(move)
         {
             last_move_index -= 1
             all_legal_moves[move_iter] = all_legal_moves[last_move_index]
