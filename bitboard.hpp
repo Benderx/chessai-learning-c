@@ -1,3 +1,7 @@
+#ifndef BITBOARD_H
+#define BITBOARD_H
+
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,21 +10,21 @@
 
 enum Piece
 {   
-    NONE,
-    PAWN,
-    ROOK,
-    NIGHT,
-    BISHOP,
-    QUEEN,
-    KING
+    NONE = 0,
+    PAWN = 1,
+    ROOK = 2,
+    NIGHT = 3,
+    BISHOP = 4,
+    QUEEN = 5,
+    KING = 6
 };
 
 enum MoveType
 {
-    REGULAR,
-    CASTLE,
-    ENPASSANT,
-    PROMOTION
+    REGULAR = 0,
+    CASTLE = 1,
+    ENPASSANT = 2,
+    PROMOTION = 3
 };
 
 
@@ -50,6 +54,11 @@ class Engine
     public:
         Engine();
         Engine(unsigned long long *board_data);
+
+
+        //Vars
+        position pos;
+
 
         // Get piece bitboards
         unsigned long long get_all_white();
@@ -117,13 +126,24 @@ class Engine
         unsigned long long vertical_flip(unsigned long long x);
 
         // board helper functions
-        int get_square(int piece, int color);
+        int get_square(Piece piece, int color);
 
         //move gen helpers
         bool check_legal(int move);
         unsigned long long pinned_pieces(int color);
         void generate_pre_check_moves(int color, int* move_list);
         void extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo);
+
+        //attacks
+        unsigned long long one_rook_attack(unsigned long long board, int color);
+        unsigned long long rook_attacks(unsigned long long board, int color);
+        unsigned long long one_bishop_attack(unsigned long long board, int color);
+        unsigned long long bishop_attacks(unsigned long long board, int color);
+        unsigned long long queen_attacks(unsigned long long board, int color);
+        unsigned long long pre_check_king_bitboard(unsigned long long king_rep, unsigned long long same_occupied);
+        unsigned long long get_king_moves(int color);
+        void pre_check_night(unsigned long long king_rep, unsigned long long same_occupied);
+
 
     private: 
         int max_move_length;
@@ -132,10 +152,22 @@ class Engine
         int stack_index;
         int *move_stack; 
         bool in_check;
-        position pos;
 
         unsigned long long *row_mask;
         unsigned long long *col_mask;
         unsigned long long *diag_left_mask;
         unsigned long long *diag_right_mask;
+
+        const int index64[64] = {
+            0,  1, 48,  2, 57, 49, 28,  3,
+           61, 58, 50, 42, 38, 29, 17,  4,
+           62, 55, 59, 36, 53, 51, 43, 22,
+           45, 39, 33, 30, 24, 18, 12,  5,
+           63, 47, 56, 27, 60, 41, 37, 16,
+           54, 35, 52, 21, 44, 32, 23, 11,
+           46, 26, 40, 15, 34, 20, 31, 10,
+           25, 14, 19,  9, 13,  8,  7,  6
+        };
 };
+
+#endif

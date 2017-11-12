@@ -24,6 +24,7 @@ void Engine::init_engine()
 
     in_check = false;
     init_masks();
+
 }
 
 void Engine::init_position()
@@ -483,15 +484,17 @@ void Engine::push_move(int move)
     unsigned long long bb_end = 2^end;
 
     // curr_piece = // LOOKUP VAL -> pointer to piece val on that square
-    int curr_piece = (curr_piece | bb_end) & (get_uint64_max()-bb_start);
+    int curr_piece = (curr_piece | bb_end) & (UINT64_MAX-bb_start);
 
     // EDIT LOOKUP TABLE THAT THE USED SQUARE IS NOW EMPTY
     // self.edit_lookup(start,None)
 
     int taken_piece;
-    if(taken):
+    if(taken)
+    {
         // taken_piece = //LOOKUP VAL -> pointer to piece val on that square
-        taken_piece = taken_piece & (get_uint64_max()-bb_end);
+        taken_piece = taken_piece & (UINT64_MAX-bb_end);
+    }
 
     // EDIT LOOKUP TABLE THAT THE FINAL SQUARE IS NOW NEW PIECE
     // self.edit_lookup(end,curr_piece)
@@ -510,7 +513,8 @@ void Engine::pop_move(int move)
 // YOU MAY ASSUME A 1 EXISTS, (0000000000000000000) will not be given
 int Engine::lsb_digit(unsigned long long board)
 {
-    return((board & -board).bit_length()-1);
+    // return((board & -board).bit_length()-1);
+
 }
 
 // Takes in a bitboard
@@ -524,9 +528,9 @@ unsigned long long Engine::lsb_board(unsigned long long board)
 
 
 // See above, except return the move_list significant bit bitboard
-void Engine::msb(unsigned long long board)
+unsigned long long Engine::msb(unsigned long long board)
 {
-    //
+    return 0ULL;
 }
 
 
@@ -569,7 +573,7 @@ unsigned long long Engine::horizontal_flip(unsigned long long x)
     unsigned long long k1 = 0x5555555555555555;
     unsigned long long k2 = 0x3333333333333333;
     unsigned long long k4 = 0x0f0f0f0f0f0f0f0f;
-    unsigned long long x = ((x >> 1) & k1) + 2 * (x & k1);
+    x = ((x >> 1) & k1) + 2 * (x & k1);
     x = ((x >> 2) & k2) + 4 * (x & k2);
     x = ((x >> 4) & k4) + 16 * (x & k4);
     return x;
@@ -592,6 +596,8 @@ void Engine::print_chess_rep(unsigned long long board)
     //     rev = reverse_8_bits(row);
     //     // print('{0}'.format(rev));
     // }
+
+    int shifter;
     unsigned long long to_print = horizontal_flip(board);
     unsigned long long row;
     for(int i = 7; i > -1; i--)
@@ -612,16 +618,15 @@ void Engine::print_chess_rep(unsigned long long board)
 // North << 8
 // Northeast << 9
 
-int Engine::get_square(int piece, int color)
+int Engine::get_square(Piece piece, int color)
 {
     // white
     if(color)
     {
-        if(piece == Piece.KING)
+        if(piece == KING)
         {
             return pos.white_kings;
         }
-            return self.white_kings
         else
         {
             //
@@ -630,11 +635,10 @@ int Engine::get_square(int piece, int color)
     // black
     else
     {
-        if(piece == Piece.KING)
+        if(piece == KING)
         {
             return pos.black_kings;
         }
-            return self.black_kings
         else
         {
             //
@@ -701,8 +705,8 @@ int* Engine::generate_legal_moves(int color)
     int *all_legal_moves = (int*) malloc(move_arr_size * sizeof(int)); 
     int last_move_index = 0;
 
-    pinned = self.pinned_pieces(color);;
-    king_square = self.get_square(Piece.KING, color);
+    unsigned long long pinned = pinned_pieces(color);
+    int king_square = get_square(KING, color);
 
     if(in_check)
     {
@@ -716,29 +720,30 @@ int* Engine::generate_legal_moves(int color)
     int move_iter = 0;
     while(move_iter < last_move_index)
     {
-        move = all_legal_moves[move_iter]
-        if (pinned or decode_from(move) == king_square or self.decode_type(move) == MoveType.ENPASSANT) and not self.check_legal(move)
+        int move = all_legal_moves[move_iter];
+        if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
         {
-            last_move_index -= 1
-            all_legal_moves[move_iter] = all_legal_moves[last_move_index]
+            last_move_index -= 1;
+            all_legal_moves[move_iter] = all_legal_moves[last_move_index];
         }
     }
-    return all_legal_moves
+    return(all_legal_moves);
 }
 
 
-void Engine::extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo)
+void Engine::extract_moves(int* moves, unsigned long long board, int curr_pos, int t, int piece, int promo)
 {
+    int move;
     while(board)
     {
-        move = self.lsb_board(board)
-        self.encode_move(lsb_digit(curr_pos), lsb_digit(move_board), t, piece, promo)
-        board = board & (~move)
+        move = lsb_board(board);
+        encode_move(lsb_digit(curr_pos), lsb_digit(board), t, piece, promo);
+        board = board & (~move);
     }
 }
 
 
-unsigned long long Engine::one_rook_attack(self, board, color)
+unsigned long long Engine::one_rook_attack(unsigned long long board, int color)
 {
     // row = np.uint64(2)
     // col = np.uint64(6)
@@ -768,20 +773,27 @@ unsigned long long Engine::one_rook_attack(self, board, color)
 
     // res = hori | vert
     // return res & ~own
+    return 0ULL;
 }
 
 
-// void Engine::rook_attacks(self, board, color)
-//     new = np.uint64(0)
-//     while board
-//         s = self.lsb_board(board)
-//         p = (o - s - s) ^ self.reverse_64_bits((~o) - (~s) - (~s))
-//         new = new | p
-//         board = board - s
-//     return new
+unsigned long long Engine::rook_attacks(unsigned long long board, int color)
+{
+    unsigned long long n = 0ULL;
+    unsigned long long s;
+    unsigned long long p;
+    while(board)
+    {
+        s = lsb_board(board);
+        p = one_rook_attack(s, color);
+        n = n | p;
+        board = board - s;
+    }
+    return(n);
+}
 
 
-unsigned long long Engine::one_bishop_attack(self, board, color)
+unsigned long long Engine::one_bishop_attack(unsigned long long board, int color)
 {
     // lineMask = diagonalMaskEx[sqOfSlider]; // excludes square of slider
     // slider   = singleBitboard[sqOfSlider]; // single bit 1 << sq, 2^sq
@@ -792,29 +804,31 @@ unsigned long long Engine::one_bishop_attack(self, board, color)
     // reverse -= byteswap( slider  ); // o'-2s'
     // forward ^= byteswap( reverse );
     // return forward & lineMask;      // mask the line again
+    return 0ULL;
 }
 
 
 
-// unsigned long long Engine::bishop_attacks(board, color)
-// {
-//     //
-// }
-
-
-unsigned long long Engine::queen_attacks(board, color)
+unsigned long long Engine::bishop_attacks(unsigned long long board, int color)
 {
-    return(self.rook_attacks(board,color) | self.bishop_attacks(board,color));
+    
+    return 0ULL;
+}
+
+
+unsigned long long Engine::queen_attacks(unsigned long long board, int color)
+{
+    return(rook_attacks(board, color) | bishop_attacks(board, color));
 }
 
 
 // Takes in king_rep (bitboad representing that colors king location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
 // Returns bitboard representing all possible pre_check moves that the king can make
-unsigned long long Engine::pre_check_king_bitboard(unsigned long long king_rep, same_occupied)
+unsigned long long Engine::pre_check_king_bitboard(unsigned long long king_rep, unsigned long long same_occupied)
 {
-    unsigned long long king_mask_file_0 = king_rep & ~self.col_mask[0];
-    unsigned long long king_mask_file_7 = king_rep & ~self.col_mask[7];
+    unsigned long long king_mask_file_0 = king_rep & ~col_mask[0];
+    unsigned long long king_mask_file_7 = king_rep & ~col_mask[7];
 
     unsigned long long spot_0 = king_mask_file_7 >> 7; // Southeast
     unsigned long long spot_1 = king_rep >> 8; // South
@@ -836,11 +850,11 @@ unsigned long long Engine::get_king_moves(int color)
 {
     if(color == 1)
     {
-        return(self.pre_check_king_bitboard(self.white_kings, self.get_all_white()));
+        return(pre_check_king_bitboard(pos.white_kings, get_all_white()));
     }
     else
     {
-        return(self.pre_check_king_bitboard(self.black_kings, self.get_all_black()));
+        return(pre_check_king_bitboard(pos.black_kings, get_all_black()));
     }
 }
 
