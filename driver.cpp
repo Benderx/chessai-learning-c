@@ -1,4 +1,4 @@
-#include "bitboard.cpp"
+#include "bitboard.hpp"
 
 
 // g++ bitboard.hpp bitboard.cpp driver.cpp -std=c++14 -o run

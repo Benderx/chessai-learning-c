@@ -1,4 +1,5 @@
 #include "bitboard.hpp"
+#include <stdlib.h>
 
 
 
@@ -583,7 +584,15 @@ unsigned long long Engine::horizontal_flip(unsigned long long x)
 //REWRITE
 unsigned long long Engine::vertical_flip(unsigned long long x)
 {
-    return _byteswap_uint64(x);
+    // return __builtin_bswap64(x);
+    return (x >> 56) |
+          ((x<<40) & 0x00FF000000000000) |
+          ((x<<24) & 0x0000FF0000000000) |
+          ((x<<8) & 0x000000FF00000000) |
+          ((x>>8) & 0x00000000FF000000) |
+          ((x>>24) & 0x0000000000FF0000) |
+          ((x>>40) & 0x000000000000FF00) |
+          (x << 56);
 }
 
 //REWRITE
