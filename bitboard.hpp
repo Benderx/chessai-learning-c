@@ -136,15 +136,16 @@ class Engine
         void extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo);
 
         //attacks
-        unsigned long long white_pawn_moves(unsigned long long white_pawns, unsigned long long all_pieces, unsigned long long all_black_pieces);
+        unsigned long long pre_check_white_pawn_moves(unsigned long long white_pawns, unsigned long long all_pieces, unsigned long long all_black_pieces);
+        unsigned long long pre_check_black_pawn_moves(unsigned long long black_pawns, unsigned long long all_pieces, unsigned long long all_white_pieces);
+        unsigned long long pre_check_king_moves(unsigned long long king_rep, unsigned long long same_occupied);
+        unsigned long long pre_check_king_moves(int color);
+        void pre_check_night(unsigned long long king_rep, unsigned long long same_occupied);
         unsigned long long one_rook_attack(unsigned long long board, int color);
         unsigned long long rook_attacks(unsigned long long board, int color);
         unsigned long long one_bishop_attack(unsigned long long board, int color);
         unsigned long long bishop_attacks(unsigned long long board, int color);
         unsigned long long queen_attacks(unsigned long long board, int color);
-        unsigned long long pre_check_king_bitboard(unsigned long long king_rep, unsigned long long same_occupied);
-        unsigned long long get_king_moves(int color);
-        void pre_check_night(unsigned long long king_rep, unsigned long long same_occupied);
 
 
     private: 

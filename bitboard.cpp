@@ -835,7 +835,7 @@ void Engine::extract_moves(int* moves, unsigned long long board, int curr_pos, i
 
 
 // PAWNS
-unsigned long long Engine::white_pawn_moves(unsigned long long white_pawns, unsigned long long all_pieces, unsigned long long all_black_pieces)
+unsigned long long Engine::pre_check_white_pawn_moves(unsigned long long white_pawns, unsigned long long all_pieces, unsigned long long all_black_pieces)
 {
     // pushes all pawns forard one
     unsigned long long pawn_one = (white_pawns << 8) & ~all_pieces; 
@@ -863,6 +863,102 @@ unsigned long long Engine::white_pawn_moves(unsigned long long white_pawns, unsi
     return both_pawn | pawn_valid_attacks;
 }
 
+unsigned long long Engine::pre_check_black_pawn_moves(unsigned long long black_pawns, unsigned long long all_pieces, unsigned long long all_white_pieces)
+{
+    // pushes all pawns forard one
+    unsigned long long pawn_one = (black_pawns >> 8) & ~all_pieces; 
+
+    // get all pieces that may be able to move to rank 4 in a doble push, masks with rank 2 pawns first
+    unsigned long long pawn_two = ((pawn_one & row_mask[6]) >> 8) & ~all_pieces; 
+
+    // or together for total moves
+    unsigned long long both_pawn = pawn_one | pawn_two;
+
+    // attacks
+    // left side, filter out left file
+    unsigned long long pawn_left = (black_pawns & col_mask[0]) >> 7;
+
+    // right side, filter out right file
+    unsigned long long pawn_right = (black_pawns & col_mask[7]) >> 9;
+
+    // or together pawn attacks
+    unsigned long long pawn_attacks = pawn_left | pawn_right;
+
+    // and together black pieces
+    unsigned long long pawn_valid_attacks = pawn_attacks & all_white_pieces;
+
+    // or together moves and attacks and return
+    return both_pawn | pawn_valid_attacks;
+}
+
+// Takes in king_rep (bitboad representing that colors king location)
+// Takes in same_occupied (bitboard representing all pieces of that color)
+// Returns bitboard representing all possible pre_check moves that the king can make
+unsigned long long Engine::pre_check_king_moves(unsigned long long king_rep, unsigned long long same_occupied)
+{
+    unsigned long long king_mask_file_0 = king_rep & ~col_mask[0];
+    unsigned long long king_mask_file_7 = king_rep & ~col_mask[7];
+
+    unsigned long long spot_0 = king_mask_file_7 >> 7; // Southeast
+    unsigned long long spot_1 = king_rep >> 8; // South
+    unsigned long long spot_2 = king_mask_file_7 >> 9; // Southwest
+    unsigned long long spot_3 = king_mask_file_7 >> 1; // West
+
+    unsigned long long spot_4 = king_mask_file_0 << 7; // Northwest
+    unsigned long long spot_5 = king_rep << 8; // North
+    unsigned long long spot_6 = king_mask_file_0 << 9; // Northeast
+    unsigned long long spot_7 = king_rep << 1; // East
+
+    unsigned long long king_moves = spot_0 | spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 | spot_7;
+
+    return king_moves & ~same_occupied;
+}
+
+unsigned long long Engine::pre_check_king_moves(int color)
+{
+    if(color == 1)
+    {
+        return(pre_check_king_moves(pos.white_kings, get_all_white()));
+    }
+    else
+    {
+        return(pre_check_king_moves(pos.black_kings, get_all_black()));
+    }
+}
+
+// Takes in night_rep (bitboad representing that colors night location)
+// Takes in same_occupied (bitboard representing all pieces of that color)
+// Returns bitboard representing all possible pre_check moves that that night can make
+void Engine::pre_check_night(unsigned long long king_rep, unsigned long long same_occupied)
+{
+    // pass
+    // // spot_1_clip = tbls->ClearFile[FILE_A] & tbls->ClearFile[FILE_B];
+    // // spot_2_clip = tbls->ClearFile[FILE_A];
+    // // spot_3_clip = tbls->ClearFile[FILE_H];
+    // // spot_4_clip = tbls->ClearFile[FILE_H] & tbls->ClearFile[FILE_G];
+
+    // // spot_5_clip = tbls->ClearFile[FILE_H] & tbls->ClearFile[FILE_G];
+    // // spot_6_clip = tbls->ClearFile[FILE_H];
+    // // spot_7_clip = tbls->ClearFile[FILE_A];
+    // // spot_8_clip = tbls->ClearFile[FILE_A] & tbls->ClearFile[FILE_B];
+
+    // // spot_1 = (night_loc & spot_1_clip) << 6;
+    // // spot_2 = (night_loc & spot_2_clip) << 15;
+    // // spot_3 = (night_loc & spot_3_clip) << 17;
+    // // spot_4 = (night_loc & spot_4_clip) << 10;
+
+    // // spot_5 = (night_loc & spot_5_clip) >> 6;
+    // // spot_6 = (night_loc & spot_6_clip) >> 15;
+    // // spot_7 = (night_loc & spot_7_clip) >> 17;
+    // // spot_8 = (night_loc & spot_8_clip) >> 10;
+
+    // // nightValid = spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 |
+    // //                 spot_7 | spot_8;
+
+    // // /* compute only the places where the night can move and attack. The
+    // //     caller will determine if this is a white or black night. */
+    // // return nightValid & ~own_side;
+}
 
 unsigned long long Engine::one_rook_attack(unsigned long long board, int color)
 {
@@ -897,7 +993,6 @@ unsigned long long Engine::one_rook_attack(unsigned long long board, int color)
     return 0ULL;
 }
 
-
 unsigned long long Engine::rook_attacks(unsigned long long board, int color)
 {
     unsigned long long n = 0ULL;
@@ -913,7 +1008,6 @@ unsigned long long Engine::rook_attacks(unsigned long long board, int color)
     return(n);
 }
 
-
 unsigned long long Engine::one_bishop_attack(unsigned long long board, int color)
 {
     // lineMask = diagonalMaskEx[sqOfSlider]; // excludes square of slider
@@ -928,88 +1022,12 @@ unsigned long long Engine::one_bishop_attack(unsigned long long board, int color
     return 0ULL;
 }
 
-
-
 unsigned long long Engine::bishop_attacks(unsigned long long board, int color)
 {
-    
     return 0ULL;
 }
-
 
 unsigned long long Engine::queen_attacks(unsigned long long board, int color)
 {
     return(rook_attacks(board, color) | bishop_attacks(board, color));
-}
-
-
-// Takes in king_rep (bitboad representing that colors king location)
-// Takes in same_occupied (bitboard representing all pieces of that color)
-// Returns bitboard representing all possible pre_check moves that the king can make
-unsigned long long Engine::pre_check_king_bitboard(unsigned long long king_rep, unsigned long long same_occupied)
-{
-    unsigned long long king_mask_file_0 = king_rep & ~col_mask[0];
-    unsigned long long king_mask_file_7 = king_rep & ~col_mask[7];
-
-    unsigned long long spot_0 = king_mask_file_7 >> 7; // Southeast
-    unsigned long long spot_1 = king_rep >> 8; // South
-    unsigned long long spot_2 = king_mask_file_7 >> 9; // Southwest
-    unsigned long long spot_3 = king_mask_file_7 >> 1; // West
-
-    unsigned long long spot_4 = king_mask_file_0 << 7; // Northwest
-    unsigned long long spot_5 = king_rep << 8; // North
-    unsigned long long spot_6 = king_mask_file_0 << 9; // Northeast
-    unsigned long long spot_7 = king_rep << 1; // East
-
-    unsigned long long king_moves = spot_0 | spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 | spot_7;
-
-    return king_moves & ~same_occupied;
-}
-
-
-unsigned long long Engine::get_king_moves(int color)
-{
-    if(color == 1)
-    {
-        return(pre_check_king_bitboard(pos.white_kings, get_all_white()));
-    }
-    else
-    {
-        return(pre_check_king_bitboard(pos.black_kings, get_all_black()));
-    }
-}
-
-
-// Takes in night_rep (bitboad representing that colors night location)
-// Takes in same_occupied (bitboard representing all pieces of that color)
-// Returns bitboard representing all possible pre_check moves that that night can make
-void Engine::pre_check_night(unsigned long long king_rep, unsigned long long same_occupied)
-{
-    // pass
-    // // spot_1_clip = tbls->ClearFile[FILE_A] & tbls->ClearFile[FILE_B];
-    // // spot_2_clip = tbls->ClearFile[FILE_A];
-    // // spot_3_clip = tbls->ClearFile[FILE_H];
-    // // spot_4_clip = tbls->ClearFile[FILE_H] & tbls->ClearFile[FILE_G];
-
-    // // spot_5_clip = tbls->ClearFile[FILE_H] & tbls->ClearFile[FILE_G];
-    // // spot_6_clip = tbls->ClearFile[FILE_H];
-    // // spot_7_clip = tbls->ClearFile[FILE_A];
-    // // spot_8_clip = tbls->ClearFile[FILE_A] & tbls->ClearFile[FILE_B];
-
-    // // spot_1 = (night_loc & spot_1_clip) << 6;
-    // // spot_2 = (night_loc & spot_2_clip) << 15;
-    // // spot_3 = (night_loc & spot_3_clip) << 17;
-    // // spot_4 = (night_loc & spot_4_clip) << 10;
-
-    // // spot_5 = (night_loc & spot_5_clip) >> 6;
-    // // spot_6 = (night_loc & spot_6_clip) >> 15;
-    // // spot_7 = (night_loc & spot_7_clip) >> 17;
-    // // spot_8 = (night_loc & spot_8_clip) >> 10;
-
-    // // nightValid = spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 |
-    // //                 spot_7 | spot_8;
-
-    // // /* compute only the places where the night can move and attack. The
-    // //     caller will determine if this is a white or black night. */
-    // // return nightValid & ~own_side;
 }
