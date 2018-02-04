@@ -367,9 +367,11 @@ int get_file(unsigned long long num)
 
 // Takes in a rank, and file
 // Returns the left and right diagonal mask indexes as [left,right]
-// Alters nothing 
+// Alters nothing
+// Mallocs int array of size 2. Free when done
+// Look here for issues with diag, altered in confusion
 
-int get_diag(unsigned long long rank, unsigned long long file)
+int* get_diag(unsigned long long rank, unsigned long long file)
 {
     int total_val = rank+file;
     int right;
@@ -385,8 +387,11 @@ int get_diag(unsigned long long rank, unsigned long long file)
         right = 7-(total_val-2*rank);
     }
 
-    return(right);
-    // int diag[2] = {total_val,right};
+    int* diag = (int*) malloc(2 * sizeof(int));
+    diag[0] = total_val;
+    diag[1] = right;
+
+    return(diag);
 }
 
 // Takes in move information
