@@ -768,7 +768,7 @@ unsigned long long Engine::pre_check_white_pawn_moves(unsigned long long white_p
     // pushes all pawns forard one
     unsigned long long pawn_one = (white_pawns << 8) & ~all_pieces; 
 
-    // get all pieces that may be able to move to rank 4 in a doble push, masks with rank 2 pawns first
+    // get all pieces that may be able to move to rank 4 in a double push, masks with rank 2 pawns first
     unsigned long long pawn_two = ((pawn_one & row_mask[2]) << 8) & ~all_pieces; 
 
     // or together for total moves
@@ -776,10 +776,10 @@ unsigned long long Engine::pre_check_white_pawn_moves(unsigned long long white_p
 
     // attacks
     // left side, filter out left file
-    unsigned long long pawn_left = (white_pawns & col_mask[0]) << 7;
+    unsigned long long pawn_left = (white_pawns & ~col_mask[0]) << 7;
 
     // right side, filter out right file
-    unsigned long long pawn_right = (white_pawns & col_mask[7]) << 9;
+    unsigned long long pawn_right = (white_pawns & ~col_mask[7]) << 9;
 
     // or together pawn attacks
     unsigned long long pawn_attacks = pawn_left | pawn_right;
@@ -796,18 +796,18 @@ unsigned long long Engine::pre_check_black_pawn_moves(unsigned long long black_p
     // pushes all pawns forard one
     unsigned long long pawn_one = (black_pawns >> 8) & ~all_pieces; 
 
-    // get all pieces that may be able to move to rank 4 in a doble push, masks with rank 2 pawns first
-    unsigned long long pawn_two = ((pawn_one & row_mask[6]) >> 8) & ~all_pieces; 
+    // get all pieces that may be able to move to rank 4 in a double push, masks with rank 2 pawns first
+    unsigned long long pawn_two = ((pawn_one & row_mask[5]) >> 8) & ~all_pieces; 
 
     // or together for total moves
     unsigned long long both_pawn = pawn_one | pawn_two;
 
     // attacks
     // left side, filter out left file
-    unsigned long long pawn_left = (black_pawns & col_mask[0]) >> 7;
+    unsigned long long pawn_left = (black_pawns & ~col_mask[0]) >> 7;
 
     // right side, filter out right file
-    unsigned long long pawn_right = (black_pawns & col_mask[7]) >> 9;
+    unsigned long long pawn_right = (black_pawns & ~col_mask[7]) >> 9;
 
     // or together pawn attacks
     unsigned long long pawn_attacks = pawn_left | pawn_right;
