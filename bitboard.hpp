@@ -82,7 +82,7 @@ class Engine
         void reset_engine();
         void init_position();
         void init_position(unsigned long long *board_data);
-        void init_lsb_lookup()
+        void init_lsb_lookup();
         
         // masks
         void init_masks();
