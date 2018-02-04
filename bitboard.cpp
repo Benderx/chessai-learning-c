@@ -373,9 +373,10 @@ int get_file(unsigned long long num)
 
 // Takes in a rank, and file
 // Returns the left and right diagonal mask indexes as [left,right]
-// Alters nothing 
-
-int get_diag(unsigned long long rank, unsigned long long file)
+// Alters nothing
+// Mallocs int array of size 2. Free when done
+// Look here for issues with diag, altered in confusion
+int* get_diag(unsigned long long rank, unsigned long long file)
 {
     int total_val = rank+file;
     int right;
@@ -391,8 +392,11 @@ int get_diag(unsigned long long rank, unsigned long long file)
         right = 7-(total_val-2*rank);
     }
 
-    return(right);
-    // int diag[2] = {total_val,right};
+    int* diag = (int*) malloc(2 * sizeof(int));
+    diag[0] = total_val;
+    diag[1] = right;
+
+    return(diag);
 }
 
 // Takes in move information
@@ -400,13 +404,13 @@ int get_diag(unsigned long long rank, unsigned long long file)
 // Square moved piece started on
 // //     end int 0-63 
 // Square moved piece ended on
-// //     m_type int 0-3 
-//Type of move made
+// //     m_type int 0-63 
+// Type of move made
 // //     piece int 0-4 
 // Piece taken in move
 // //     promotion int 2-5 
 // Piece to promote pawn to
-// Return a np.uint32 representing all above info
+// Return an int representing all above info
 // Alters nothing
 int Engine::encode_move(int start, int end, int m_type, int piece, int promotion)
 {
@@ -418,15 +422,15 @@ int Engine::encode_move(int start, int end, int m_type, int piece, int promotion
     return(encode_start & encode_end & encode_type & encode_piece & encode_promotion);
 }
 
-// Takes in a np.uint32 move
-// Returns square number moved piece originated from
+// Takes in an int move
+// Returns square number the moved piece originated from
 // Alters nothing
 int Engine::decode_from(int move)
 {
     return(move & 63);
 }
 
-// Takes in a np.uint32 move
+// Takes in an int move
 // Returns square number moved piece travels to
 // Alters nothing
 int Engine::decode_to(int move)
@@ -434,7 +438,7 @@ int Engine::decode_to(int move)
     return((move >> 6) & 63);
 }
 
-// Takes in a np.uint32 move
+// Takes in an int move
 // Returns type of move made
 // Alters nothing
 int Engine::decode_type(int move)
@@ -442,7 +446,7 @@ int Engine::decode_type(int move)
     return((move >> 12) & 3);
 }   
 
-// Takes in a np.uint32 move
+// Takes in an int move
 // Returns any piece taken by move
 // Alters nothing
 int Engine::decode_piece(int move)
@@ -450,7 +454,7 @@ int Engine::decode_piece(int move)
     return((move >> 14) & 7);
 }
 
-// Takes in a np.uint32 move
+// Takes in an int move
 // Returns new piece pawn promoted to
 // Alters nothing
 int Engine::decode_promo(int move)
