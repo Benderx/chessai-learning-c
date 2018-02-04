@@ -37,8 +37,13 @@ int print_all_pieces(Engine *e)
 int test_pawn(Engine *e)
 {
     e->pos.white_pawns = 0b0000000000000000000000000000000000010000000000001110111100000000;
+    e->pos.black_pawns = 0b0000000011110111000000000000100000000000000000000000000000000000;
+
     print_pieces(e, "white", "pawns", e->pos.white_pawns);
+    print_pieces(e, "black", "pawns", e->pos.black_pawns);
+
     print_pieces(e, "white", "pawn moves", e->pre_check_white_pawn_moves(e->pos.white_pawns, e->get_all(), e->get_all_black()));
+    print_pieces(e, "black", "pawn moves", e->pre_check_black_pawn_moves(e->pos.black_pawns, e->get_all(), e->get_all_white()));
 }
 
 
