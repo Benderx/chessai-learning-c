@@ -68,6 +68,44 @@ void Engine::init_position(unsigned long long *board_data)
     pos.black_kings = board_data[11];
 }
 
+void Engine::init_lsb_lookup()
+{
+    std::unordered_map <unsigned long long, int> lsb_lookup;
+    lsb_lookup = 
+    {
+        {,0},
+        {,1},
+        {,2},
+        {,3},
+        {,4},
+        {,5},
+        {,6},
+        {,7},
+        {,8},
+        {,9},
+        {,10},
+        {,11},
+        {,12},
+        {,13},
+        {,14},
+        {,15},
+        {,16},
+        {,17},
+        {,18},
+        {,19},
+        {,20},
+        {,21},
+        {,22},
+        {,23},
+        {,24},
+        {,25},
+        {,26},
+        {,27},
+        {,28},
+        {,29},
+    }
+}
+
 void Engine::init_masks()
 {
     row_mask = (unsigned long long*) malloc(8 * sizeof(unsigned long long));    
