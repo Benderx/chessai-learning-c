@@ -399,7 +399,7 @@ int* get_diag(unsigned long long rank, unsigned long long file)
 // Square moved piece started on
 // //     end int 0-63 
 // Square moved piece ended on
-// //     m_type int 0-3 
+// //     m_type int 0-63 
 //Type of move made
 // //     piece int 0-4 
 // Piece taken in move
