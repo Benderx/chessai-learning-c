@@ -79,6 +79,7 @@ class Engine
 
 
         void init_engine();
+        void reset_engine();
         void init_position();
         void init_position(unsigned long long *board_data);
         
@@ -134,6 +135,7 @@ class Engine
         void extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo);
 
         //attacks
+        unsigned long long white_pawn_moves(unsigned long long white_pawns, unsigned long long all_pieces, unsigned long long all_black_pieces);
         unsigned long long one_rook_attack(unsigned long long board, int color);
         unsigned long long rook_attacks(unsigned long long board, int color);
         unsigned long long one_bishop_attack(unsigned long long board, int color);
