@@ -34,7 +34,7 @@ int print_all_pieces(Engine *e)
     print_pieces(e, c, "pawns", e->pos.black_pawns);
 }
 
-int test_pawn(Engine *e)
+int test_pawn_moves(Engine *e)
 {
     e->pos.white_pawns = 0b0000000000000000000000000000000000010000000000001110111100000000;
     e->pos.black_pawns = 0b0000000011110111000000000000100000000000000000000000000000000000;
@@ -46,16 +46,30 @@ int test_pawn(Engine *e)
     print_pieces(e, "black", "pawn moves", e->pre_check_black_pawn_moves(e->pos.black_pawns, e->get_all(), e->get_all_white()));
 }
 
+int test_king_moves(Engine *e)
+{
+    e->pos.white_kings = 0b0000000000000000000000000000000000000000000100000000000000000000;
+    e->pos.black_kings = 0b0000000000000000000100000000000000000000000000000000000000000000;
+
+    print_pieces(e, "white", "kings", e->pos.white_kings);
+    print_pieces(e, "black", "kings", e->pos.black_kings);
+
+    print_pieces(e, "white", "kings moves", e->pre_check_king_moves(1));
+    print_pieces(e, "black", "kings moves", e->pre_check_king_moves(0));
+}
 
 int main()
 {
     Engine *e = new Engine();
     print_all_pieces(e);
 
-    std::cout << "testing pawn" << std::endl;
-    test_pawn(e);
+    std::cout << "testing pawn moves" << std::endl;
+    test_pawn_moves(e);
 
     e->reset_engine();
+
+    std::cout << "testing king moves" << std::endl;
+    test_king_moves(e);
 
     return 0;
 }
