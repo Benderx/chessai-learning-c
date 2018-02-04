@@ -792,85 +792,6 @@ unsigned long long Engine::white_pawn_moves(unsigned long long white_pawns, unsi
 }
 
 
-unsigned long long Engine::one_rook_attack(unsigned long long board, int color)
-{
-    // row = np.uint64(2)
-    // col = np.uint64(6)
-
-    // s = board
-    // o = self.get_all()
-
-    // // white
-    // if color == 1
-    //     own = self.get_all_white()
-    // // black
-    // else
-    //     own = self.get_all_black()
-
-    // o_rev = self.reverse_64_bits(o)
-    // s_rev = self.reverse_64_bits(s)
-    // two = np.uint64(2)
-
-    // hori = (o - two*s) ^ self.reverse_64_bits(o_rev - two*s_rev)
-    // hori = hori & self.row_mask[row]
-
-
-    // o_mask = o & self.col_mask[col]
-    // o_rev_mask = self.reverse_64_bits(o_mask)
-    // vert = (o_mask - two*s) ^ self.reverse_64_bits(o_rev_mask - two*s_rev)
-    // vert = vert & self.col_mask[col]
-
-    // res = hori | vert
-    // return res & ~own
-    return 0ULL;
-}
-
-
-unsigned long long Engine::rook_attacks(unsigned long long board, int color)
-{
-    unsigned long long n = 0ULL;
-    unsigned long long s;
-    unsigned long long p;
-    while(board)
-    {
-        s = lsb_board(board);
-        p = one_rook_attack(s, color);
-        n = n | p;
-        board = board - s;
-    }
-    return(n);
-}
-
-
-unsigned long long Engine::one_bishop_attack(unsigned long long board, int color)
-{
-    // lineMask = diagonalMaskEx[sqOfSlider]; // excludes square of slider
-    // slider   = singleBitboard[sqOfSlider]; // single bit 1 << sq, 2^sq
-
-    // forward  = occ & lineMask; // also performs the first subtraction by clearing the s in o
-    // reverse  = byteswap( forward ); // o'-s'
-    // forward -=         ( slider  ); // o -2s
-    // reverse -= byteswap( slider  ); // o'-2s'
-    // forward ^= byteswap( reverse );
-    // return forward & lineMask;      // mask the line again
-    return 0ULL;
-}
-
-
-
-unsigned long long Engine::bishop_attacks(unsigned long long board, int color)
-{
-    
-    return 0ULL;
-}
-
-
-unsigned long long Engine::queen_attacks(unsigned long long board, int color)
-{
-    return(rook_attacks(board, color) | bishop_attacks(board, color));
-}
-
-
 // Takes in king_rep (bitboad representing that colors king location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
 // Returns bitboard representing all possible pre_check moves that the king can make
@@ -894,7 +815,6 @@ unsigned long long Engine::pre_check_king_bitboard(unsigned long long king_rep, 
     return king_moves & ~same_occupied;
 }
 
-
 unsigned long long Engine::get_king_moves(int color)
 {
     if(color == 1)
@@ -906,7 +826,6 @@ unsigned long long Engine::get_king_moves(int color)
         return(pre_check_king_bitboard(pos.black_kings, get_all_black()));
     }
 }
-
 
 // Takes in night_rep (bitboad representing that colors night location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
@@ -940,4 +859,76 @@ void Engine::pre_check_night(unsigned long long king_rep, unsigned long long sam
     // // /* compute only the places where the night can move and attack. The
     // //     caller will determine if this is a white or black night. */
     // // return nightValid & ~own_side;
+}
+
+unsigned long long Engine::one_rook_attack(unsigned long long board, int color)
+{
+    // row = np.uint64(2)
+    // col = np.uint64(6)
+
+    // s = board
+    // o = self.get_all()
+
+    // // white
+    // if color == 1
+    //     own = self.get_all_white()
+    // // black
+    // else
+    //     own = self.get_all_black()
+
+    // o_rev = self.reverse_64_bits(o)
+    // s_rev = self.reverse_64_bits(s)
+    // two = np.uint64(2)
+
+    // hori = (o - two*s) ^ self.reverse_64_bits(o_rev - two*s_rev)
+    // hori = hori & self.row_mask[row]
+
+
+    // o_mask = o & self.col_mask[col]
+    // o_rev_mask = self.reverse_64_bits(o_mask)
+    // vert = (o_mask - two*s) ^ self.reverse_64_bits(o_rev_mask - two*s_rev)
+    // vert = vert & self.col_mask[col]
+
+    // res = hori | vert
+    // return res & ~own
+    return 0ULL;
+}
+
+unsigned long long Engine::rook_attacks(unsigned long long board, int color)
+{
+    unsigned long long n = 0ULL;
+    unsigned long long s;
+    unsigned long long p;
+    while(board)
+    {
+        s = lsb_board(board);
+        p = one_rook_attack(s, color);
+        n = n | p;
+        board = board - s;
+    }
+    return(n);
+}
+
+unsigned long long Engine::one_bishop_attack(unsigned long long board, int color)
+{
+    // lineMask = diagonalMaskEx[sqOfSlider]; // excludes square of slider
+    // slider   = singleBitboard[sqOfSlider]; // single bit 1 << sq, 2^sq
+
+    // forward  = occ & lineMask; // also performs the first subtraction by clearing the s in o
+    // reverse  = byteswap( forward ); // o'-s'
+    // forward -=         ( slider  ); // o -2s
+    // reverse -= byteswap( slider  ); // o'-2s'
+    // forward ^= byteswap( reverse );
+    // return forward & lineMask;      // mask the line again
+    return 0ULL;
+}
+
+unsigned long long Engine::bishop_attacks(unsigned long long board, int color)
+{
+    return 0ULL;
+}
+
+unsigned long long Engine::queen_attacks(unsigned long long board, int color)
+{
+    return(rook_attacks(board, color) | bishop_attacks(board, color));
 }
