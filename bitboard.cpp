@@ -791,11 +791,10 @@ unsigned long long Engine::white_pawn_moves(unsigned long long white_pawns, unsi
     return both_pawn | pawn_valid_attacks;
 }
 
-
 // Takes in king_rep (bitboad representing that colors king location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
 // Returns bitboard representing all possible pre_check moves that the king can make
-unsigned long long Engine::pre_check_king_bitboard(unsigned long long king_rep, unsigned long long same_occupied)
+unsigned long long Engine::pre_check_king_moves(unsigned long long king_rep, unsigned long long same_occupied)
 {
     unsigned long long king_mask_file_0 = king_rep & ~col_mask[0];
     unsigned long long king_mask_file_7 = king_rep & ~col_mask[7];
@@ -815,15 +814,15 @@ unsigned long long Engine::pre_check_king_bitboard(unsigned long long king_rep, 
     return king_moves & ~same_occupied;
 }
 
-unsigned long long Engine::get_king_moves(int color)
+unsigned long long Engine::pre_check_king_moves(int color)
 {
     if(color == 1)
     {
-        return(pre_check_king_bitboard(pos.white_kings, get_all_white()));
+        return(pre_check_king_moves(pos.white_kings, get_all_white()));
     }
     else
     {
-        return(pre_check_king_bitboard(pos.black_kings, get_all_black()));
+        return(pre_check_king_moves(pos.black_kings, get_all_black()));
     }
 }
 
