@@ -27,7 +27,6 @@ enum MoveType
     PROMOTION = 3
 };
 
-
 struct position
 {
     unsigned long long white_pawns; // 65280
