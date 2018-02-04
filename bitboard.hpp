@@ -99,7 +99,7 @@ class Engine
         // get rank/file/diag info
         int get_rank(unsigned long long num);
         int get_file(unsigned long long num);
-        int get_diag(int rank, int file);
+        int* get_diag(int rank, int file);
 
         // move encoding and decoding
         int encode_move(int start, int end, int m_type, int piece, int promotion);
