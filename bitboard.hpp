@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <bitset>
+#include <unordered_map>
 
 
 enum Piece
@@ -166,6 +167,7 @@ class Engine
         unsigned long long *col_mask;
         unsigned long long *diag_left_mask;
         unsigned long long *diag_right_mask;
+        std::unordered_map<unsigned long long, int> lsb_lookup;
 
         const int index64[64] = {
             0,  1, 48,  2, 57, 49, 28,  3,

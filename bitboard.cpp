@@ -9,12 +9,14 @@ Engine::Engine()
 {
     init_position();
     init_engine();
+    init_lsb_lookup();
 }
 
 Engine::Engine(unsigned long long *board_data)
 {
     init_position(board_data);
     init_engine();
+    init_lsb_lookup();
 }
 
 void Engine::init_engine()
@@ -72,8 +74,6 @@ void Engine::init_position(unsigned long long *board_data)
 
 void Engine::init_lsb_lookup()
 {
-    std::unordered_map<unsigned long long, int> lsb_lookup;
-    
     for(int i=0;i<63;i++)
     {
         lsb_lookup.insert({(unsigned long long) std::pow(2,i),i});
@@ -536,8 +536,7 @@ void Engine::pop_move(int move)
 // YOU MAY ASSUME A 1 EXISTS, (0000000000000000000) will not be given
 int Engine::lsb_digit(unsigned long long board)
 {
-    // return((board & -board).bit_length()-1);
-
+    return(lsb_lookup[lsb_board(board)]);
 }
 
 // Takes in a bitboard
