@@ -54,8 +54,20 @@ int test_king_moves(Engine *e)
     print_pieces(e, "white", "kings", e->pos.white_kings);
     print_pieces(e, "black", "kings", e->pos.black_kings);
 
-    print_pieces(e, "white", "kings moves", e->pre_check_king_moves(1));
-    print_pieces(e, "black", "kings moves", e->pre_check_king_moves(0));
+    print_pieces(e, "white", "king moves", e->pre_check_king_moves(1));
+    print_pieces(e, "black", "king moves", e->pre_check_king_moves(0));
+}
+
+int test_night_moves(Engine *e)
+{
+    e->pos.white_kings = 0b0000000000000000000000000000000000000000001000000000000000000000;
+    e->pos.black_kings = 0b0000000000000000000100000000000000000000000000000000000000000000;
+
+    print_pieces(e, "white", "nights", e->pos.white_nights);
+    print_pieces(e, "black", "nights", e->pos.black_nights);
+
+    print_pieces(e, "white", "night moves", e->pre_check_king_moves(1));
+    print_pieces(e, "black", "night moves", e->pre_check_king_moves(0));
 }
 
 int main()
@@ -65,11 +77,15 @@ int main()
 
     std::cout << "testing pawn moves" << std::endl;
     test_pawn_moves(e);
-
     e->reset_engine();
 
     std::cout << "testing king moves" << std::endl;
     test_king_moves(e);
+    e->reset_engine();
+
+    std::cout << "testing night moves" << std::endl;
+    test_king_moves(e);
+    e->reset_engine();
 
     return 0;
 }
