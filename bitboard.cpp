@@ -910,38 +910,6 @@ unsigned long long Engine::pre_check_night(int color)
     }
 }
 
-// Takes in night_rep (bitboad representing that colors night location)
-// Takes in same_occupied (bitboard representing all pieces of that color)
-// Returns bitboard representing all possible pre_check moves that that night can make
-void Engine::pre_check_night(unsigned long long nights, unsigned long long own_occupied)
-{
-    // pass
-    unsigned long long spot_1_clip = col_mask[0] & col_mask[1];
-    unsigned long long spot_2_clip = col_mask[0];
-    unsigned long long spot_3_clip = col_mask[7];
-    unsigned long long spot_4_clip = col_mask[7] & col_mask[6];
-
-    unsigned long long spot_5_clip = col_mask[7] & col_mask[6];
-    unsigned long long spot_6_clip = col_mask[7];
-    unsigned long long spot_7_clip = col_mask[0];
-    unsigned long long spot_8_clip = col_mask[0] & col_mask[1];
-
-    unsigned long long spot_1 = (nights & spot_1_clip) << 6;
-    unsigned long long spot_2 = (nights & spot_2_clip) << 15;
-    unsigned long long spot_3 = (nights & spot_3_clip) << 17;
-    unsigned long long spot_4 = (nights & spot_4_clip) << 10;
-
-    unsigned long long spot_5 = (nights & spot_5_clip) >> 6;
-    unsigned long long spot_6 = (nights & spot_6_clip) >> 15;
-    unsigned long long spot_7 = (nights & spot_7_clip) >> 17;
-    unsigned long long spot_8 = (nights & spot_8_clip) >> 10;
-
-    unsigned long long night_valids = spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 | spot_7 | spot_8;
-
-    // and to elimate attacking own pieces
-    return night_valids & ~own_occupied;
-}
-
 unsigned long long Engine::one_rook_attack(unsigned long long board, int color)
 {
     // row = np.uint64(2)
