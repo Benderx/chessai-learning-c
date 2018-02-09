@@ -143,8 +143,8 @@ class Engine
         unsigned long long pre_check_king_moves(unsigned long long king_rep, unsigned long long same_occupied);
         unsigned long long pre_check_king_moves(int color);
 
-        unsigned long long pre_check_night(unsigned long long nights, unsigned long long own_occupied);
-        unsigned long long pre_check_night(int color);
+        unsigned long long pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied);
+        unsigned long long pre_check_night_moves(int color);
 
         unsigned long long one_rook_attack(unsigned long long board, int color);
         unsigned long long rook_attacks(unsigned long long board, int color);

@@ -1,0 +1,13 @@
+general notes:
+	white is 1
+	black is 0
+
+
+probable bug:
+	// curr_piece = // LOOKUP VAL -> pointer to piece val on that square
+	    int curr_piece = (curr_piece | bb_end) & (UINT64_MAX-bb_start);
+	why curr_piece | with itself
+	before it is assigned to anything
+	i think theres a logic error there, its in Engine::push_move
+	happens again here,         // taken_piece = //LOOKUP VAL -> pointer to piece val on that square
+	        taken_piece = taken_piece & (UINT64_MAX-bb_end);

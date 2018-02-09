@@ -66,8 +66,8 @@ void test_night_moves(Engine *e)
     print_pieces(e, "white", "nights", e->pos.white_nights);
     print_pieces(e, "black", "nights", e->pos.black_nights);
 
-    print_pieces(e, "white", "night moves", e->pre_check_king_moves(1));
-    print_pieces(e, "black", "night moves", e->pre_check_king_moves(0));
+    print_pieces(e, "white", "night moves", e->pre_check_night_moves(1));
+    print_pieces(e, "black", "night moves", e->pre_check_night_moves(0));
 }
 
 int main()
@@ -84,7 +84,7 @@ int main()
     e->reset_engine();
 
     std::cout << "testing night moves" << std::endl;
-    test_king_moves(e);
+    test_night_moves(e);
     e->reset_engine();
 
     return 0;

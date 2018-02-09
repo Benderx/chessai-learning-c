@@ -872,7 +872,7 @@ unsigned long long Engine::pre_check_king_moves(int color)
 // Takes in night_rep (bitboad representing that colors night location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
 // Returns bitboard representing all possible pre_check moves that that night can make
-unsigned long long Engine::pre_check_night(unsigned long long nights, unsigned long long own_occupied)
+unsigned long long Engine::pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied)
 {
     // pass
     unsigned long long spot_1_clip = col_mask[0] & col_mask[1];
@@ -901,15 +901,15 @@ unsigned long long Engine::pre_check_night(unsigned long long nights, unsigned l
     return night_valids & ~own_occupied;
 }
 
-unsigned long long Engine::pre_check_night(int color)
+unsigned long long Engine::pre_check_night_moves(int color)
 {
     if(color == 1)
     {
-        return(pre_check_night(pos.white_nights, get_all_white()));
+        return(pre_check_night_moves(pos.white_nights, get_all_white()));
     }
     else
     {
-        return(pre_check_night(pos.black_nights, get_all_black()));
+        return(pre_check_night_moves(pos.black_nights, get_all_black()));
     }
 }
 
