@@ -280,6 +280,7 @@ int get_rank(unsigned long long num)
     {
         return(7);
     }
+    return -1;
 }
 
 
@@ -674,6 +675,7 @@ int Engine::get_square(Piece piece, int color)
             //
         }
     } 
+    return -1;
 }
 
 
@@ -681,6 +683,7 @@ int Engine::get_square(Piece piece, int color)
 bool Engine::check_legal(int move)
 {
     //
+    return false;
 }
 
 
