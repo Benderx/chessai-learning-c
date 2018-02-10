@@ -1,15 +1,28 @@
 general notes:
-	white is 1
-	black is 0
+    white is 1
+    black is 0
 
 look into this https://stackoverflow.com/questions/25802605/what-does-performing-a-byteswap-mean
 
 
+pre_check_one_bishop_moves:
+    original code:
+        // unsigned long long line_mask = diagonalMaskEx[bishop_square]; // excludes square of slider
+        // unsigned long long slider = singleBitboard[bishop_square]; // single bit 1 << sq, 2^sq
+
+        // unsigned long long forward = own_occupied & line_mask; // also performs the first subtraction by clearing the s in o
+        // unsigned long long reverse = byteswap(forward); // o'-s'
+        // forward = forward - slider; // o -2s
+        // reverse = reverse - byteswap(slider); // o'-2s'
+        // forward = forward ^ byteswap(reverse);
+        // return forward & line_mask;      // mask the line again
+
+
 probable bug:
-	// curr_piece = // LOOKUP VAL -> pointer to piece val on that square
-	    int curr_piece = (curr_piece | bb_end) & (UINT64_MAX-bb_start);
-	why curr_piece | with itself
-	before it is assigned to anything
-	i think theres a logic error there, its in Engine::push_move
-	happens again here,         // taken_piece = //LOOKUP VAL -> pointer to piece val on that square
-	        taken_piece = taken_piece & (UINT64_MAX-bb_end);
+    // curr_piece = // LOOKUP VAL -> pointer to piece val on that square
+        int curr_piece = (curr_piece | bb_end) & (UINT64_MAX-bb_start);
+    why curr_piece | with itself
+    before it is assigned to anything
+    i think theres a logic error there, its in Engine::push_move
+    happens again here,         // taken_piece = //LOOKUP VAL -> pointer to piece val on that square
+            taken_piece = taken_piece & (UINT64_MAX-bb_end);

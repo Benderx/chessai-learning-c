@@ -689,7 +689,7 @@ int Engine::get_square(Piece piece, int color)
             //
         }
     } 
-    return -1;
+    return(-1);
 }
 
 
@@ -697,7 +697,7 @@ int Engine::get_square(Piece piece, int color)
 bool Engine::check_legal(int move)
 {
     //
-    return false;
+    return(false);
 }
 
 
@@ -708,31 +708,38 @@ unsigned long long Engine::pinned_pieces(int color)
     unsigned long long enemy_rook;
     unsigned long long enemy_bishop;
     unsigned long long enemy_queen;
-    unsigned long long enemy_color;
+    unsigned long long enemy_pieces;
 
+    unsigned long long attacker_squares;
+
+    // CHECK COLORS
     // Replace king with enemy queen
     // Find kings defenders
     // Declare enemy
     // white
-    if(color)
+    if(color == 1)
     {
-        defenders = queen_attacks(pos.white_kings, 0);
+        defenders = pre_check_queen_attacks(pos.white_kings, get_all(), get_all_black());
         enemy_rook = pos.black_rooks;
         enemy_bishop = pos.black_bishops;
         enemy_queen = pos.black_queens;
-        enemy_color = 0;
+        enemy_pieces = get_all_black();
     }
     // black
     else
     {
-        defenders = queen_attacks(pos.black_kings, 1);
+        defenders = pre_check_queen_attacks(pos.black_kings, get_all(), get_all_white());
         enemy_rook = pos.white_rooks;
         enemy_bishop = pos.white_bishops;
         enemy_queen = pos.white_queens;
-        enemy_color = 1;
+        enemy_pieces = get_all_white();
     }
     // Compile all squares under attack from enemy
-    unsigned long long attacker_squares = pre_check_rook_moves(enemy_rook, enemy_color) | pre_check_bishop_moves(enemy_bishop, enemy_color) | queen_attacks(enemy_queen, enemy_color);
+    attacker_squares = pre_check_rook_attacks(enemy_rook, get_all(), enemy_pieces) | 
+                        pre_check_bishop_attacks(enemy_bishop, get_all(), enemy_pieces) | 
+                        pre_check_queen_attacks(enemy_queen, get_all(), enemy_pieces);
+
+
     // Defenders in attacker squares are pinned pieces
     return(defenders & attacker_squares);
 }
@@ -816,7 +823,7 @@ unsigned long long Engine::pre_check_white_pawn_moves(unsigned long long white_p
     unsigned long long pawn_valid_attacks = pawn_attacks & all_black_pieces;
 
     // or together moves and attacks and return
-    return both_pawn | pawn_valid_attacks;
+    return(both_pawn | pawn_valid_attacks);
 }
 
 unsigned long long Engine::pre_check_black_pawn_moves(unsigned long long black_pawns, unsigned long long all_pieces, unsigned long long all_white_pieces)
@@ -844,7 +851,7 @@ unsigned long long Engine::pre_check_black_pawn_moves(unsigned long long black_p
     unsigned long long pawn_valid_attacks = pawn_attacks & all_white_pieces;
 
     // or together moves and attacks and return
-    return both_pawn | pawn_valid_attacks;
+    return(both_pawn | pawn_valid_attacks);
 }
 
 // Takes in king_rep (bitboad representing that colors king location)
@@ -868,7 +875,7 @@ unsigned long long Engine::pre_check_king_moves(unsigned long long kings, unsign
     unsigned long long king_moves = spot_0 | spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 | spot_7;
 
     // and to elimate attacking own pieces
-    return king_moves & ~own_occupied;
+    return(king_moves & ~own_occupied);
 }
 
 unsigned long long Engine::pre_check_king_moves(int color)
@@ -926,49 +933,43 @@ unsigned long long Engine::pre_check_night_moves(int color)
     }
 }
 
-unsigned long long Engine::pre_check_rook_moves(unsigned long long rooks, unsigned long long own_occupied)
-{
-    return -1;
-}
 
-unsigned long long Engine::pre_check_rook_moves(int color)
-{
-    if(color == 1)
-    {
-        return(pre_check_rook_moves(pos.white_rooks, get_all_white()));
-    }
-    else
-    {
-        return(pre_check_rook_moves(pos.black_rooks, get_all_black()));
-    }
-}
+/////BISHOPS//////
 
-unsigned long long Engine::pre_check_one_bishop_moves(unsigned long long bishop, unsigned long long own_occupied)
+
+unsigned long long Engine::pre_check_one_bishop_attacks(unsigned long long bishop, unsigned long long all_occupied)
 {
     int* diags = get_diag(get_rank(bishop), get_file(bishop));
     unsigned long long line_mask = ~bishop & (diag_left_mask[diags[0]] | diag_right_mask[diags[1]]); // excludes square of slider
     free(diags);
-    // unsigned long long line_mask = 3;
 
-    unsigned long long forward = own_occupied & line_mask; // also performs the first subtraction by clearing the s in o
+    unsigned long long forward = all_occupied & line_mask; // also performs the first subtraction by clearing the s in o
     unsigned long long reverse = vertical_flip(forward); // o'-s'
     forward = forward - bishop; // o -2s
     reverse = reverse - vertical_flip(bishop); // o'-2s'
     forward = forward ^ vertical_flip(reverse);
     return forward & line_mask;      // mask the line again
-
-    // unsigned long long line_mask = diagonalMaskEx[bishop_square]; // excludes square of slider
-    // unsigned long long slider = singleBitboard[bishop_square]; // single bit 1 << sq, 2^sq
-
-    // unsigned long long forward = own_occupied & line_mask; // also performs the first subtraction by clearing the s in o
-    // unsigned long long reverse = byteswap(forward); // o'-s'
-    // forward = forward - slider; // o -2s
-    // reverse = reverse - byteswap(slider); // o'-2s'
-    // forward = forward ^ byteswap(reverse);
-    // return forward & line_mask;      // mask the line again
 }
 
-unsigned long long Engine::pre_check_bishop_moves(unsigned long long bishops, unsigned long long own_occupied)
+unsigned long long Engine::pre_check_bishop_attacks(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied)
+{
+    unsigned long long one_bishop;
+    unsigned long long bishop_attacks = 0;
+    while(bishops)
+    {
+        one_bishop = lsb_board(bishops);
+        bishops = bishops & ~one_bishop;
+        bishop_attacks = bishop_attacks | pre_check_one_bishop_attacks(one_bishop, all_occupied);
+    }
+    return bishop_attacks;
+}
+
+unsigned long long Engine::pre_check_one_bishop_moves(unsigned long long bishop, unsigned long long all_occupied, unsigned long long own_occupied)
+{
+    return pre_check_one_bishop_attacks(bishop, all_occupied) & own_occupied;
+}
+
+unsigned long long Engine::pre_check_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied)
 {
     unsigned long long one_bishop;
     unsigned long long bishop_moves = 0;
@@ -976,7 +977,7 @@ unsigned long long Engine::pre_check_bishop_moves(unsigned long long bishops, un
     {
         one_bishop = lsb_board(bishops);
         bishops = bishops & ~one_bishop;
-        bishop_moves = bishop_moves | pre_check_one_bishop_moves(one_bishop, own_occupied);
+        bishop_moves = bishop_moves | pre_check_one_bishop_moves(one_bishop, all_occupied, own_occupied);
     }
     return bishop_moves;
 }
@@ -985,20 +986,37 @@ unsigned long long Engine::pre_check_bishop_moves(int color)
 {
     if(color == 1)
     {
-        return(pre_check_bishop_moves(pos.white_bishops, get_all_white()));
+        return pre_check_bishop_moves(pos.white_bishops, color);
     }
     else
     {
-        return(pre_check_bishop_moves(pos.black_bishops, get_all_black()));
+        return pre_check_bishop_moves(pos.white_bishops, color);
     }
 }
 
-unsigned long long Engine::one_rook_attack(unsigned long long board, int color)
+unsigned long long Engine::pre_check_bishop_moves(unsigned long long piece, int color)
+{
+    if(color == 1)
+    {
+        return(pre_check_bishop_moves(piece, get_all(), get_all_white()));
+    }
+    else
+    {
+        return(pre_check_bishop_moves(piece, get_all(), get_all_black()));
+    }
+}
+
+
+
+/////ROOKS//////
+
+// check args
+unsigned long long Engine::pre_check_one_rook_attacks(unsigned long long rook, unsigned long long all_occupied)
 {
     // row = np.uint64(2)
     // col = np.uint64(6)
 
-    // s = board
+    // s = rook
     // o = self.get_all()
 
     // // white
@@ -1026,22 +1044,137 @@ unsigned long long Engine::one_rook_attack(unsigned long long board, int color)
     return 0ULL;
 }
 
-unsigned long long Engine::rook_attacks(unsigned long long board, int color)
+unsigned long long Engine::pre_check_rook_attacks(unsigned long long rooks, unsigned long long all_occupied, unsigned long long own_occupied)
 {
-    unsigned long long n = 0ULL;
-    unsigned long long s;
-    unsigned long long p;
-    while(board)
+    // unsigned long long n = 0ULL;
+    // unsigned long long s;
+    // unsigned long long p;
+    // while(rooks)
+    // {
+    //     s = lsb_board(rooks);
+    //     p = one_rook_attack(s, color);
+    //     n = n | p;
+    //     rooks = rooks - s;
+    // }
+    // return(n);
+
+    unsigned long long one_rook;
+    unsigned long long rook_attacks = 0;
+    while(rooks)
     {
-        s = lsb_board(board);
-        p = one_rook_attack(s, color);
-        n = n | p;
-        board = board - s;
+        one_rook = lsb_board(rooks);
+        rooks = rooks & ~one_rook;
+        rook_attacks = rook_attacks | pre_check_one_rook_attacks(one_rook, all_occupied);
     }
-    return(n);
+    return rook_attacks;
 }
 
-unsigned long long Engine::queen_attacks(unsigned long long queens, int color)
+unsigned long long Engine::pre_check_one_rook_moves(unsigned long long rook, unsigned long long all_occupied, unsigned long long own_occupied)
 {
-    return(pre_check_rook_moves(queens, color) | pre_check_bishop_moves(queens, color));
+    return pre_check_one_rook_attacks(rook, all_occupied) & own_occupied;
+}
+
+unsigned long long Engine::pre_check_rook_moves(unsigned long long rooks, unsigned long long all_occupied, unsigned long long own_occupied)
+{
+    unsigned long long one_rook;
+    unsigned long long rook_moves = 0;
+    while(rooks)
+    {
+        one_rook = lsb_board(rooks);
+        rooks = rooks & ~one_rook;
+        rook_moves = rook_moves | pre_check_one_rook_moves(one_rook, all_occupied, own_occupied);
+    }
+    return rook_moves;
+}
+
+unsigned long long Engine::pre_check_rook_moves(int color)
+{
+    if(color == 1)
+    {
+        return pre_check_rook_moves(pos.white_rooks, color);
+    }
+    else
+    {
+        return pre_check_rook_moves(pos.white_rooks, color);
+    }
+}
+
+unsigned long long Engine::pre_check_rook_moves(unsigned long long piece, int color)
+{
+    if(color == 1)
+    {
+        return(pre_check_rook_moves(piece, get_all(), get_all_white()));
+    }
+    else
+    {
+        return(pre_check_rook_moves(piece, get_all(), get_all_black()));
+    }
+}
+
+
+
+/////QUEENS//////
+
+
+unsigned long long Engine::pre_check_one_queen_attacks(unsigned long long queen, unsigned long long all_occupied)
+{
+    return 0ULL;
+}
+
+unsigned long long Engine::pre_check_queen_attacks(unsigned long long queens, unsigned long long all_occupied, unsigned long long own_occupied)
+{
+    unsigned long long one_queen;
+    unsigned long long queen_attacks = 0;
+    while(queens)
+    {
+        one_queen = lsb_board(queens);
+        queens = queens & ~one_queen;
+        queen_attacks = queen_attacks | pre_check_one_queen_attacks(one_queen, all_occupied);
+    }
+    return queen_attacks;
+}
+
+unsigned long long Engine::pre_check_one_queen_moves(unsigned long long queen, unsigned long long all_occupied, unsigned long long own_occupied)
+{
+    return pre_check_one_queen_attacks(queen, all_occupied) & own_occupied;
+}
+
+unsigned long long Engine::pre_check_queen_moves(unsigned long long queens, unsigned long long all_occupied, unsigned long long own_occupied)
+{
+    unsigned long long one_queen;
+    unsigned long long queen_moves = 0;
+    while(queens)
+    {
+        one_queen = lsb_board(queens);
+        queens = queens & ~one_queen;
+        queen_moves = queen_moves | pre_check_one_queen_moves(one_queen, all_occupied, own_occupied);
+    }
+    return queen_moves;
+}
+
+
+unsigned long long Engine::pre_check_queen_moves(int color)
+{
+    if(color == 1)
+    {
+        return pre_check_queen_moves(pos.white_queens, color);
+    }
+    else
+    {
+        return pre_check_queen_moves(pos.black_queens, color);
+    }
+}
+
+unsigned long long Engine::pre_check_queen_moves(unsigned long long piece, int color)
+{
+    if(color == 1)
+    {
+        return pre_check_bishop_moves(piece, get_all(), get_all_white()) | 
+            pre_check_rook_moves(piece, get_all(), get_all_white());
+    }
+    else
+    {
+        return pre_check_bishop_moves(piece, get_all(), get_all_black()) | 
+            pre_check_rook_moves(piece, get_all(), get_all_black());
+    }
 }
