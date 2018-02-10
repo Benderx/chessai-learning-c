@@ -530,11 +530,11 @@ void Engine::pop_move(int move)
     //
 }
 
-//REWRITE
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
 // Example: the initial white_nights bitboard, the least significant 1 occurs at index 1 (...00001000010)
 // therefore simply return ((lots of zeros)00000000000010)
 // YOU MAY ASSUME A 1 EXISTS, (0000000000000000000) will not be given
+// n &= (n - 1) to find val of leftmost maybe faster
 int Engine::lsb_digit(unsigned long long board)
 {
     return(lsb_lookup[lsb_board(board)]);
