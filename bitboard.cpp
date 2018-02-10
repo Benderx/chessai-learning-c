@@ -551,11 +551,24 @@ unsigned long long Engine::lsb_board(unsigned long long board)
 
 
 // See above, except return the move_list significant bit bitboard
-unsigned long long Engine::msb(unsigned long long board)
+unsigned long long Engine::msb_board(unsigned long long board)
 {
-    return 0ULL;
+    unsigned long long sol = pow(2,msb_digit(board));
+    return(sol);
 }
 
+// See above, except return the move_list significant bit bitboard
+// Returns the index (right = 0 left = 63) corresponding to the most significant 1
+// Probably a speed up to be had by checking if its above 32 bit
+unsigned long long Engine::msb_digit(unsigned long long board)
+{
+    uint32_t first = board >> 32;
+    uint32_t second = board & 0xFFFFFFFFLL;
+    if(first == 0)
+        return(63-(32 + __builtin_clz(second)));
+    else
+        return(63-__builtin_clz(first));
+}
 
 // REWRITE
 // Reverses a uint8 number, like this (00110000 -> 00001100)
