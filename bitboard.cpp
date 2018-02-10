@@ -12,7 +12,7 @@ Engine::Engine()
     init_lsb_lookup();
 }
 
-Engine::Engine(unsigned long long *board_data)
+Engine::Engine(unsigned long long* board_data)
 {
     init_position(board_data);
     init_engine();
@@ -874,7 +874,6 @@ unsigned long long Engine::pre_check_king_moves(int color)
 // Returns bitboard representing all possible pre_check moves that that night can make
 unsigned long long Engine::pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied)
 {
-    // pass
     unsigned long long spot_1_clip = col_mask[0] & col_mask[1];
     unsigned long long spot_2_clip = col_mask[0];
     unsigned long long spot_3_clip = col_mask[7];

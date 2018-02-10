@@ -78,6 +78,11 @@ class Engine
 
         // TEMPORARILY PUBLIC
 
+        unsigned long long *row_mask;
+        unsigned long long *col_mask;
+        unsigned long long *diag_left_mask;
+        unsigned long long *diag_right_mask;
+
 
         void init_engine();
         void reset_engine();
@@ -160,13 +165,9 @@ class Engine
         int move_arr_size;
 
         int stack_index;
-        int *move_stack; 
+        int* move_stack; 
         bool in_check;
 
-        unsigned long long *row_mask;
-        unsigned long long *col_mask;
-        unsigned long long *diag_left_mask;
-        unsigned long long *diag_right_mask;
         std::unordered_map<unsigned long long, int> lsb_lookup;
 
         const int index64[64] = {
