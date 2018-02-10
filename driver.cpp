@@ -70,6 +70,19 @@ void test_night_moves(Engine* e)
     print_pieces(e, "black", "night moves", e->pre_check_night_moves(0));
 }
 
+void test_bishop_moves(Engine* e)
+{
+    e->pos.white_bishops = 0b0000000000000000000000000000000000000000001000000000000000000000;
+    e->pos.black_bishops = 0b0000000000000000000100000000000000000000000000000000000000000000;
+
+    print_all_pieces(e);
+    print_pieces(e, "white", "bishops", e->pos.white_bishops);
+    print_pieces(e, "black", "bishops", e->pos.black_bishops);
+
+    print_pieces(e, "white", "bishop moves", e->pre_check_bishop_moves(1));
+    print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+}
+
 void test_rook_moves(Engine* e)
 {
     e->pos.white_rooks = 0b0000000000000000000000000000000000000000001000000000000000000000;
@@ -82,17 +95,16 @@ void test_rook_moves(Engine* e)
     print_pieces(e, "black", "rook moves", e->pre_check_rook_moves(0));
 }
 
-void test_bishop_moves(Engine* e)
+void test_queen_moves(Engine* e)
 {
-    e->pos.white_bishops = 0b0000000000000000000000000000000000000000001000000000000000000000;
-    e->pos.black_bishops = 0b0000000000000000000100000000000000000000000000000000000000000000;
+    e->pos.white_queens = 0b0000000000000000000000000000000000000000001000000000000000000000;
+    e->pos.black_queens = 0b0000000000000000000100000000000000000000000000000000000000000000;
 
-    print_all_pieces(e);
-    print_pieces(e, "white", "bishops", e->pos.white_bishops);
-    print_pieces(e, "black", "bishops", e->pos.black_bishops);
+    print_pieces(e, "white", "queens", e->pos.white_queens);
+    print_pieces(e, "black", "queens", e->pos.black_queens);
 
-    print_pieces(e, "white", "bishop moves", e->pre_check_bishop_moves(1));
-    print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+    print_pieces(e, "white", "queen moves", e->pre_check_queen_moves(1));
+    print_pieces(e, "black", "queen moves", e->pre_check_queen_moves(0));
 }
 
 void test_mask_check(Engine* e)
@@ -120,12 +132,16 @@ int main()
     test_night_moves(e);
     e->reset_engine();
 
+    std::cout << "testing bishop moves" << std::endl;
+    test_bishop_moves(e);
+    e->reset_engine();
+
     std::cout << "testing rook moves" << std::endl;
     test_rook_moves(e);
     e->reset_engine();
 
-    std::cout << "testing bishop moves" << std::endl;
-    test_bishop_moves(e);
+    std::cout << "testing queen moves" << std::endl;
+    test_queen_moves(e);
     e->reset_engine();
 
     return 0;

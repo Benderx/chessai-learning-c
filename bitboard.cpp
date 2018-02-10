@@ -1013,51 +1013,29 @@ unsigned long long Engine::pre_check_bishop_moves(unsigned long long piece, int 
 // check args
 unsigned long long Engine::pre_check_one_rook_attacks(unsigned long long rook, unsigned long long all_occupied)
 {
-    // row = np.uint64(2)
-    // col = np.uint64(6)
+    unsigned long long row = get_rank(rook);
+    unsigned long long col = get_file(rook);
 
-    // s = rook
-    // o = self.get_all()
+    unsigned long long s = rook;
+    unsigned long long o = get_all();
 
-    // // white
-    // if color == 1
-    //     own = self.get_all_white()
-    // // black
-    // else
-    //     own = self.get_all_black()
+    unsigned long long o_rev = reverse_64_bits(o);
+    unsigned long long s_rev = reverse_64_bits(s);
 
-    // o_rev = self.reverse_64_bits(o)
-    // s_rev = self.reverse_64_bits(s)
-    // two = np.uint64(2)
-
-    // hori = (o - two*s) ^ self.reverse_64_bits(o_rev - two*s_rev)
-    // hori = hori & self.row_mask[row]
+    unsigned long long hori = (o - 2*s) ^ reverse_64_bits(o_rev - 2*s_rev);
+    hori = hori & row_mask[row];
 
 
-    // o_mask = o & self.col_mask[col]
-    // o_rev_mask = self.reverse_64_bits(o_mask)
-    // vert = (o_mask - two*s) ^ self.reverse_64_bits(o_rev_mask - two*s_rev)
-    // vert = vert & self.col_mask[col]
+    unsigned long long o_mask = o & col_mask[col];
+    unsigned long long o_rev_mask = reverse_64_bits(o_mask);
+    unsigned long long vert = (o_mask - 2*s) ^ reverse_64_bits(o_rev_mask - 2*s_rev);
+    vert = vert & col_mask[col];
 
-    // res = hori | vert
-    // return res & ~own
-    return 0ULL;
+    return(hori | vert);
 }
 
 unsigned long long Engine::pre_check_rook_attacks(unsigned long long rooks, unsigned long long all_occupied, unsigned long long own_occupied)
 {
-    // unsigned long long n = 0ULL;
-    // unsigned long long s;
-    // unsigned long long p;
-    // while(rooks)
-    // {
-    //     s = lsb_board(rooks);
-    //     p = one_rook_attack(s, color);
-    //     n = n | p;
-    //     rooks = rooks - s;
-    // }
-    // return(n);
-
     unsigned long long one_rook;
     unsigned long long rook_attacks = 0;
     while(rooks)
@@ -1095,7 +1073,7 @@ unsigned long long Engine::pre_check_rook_moves(int color)
     }
     else
     {
-        return pre_check_rook_moves(pos.white_rooks, color);
+        return pre_check_rook_moves(pos.black_rooks, color);
     }
 }
 
@@ -1118,7 +1096,8 @@ unsigned long long Engine::pre_check_rook_moves(unsigned long long piece, int co
 
 unsigned long long Engine::pre_check_one_queen_attacks(unsigned long long queen, unsigned long long all_occupied)
 {
-    return 0ULL;
+    return pre_check_one_bishop_attacks(queen, all_occupied) |
+            pre_check_one_rook_attacks(queen, all_occupied);
 }
 
 unsigned long long Engine::pre_check_queen_attacks(unsigned long long queens, unsigned long long all_occupied, unsigned long long own_occupied)
