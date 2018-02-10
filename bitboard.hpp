@@ -124,7 +124,8 @@ class Engine
         // bitboard tricks
         int lsb_digit(unsigned long long board);
         unsigned long long lsb_board(unsigned long long board);
-        unsigned long long msb(unsigned long long board);
+        unsigned long long msb_digit(unsigned long long board);
+        unsigned long long msb_board(unsigned long long board);
 
         // reversing and flipping
         unsigned long long reverse_8_bits(unsigned long long x);
