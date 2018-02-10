@@ -70,6 +70,30 @@ void test_night_moves(Engine* e)
     print_pieces(e, "black", "night moves", e->pre_check_night_moves(0));
 }
 
+void test_rook_moves(Engine* e)
+{
+    e->pos.white_rooks = 0b0000000000000000000000000000000000000000001000000000000000000000;
+    e->pos.black_rooks = 0b0000000000000000000100000000000000000000000000000000000000000000;
+
+    print_pieces(e, "white", "rooks", e->pos.white_rooks);
+    print_pieces(e, "black", "rooks", e->pos.black_rooks);
+
+    print_pieces(e, "white", "rook moves", e->pre_check_rook_moves(1));
+    print_pieces(e, "black", "rook moves", e->pre_check_rook_moves(0));
+}
+
+void test_bishop_moves(Engine* e)
+{
+    e->pos.white_bishops = 0b0000000000000000000000000000000000000000001000000000000000000000;
+    e->pos.black_bishops = 0b0000000000000000000100000000000000000000000000000000000000000000;
+
+    print_pieces(e, "white", "bishops", e->pos.white_bishops);
+    print_pieces(e, "black", "bishops", e->pos.black_bishops);
+
+    print_pieces(e, "white", "bishop moves", e->pre_check_bishop_moves(1));
+    print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+}
+
 void test_mask_check(Engine* e)
 {
     print_pieces(e, "pieces", "masked", e->get_all() & e->col_mask[0]);
@@ -80,7 +104,7 @@ int main()
     Engine* e = new Engine();
     print_all_pieces(e);
 
-    test_mask_check(Engine* e);
+    test_mask_check(e);
     e->reset_engine();
 
     std::cout << "testing pawn moves" << std::endl;
@@ -93,6 +117,14 @@ int main()
 
     std::cout << "testing night moves" << std::endl;
     test_night_moves(e);
+    e->reset_engine();
+
+    std::cout << "testing rook moves" << std::endl;
+    test_rook_moves(e);
+    e->reset_engine();
+
+    std::cout << "testing bishop moves" << std::endl;
+    test_bishop_moves(e);
     e->reset_engine();
 
     return 0;

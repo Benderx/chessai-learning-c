@@ -151,6 +151,12 @@ class Engine
         unsigned long long pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied);
         unsigned long long pre_check_night_moves(int color);
 
+        unsigned long long pre_check_rook_moves(unsigned long long rooks, unsigned long long own_occupied);
+        unsigned long long pre_check_rook_moves(int color);
+
+        unsigned long long pre_check_bishop_moves(unsigned long long bishops, unsigned long long own_occupied);
+        unsigned long long pre_check_bishop_moves(int color);
+
         unsigned long long one_rook_attack(unsigned long long board, int color);
         unsigned long long rook_attacks(unsigned long long board, int color);
 

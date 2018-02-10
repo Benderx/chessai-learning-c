@@ -874,15 +874,15 @@ unsigned long long Engine::pre_check_king_moves(int color)
 // Returns bitboard representing all possible pre_check moves that that night can make
 unsigned long long Engine::pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied)
 {
-    unsigned long long spot_1_clip = col_mask[0] & col_mask[1];
-    unsigned long long spot_2_clip = col_mask[0];
-    unsigned long long spot_3_clip = col_mask[7];
-    unsigned long long spot_4_clip = col_mask[7] & col_mask[6];
+    unsigned long long spot_1_clip = ~col_mask[0] & ~col_mask[1];
+    unsigned long long spot_2_clip = ~col_mask[0];
+    unsigned long long spot_3_clip = ~col_mask[7];
+    unsigned long long spot_4_clip = ~col_mask[7] & ~col_mask[6];
 
-    unsigned long long spot_5_clip = col_mask[7] & col_mask[6];
-    unsigned long long spot_6_clip = col_mask[7];
-    unsigned long long spot_7_clip = col_mask[0];
-    unsigned long long spot_8_clip = col_mask[0] & col_mask[1];
+    unsigned long long spot_5_clip = ~col_mask[7] & ~col_mask[6];
+    unsigned long long spot_6_clip = ~col_mask[7];
+    unsigned long long spot_7_clip = ~col_mask[0];
+    unsigned long long spot_8_clip = ~col_mask[0] & ~col_mask[1];
 
     unsigned long long spot_1 = (nights & spot_1_clip) << 6;
     unsigned long long spot_2 = (nights & spot_2_clip) << 15;
@@ -909,6 +909,40 @@ unsigned long long Engine::pre_check_night_moves(int color)
     else
     {
         return(pre_check_night_moves(pos.black_nights, get_all_black()));
+    }
+}
+
+unsigned long long Engine::pre_check_rook_moves(unsigned long long rooks, unsigned long long own_occupied)
+{
+    return -1;
+}
+
+unsigned long long Engine::pre_check_rook_moves(int color)
+{
+    if(color == 1)
+    {
+        return(pre_check_rook_moves(pos.white_rooks, get_all_white()));
+    }
+    else
+    {
+        return(pre_check_rook_moves(pos.black_rooks, get_all_black()));
+    }
+}
+
+unsigned long long Engine::pre_check_bishop_moves(unsigned long long bishops, unsigned long long own_occupied)
+{
+    return -1;
+}
+
+unsigned long long Engine::pre_check_bishop_moves(int color)
+{
+    if(color == 1)
+    {
+        return(pre_check_bishop_moves(pos.white_bishops, get_all_white()));
+    }
+    else
+    {
+        return(pre_check_bishop_moves(pos.black_bishops, get_all_black()));
     }
 }
 
