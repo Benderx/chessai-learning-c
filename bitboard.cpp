@@ -990,7 +990,7 @@ unsigned long long Engine::pre_check_bishop_moves(int color)
     }
     else
     {
-        return pre_check_bishop_moves(pos.white_bishops, color);
+        return pre_check_bishop_moves(pos.black_bishops, color);
     }
 }
 
