@@ -2,6 +2,8 @@ general notes:
 	white is 1
 	black is 0
 
+look into this https://stackoverflow.com/questions/25802605/what-does-performing-a-byteswap-mean
+
 
 probable bug:
 	// curr_piece = // LOOKUP VAL -> pointer to piece val on that square

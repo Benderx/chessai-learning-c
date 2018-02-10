@@ -231,7 +231,7 @@ unsigned long long Engine::get_all()
 // Takes in a 64 bit number with single bit
 // Returns the rank piece is on 0-7, bottom to top
 // Alters nothing
-int get_rank(unsigned long long num)
+int Engine::get_rank(unsigned long long num)
 {
     unsigned long long max0 = 128ULL; // 2^7
     if(num <= max0)
@@ -287,7 +287,7 @@ int get_rank(unsigned long long num)
 // Takes in a 64 bit number with single bit
 // Returns the file piece is on 0-7, left to right
 // Alters nothing 
-int get_file(unsigned long long num)
+int Engine::get_file(unsigned long long num)
 {
     switch(num)
     {
@@ -389,7 +389,7 @@ int get_file(unsigned long long num)
 // Alters nothing
 // Mallocs int array of size 2. Free when done
 // Look here for issues with diag, altered in confusion
-int* get_diag(unsigned long long rank, unsigned long long file)
+int* Engine::get_diag(int rank, int file)
 {
     int total_val = rank+file;
     int right;
@@ -579,6 +579,7 @@ unsigned long long Engine::msb(unsigned long long board)
 //     // return ~(np.uint8(255) - np.uint8(row))
 // }
 
+// https://stackoverflow.com/questions/25802605/what-does-performing-a-byteswap-mean
 unsigned long long Engine::reverse_8_bits(unsigned long long x)
 {
     return (x * 0x0202020202 & 0x010884422010) % 1023;
@@ -718,7 +719,7 @@ unsigned long long Engine::pinned_pieces(int color)
         enemy_color = 1;
     }
     // Compile all squares under attack from enemy
-    unsigned long long attacker_squares = rook_attacks(enemy_rook, enemy_color) | bishop_attacks(enemy_bishop, enemy_color) | queen_attacks(enemy_queen, enemy_color);
+    unsigned long long attacker_squares = pre_check_rook_moves(enemy_rook, enemy_color) | pre_check_bishop_moves(enemy_bishop, enemy_color) | queen_attacks(enemy_queen, enemy_color);
     // Defenders in attacker squares are pinned pieces
     return(defenders & attacker_squares);
 }
@@ -929,9 +930,42 @@ unsigned long long Engine::pre_check_rook_moves(int color)
     }
 }
 
+unsigned long long Engine::pre_check_one_bishop_moves(unsigned long long bishop, unsigned long long own_occupied)
+{
+    int* diags = get_diag(get_rank(bishop), get_file(bishop));
+    unsigned long long line_mask = ~bishop & (diag_left_mask[diags[0]] | diag_right_mask[diags[1]]); // excludes square of slider
+    free(diags);
+    // unsigned long long line_mask = 3;
+
+    unsigned long long forward = own_occupied & line_mask; // also performs the first subtraction by clearing the s in o
+    unsigned long long reverse = vertical_flip(forward); // o'-s'
+    forward = forward - bishop; // o -2s
+    reverse = reverse - vertical_flip(bishop); // o'-2s'
+    forward = forward ^ vertical_flip(reverse);
+    return forward & line_mask;      // mask the line again
+
+    // unsigned long long line_mask = diagonalMaskEx[bishop_square]; // excludes square of slider
+    // unsigned long long slider = singleBitboard[bishop_square]; // single bit 1 << sq, 2^sq
+
+    // unsigned long long forward = own_occupied & line_mask; // also performs the first subtraction by clearing the s in o
+    // unsigned long long reverse = byteswap(forward); // o'-s'
+    // forward = forward - slider; // o -2s
+    // reverse = reverse - byteswap(slider); // o'-2s'
+    // forward = forward ^ byteswap(reverse);
+    // return forward & line_mask;      // mask the line again
+}
+
 unsigned long long Engine::pre_check_bishop_moves(unsigned long long bishops, unsigned long long own_occupied)
 {
-    return -1;
+    unsigned long long one_bishop;
+    unsigned long long bishop_moves = 0;
+    while(bishops)
+    {
+        one_bishop = lsb_board(bishops);
+        bishops = bishops & ~one_bishop;
+        bishop_moves = bishop_moves | pre_check_one_bishop_moves(one_bishop, own_occupied);
+    }
+    return bishop_moves;
 }
 
 unsigned long long Engine::pre_check_bishop_moves(int color)
@@ -994,26 +1028,7 @@ unsigned long long Engine::rook_attacks(unsigned long long board, int color)
     return(n);
 }
 
-unsigned long long Engine::one_bishop_attack(unsigned long long board, int color)
+unsigned long long Engine::queen_attacks(unsigned long long queens, int color)
 {
-    // lineMask = diagonalMaskEx[sqOfSlider]; // excludes square of slider
-    // slider   = singleBitboard[sqOfSlider]; // single bit 1 << sq, 2^sq
-
-    // forward  = occ & lineMask; // also performs the first subtraction by clearing the s in o
-    // reverse  = byteswap( forward ); // o'-s'
-    // forward -=         ( slider  ); // o -2s
-    // reverse -= byteswap( slider  ); // o'-2s'
-    // forward ^= byteswap( reverse );
-    // return forward & lineMask;      // mask the line again
-    return 0ULL;
-}
-
-unsigned long long Engine::bishop_attacks(unsigned long long board, int color)
-{
-    return 0ULL;
-}
-
-unsigned long long Engine::queen_attacks(unsigned long long board, int color)
-{
-    return(rook_attacks(board, color) | bishop_attacks(board, color));
+    return(pre_check_rook_moves(queens, color) | pre_check_bishop_moves(queens, color));
 }

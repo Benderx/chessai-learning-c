@@ -87,6 +87,7 @@ void test_bishop_moves(Engine* e)
     e->pos.white_bishops = 0b0000000000000000000000000000000000000000001000000000000000000000;
     e->pos.black_bishops = 0b0000000000000000000100000000000000000000000000000000000000000000;
 
+    print_all_pieces(e);
     print_pieces(e, "white", "bishops", e->pos.white_bishops);
     print_pieces(e, "black", "bishops", e->pos.black_bishops);
 
