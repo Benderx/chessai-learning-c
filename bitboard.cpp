@@ -966,7 +966,7 @@ unsigned long long Engine::pre_check_bishop_attacks(unsigned long long bishops, 
 
 unsigned long long Engine::pre_check_one_bishop_moves(unsigned long long bishop, unsigned long long all_occupied, unsigned long long own_occupied)
 {
-    return pre_check_one_bishop_attacks(bishop, all_occupied) & own_occupied;
+    return pre_check_one_bishop_attacks(bishop, all_occupied) & ~own_occupied;
 }
 
 unsigned long long Engine::pre_check_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied)
@@ -1071,7 +1071,7 @@ unsigned long long Engine::pre_check_rook_attacks(unsigned long long rooks, unsi
 
 unsigned long long Engine::pre_check_one_rook_moves(unsigned long long rook, unsigned long long all_occupied, unsigned long long own_occupied)
 {
-    return pre_check_one_rook_attacks(rook, all_occupied) & own_occupied;
+    return pre_check_one_rook_attacks(rook, all_occupied) & ~own_occupied;
 }
 
 unsigned long long Engine::pre_check_rook_moves(unsigned long long rooks, unsigned long long all_occupied, unsigned long long own_occupied)
@@ -1136,7 +1136,7 @@ unsigned long long Engine::pre_check_queen_attacks(unsigned long long queens, un
 
 unsigned long long Engine::pre_check_one_queen_moves(unsigned long long queen, unsigned long long all_occupied, unsigned long long own_occupied)
 {
-    return pre_check_one_queen_attacks(queen, all_occupied) & own_occupied;
+    return pre_check_one_queen_attacks(queen, all_occupied) & ~own_occupied;
 }
 
 unsigned long long Engine::pre_check_queen_moves(unsigned long long queens, unsigned long long all_occupied, unsigned long long own_occupied)
