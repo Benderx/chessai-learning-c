@@ -516,6 +516,8 @@ void Engine::push_move(int move)
     if(taken_piece_type)
     {
         // int taken_piece_type = get_piece_by_bitboard(1-color, taken_piece_loc);
+        std::cout << taken_piece_type << std::endl;
+        exit(0);
         remove_piece(1-color, taken_piece_type, taken_piece_loc);
     }
 
@@ -542,6 +544,8 @@ void Engine::pop_move()
 
     if(taken_piece_type)
     {
+        std::cout << taken_piece_type << std::endl;
+        exit(0);
         place_piece(1-color, taken_piece_type, curr_piece_loc);
     }
 
@@ -742,12 +746,12 @@ Piece Engine::get_piece_by_bitboard(int color, unsigned long long board)
     }
     else
     {
-        pawns = pos.white_pawns;
-        rooks = pos.white_rooks;
-        nights = pos.white_nights;
-        bishops = pos.white_bishops;
-        queens = pos.white_queens;
-        kings = pos.white_kings;
+        pawns = pos.black_pawns;
+        rooks = pos.black_rooks;
+        nights = pos.black_nights;
+        bishops = pos.black_bishops;
+        queens = pos.black_queens;
+        kings = pos.black_kings;
     }
 
     if(board & pawns)
@@ -968,16 +972,12 @@ unsigned long long Engine::pinned_pieces(int color)
 
 void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long long board, int curr_pos)
 {
-    // while(moves)
-    // {
-    //     move_list[index] = encode_move(bitboard_to_square(one_p), bitboard_to_square(temp), REGULAR, 0, 0);
-    //     move_list[0]++;
-    // }
-
     unsigned long long new_pos;
     int piece_taken;
     while(board)
     {
+        // std::cout << "printing boardrep" << std::endl;
+        // print_chess_rep(board);
         new_pos = lsb_board(board);
         piece_taken = get_piece_by_bitboard(1-color, new_pos);
         move_list[move_list[0]+1] = encode_move(curr_pos, bitboard_to_square(new_pos), REGULAR, piece_taken, 0);
@@ -991,20 +991,37 @@ void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long 
 // DOES NOT CHECK BOUNDS FOR move_arr_size
 void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long long pinned)
 {
-    unsigned long long p, one_p, all_occupied, own_occupied, temp;
+    unsigned long long p, one_p, all_occupied, own_occupied, temp, enemy_occupied;
     all_occupied = get_all();
 
     if(color == 1)
     {
         own_occupied = get_all_white();
+        enemy_occupied = get_all_black();
 
         p = pos.white_rooks & ~pinned;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-            // std::cout << bitboard_to_square(one_p) << std::endl;
-            pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, all_occupied, own_occupied), bitboard_to_square(one_p));
+            pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
+                all_occupied, own_occupied), bitboard_to_square(one_p));
+        }
+
+
+        p = pos.white_pawns & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            std::cout << "printing boardrep" << std::endl;
+            // print_chess_rep(one_p);
+            // std::cout << "printing boardrep2" << std::endl;
+            print_chess_rep(pre_check_white_pawn_moves(one_p, all_occupied, own_occupied));
+            // std::cout << "printing boardrep3" << std::endl;
+            // print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            pop_and_add_regular_moves(color, move_list, pre_check_white_pawn_moves(one_p, 
+                all_occupied, enemy_occupied), bitboard_to_square(one_p));
         }
     }
     else

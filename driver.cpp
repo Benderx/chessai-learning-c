@@ -25,6 +25,7 @@ void print_moves(Engine* e, std::string c, int* moves)
         // e->print_chess_rep(e->get_all());
         // exit(0);
     }
+    std::cout << "total legal moves: " << moves[0] << std::endl;
 }
 
 void print_all_pieces(Engine* e)
@@ -125,8 +126,8 @@ void test_queen_moves(Engine* e)
 
 void test_white_moves(Engine* e)
 {
-    e->pos.white_pawns = 0b0000000000000000000000000000000000000000000000101111111000000000;
-    e->pos.black_pawns = 0b0000000001111111010000000000000000000000000000000000000000000000;
+    e->pos.white_pawns = 0b0000000000000000000000000000000000000000000000011111111000000000;
+    // e->pos.black_pawns = 0b0000000001111111010000000000000000000000000000000000000000000000;
 
     print_pieces(e, "white", "pawns", e->pos.white_pawns);
     print_pieces(e, "black", "pawns", e->pos.black_pawns);
