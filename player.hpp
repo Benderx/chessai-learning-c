@@ -25,10 +25,12 @@ class Rand: public Player
 {
 	public:
 		//Var
+		int color;
+		Engine *e;
 
 		//Methods
-		Rand(int col, Engine *engine)
-		unsigned long long move()
+		Rand(int col, Engine *engine);
+		unsigned long long move();
 
 	private:
 };
