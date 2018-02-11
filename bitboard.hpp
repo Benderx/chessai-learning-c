@@ -134,12 +134,13 @@ class Engine
         unsigned long long vertical_flip(unsigned long long x);
 
         // board helper functions
+        int bitboard_to_square(unsigned long long piece);
         int get_square(Piece piece, int color);
 
         //move gen helpers
         bool check_legal(int move);
         unsigned long long pinned_pieces(int color);
-        void generate_pre_check_moves(int color, int* move_list);
+        int generate_pre_check_moves(int color, int* move_list);
         void extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo);
 
         //attacks and moves
@@ -153,21 +154,21 @@ class Engine
         unsigned long long pre_check_night_moves(int color);
 
         unsigned long long pre_check_one_bishop_attacks(unsigned long long bishop, unsigned long long all_occupied);
-        unsigned long long pre_check_bishop_attacks(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);
+        unsigned long long pre_check_bishop_attacks(unsigned long long bishops, unsigned long long all_occupied);
         unsigned long long pre_check_one_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_bishop_moves(int color);
         unsigned long long pre_check_bishop_moves(unsigned long long piece, int color);
 
         unsigned long long pre_check_one_rook_attacks(unsigned long long rook, unsigned long long all_occupied);
-        unsigned long long pre_check_rook_attacks(unsigned long long rooks, unsigned long long all_occupied, unsigned long long own_occupied);
+        unsigned long long pre_check_rook_attacks(unsigned long long rooks, unsigned long long all_occupied);
         unsigned long long pre_check_one_rook_moves(unsigned long long rook, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_rook_moves(unsigned long long rooks, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_rook_moves(int color);
         unsigned long long pre_check_rook_moves(unsigned long long piece, int color);
 
         unsigned long long pre_check_one_queen_attacks(unsigned long long queen, unsigned long long all_occupied);
-        unsigned long long pre_check_queen_attacks(unsigned long long queens, unsigned long long all_occupied, unsigned long long own_occupied);
+        unsigned long long pre_check_queen_attacks(unsigned long long queens, unsigned long long all_occupied);
         unsigned long long pre_check_one_queen_moves(unsigned long long queen, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_queen_moves(unsigned long long queens, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_queen_moves(int color);
