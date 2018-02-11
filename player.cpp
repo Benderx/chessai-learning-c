@@ -9,14 +9,17 @@ Player::Player(int col, Engine *engine)
 
 int Player::get_color()
 {
-	return(this.color);
+	return(this->color);
 }
 
 
 Rand::Rand(int col, Engine *engine) 
 : Player(col, *engine)
+{
+
+}
 
 unsigned long long Rand::move()
 {
-
+	std::cout << e->generate_legal_moves(color) << std::endl;
 }
