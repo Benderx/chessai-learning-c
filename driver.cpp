@@ -13,12 +13,18 @@ void print_pieces(Engine* e, std::string c, std::string s, unsigned long long pi
 
 void print_moves(Engine* e, std::string c, int* moves)
 {
+    print_pieces(e, "", "pieces", e->get_all());
     std::cout << "printing moves for " << c << std::endl;
     for(int i = 0; i < moves[0]; i++)
     {
-        std::cout << moves[i+1] << std::endl;
+        std::cout << "making move " << moves[i+1] << std::endl;
+        e->push_move(moves[i+1]);
+        e->print_chess_rep(e->get_all());
+        e->pop_move();
+        // std::cout << "popped" << std::endl;
+        // e->print_chess_rep(e->get_all());
+        // exit(0);
     }
-
 }
 
 void print_all_pieces(Engine* e)
@@ -134,6 +140,11 @@ void test_white_moves(Engine* e)
 void test_mask_check(Engine* e)
 {
     print_pieces(e, "pieces", "masked", e->get_all() & e->col_mask[0]);
+}
+
+void write_board()
+{
+    //
 }
 
 int main()

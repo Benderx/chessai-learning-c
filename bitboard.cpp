@@ -488,7 +488,7 @@ void Engine::stack_push(int move)
 // Takes in nothing
 // Returns the last move in the move stack
 // Alters the stack_index value
-unsigned long long Engine::stack_pop()
+int Engine::stack_pop()
 {
     // get pointer to stack index
     // get pointer to move_stack
@@ -501,33 +501,51 @@ void Engine::push_move(int move)
 {
     stack_push(move);
     int start = decode_from(move);
-    int end = decode_from(move);
-    int taken = decode_piece(move);
+    int end = decode_to(move);
+    int taken_piece_type = decode_piece(move);
+    int color;
 
-    unsigned long long bb_start = 2^start;
-    unsigned long long bb_end = 2^end;
+    unsigned long long curr_piece_loc = square_to_bitboard(start);
+    unsigned long long taken_piece_loc = square_to_bitboard(end);
 
-    // curr_piece = // LOOKUP VAL -> pointer to piece val on that square
-    int curr_piece = (curr_piece | bb_end) & (UINT64_MAX-bb_start);
+    color = get_color_by_bitboard(curr_piece_loc);
 
-    // EDIT LOOKUP TABLE THAT THE USED SQUARE IS NOW EMPTY
-    // self.edit_lookup(start,None)
+    int curr_piece_type = get_piece_by_bitboard(color, curr_piece_loc);
+    remove_piece(color, curr_piece_type, curr_piece_loc);
 
-    int taken_piece;
-    if(taken)
+    if(taken_piece_type)
     {
-        // taken_piece = //LOOKUP VAL -> pointer to piece val on that square
-        taken_piece = taken_piece & (UINT64_MAX-bb_end);
+        // int taken_piece_type = get_piece_by_bitboard(1-color, taken_piece_loc);
+        remove_piece(1-color, taken_piece_type, taken_piece_loc);
     }
 
-    // EDIT LOOKUP TABLE THAT THE FINAL SQUARE IS NOW NEW PIECE
-    // self.edit_lookup(end,curr_piece)
+    place_piece(color, curr_piece_type, taken_piece_loc);
 }
 
 // Takes in a move, alters the BitboardEngine's representation to the PREVIOUS state based on the LAST move action
-void Engine::pop_move(int move)
+void Engine::pop_move()
 {
-    //
+    int move = stack_pop();
+
+    int start = decode_from(move);
+    int end = decode_to(move);
+    int taken_piece_type = decode_piece(move);
+    int color;
+
+    unsigned long long curr_piece_loc = square_to_bitboard(end);
+    unsigned long long orig_piece_loc = square_to_bitboard(start);
+
+    color = get_color_by_bitboard(curr_piece_loc);
+
+    int curr_piece_type = get_piece_by_bitboard(color, curr_piece_loc);
+    remove_piece(color, curr_piece_type, curr_piece_loc);
+
+    if(taken_piece_type)
+    {
+        place_piece(1-color, taken_piece_type, curr_piece_loc);
+    }
+
+    place_piece(color, curr_piece_type, orig_piece_loc);
 }
 
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
@@ -669,6 +687,11 @@ int Engine::bitboard_to_square(unsigned long long piece)
     return(lsb_digit(piece));
 }
 
+unsigned long long Engine::square_to_bitboard(int square)
+{
+    return(1ULL << square);
+}
+
 int Engine::get_square(Piece piece, int color)
 {
     if(color == 1)
@@ -703,6 +726,191 @@ int Engine::get_square(Piece piece, int color)
     // {
 
     // } 
+}
+
+Piece Engine::get_piece_by_bitboard(int color, unsigned long long board)
+{
+    unsigned long long pawns, rooks, nights, bishops, queens, kings;
+    if(color == 1)
+    {
+        pawns = pos.white_pawns;
+        rooks = pos.white_rooks;
+        nights = pos.white_nights;
+        bishops = pos.white_bishops;
+        queens = pos.white_queens;
+        kings = pos.white_kings;
+    }
+    else
+    {
+        pawns = pos.white_pawns;
+        rooks = pos.white_rooks;
+        nights = pos.white_nights;
+        bishops = pos.white_bishops;
+        queens = pos.white_queens;
+        kings = pos.white_kings;
+    }
+
+    if(board & pawns)
+    {
+        return(PAWN);
+    }
+    else if(board & rooks)
+    {
+        return(ROOK);
+    }
+    else if(board & nights)
+    {
+        return(NIGHT);
+    }
+    else if(board & bishops)
+    {
+        return(BISHOP);
+    }
+    else if(board & queens)
+    {
+        return(QUEEN);
+    }
+    else if(board & kings)
+    {
+        return(KING);
+    }
+    else
+    {
+        return(NONE);
+    }
+}
+
+Piece Engine::get_piece_by_bitboard(unsigned long long board)
+{
+    return(get_piece_by_bitboard(get_color_by_bitboard(board), board));
+}
+
+void Engine::remove_piece(int color, int type, unsigned long long board)
+{
+    if(color == 1)
+    {
+        if(type == PAWN)
+        {
+            pos.white_pawns = pos.white_pawns - board;
+        }
+        else if(type == ROOK)
+        {
+            pos.white_rooks = pos.white_rooks - board;
+        }
+        else if(type == NIGHT)
+        {
+            pos.white_nights = pos.white_nights - board;
+        }
+        else if(type == BISHOP)
+        {
+            pos.white_bishops = pos.white_bishops - board;
+        }
+        else if(type == QUEEN)
+        {
+            pos.white_queens = pos.white_queens - board;
+        }
+        else
+        {
+            pos.white_kings = pos.white_kings - board;
+        }
+    }
+    else
+    {
+        if(type == PAWN)
+        {
+            pos.black_pawns = pos.black_pawns - board;
+        }
+        else if(type == ROOK)
+        {
+            pos.black_rooks = pos.black_rooks - board;
+        }
+        else if(type == NIGHT)
+        {
+            pos.black_nights = pos.black_nights - board;
+        }
+        else if(type == BISHOP)
+        {
+            pos.black_bishops = pos.black_bishops - board;
+        }
+        else if(type == QUEEN)
+        {
+            pos.black_queens = pos.black_queens - board;
+        }
+        else
+        {
+            pos.black_kings = pos.black_kings - board;
+        }
+    }
+}
+
+void Engine::place_piece(int color, int type, unsigned long long board)
+{
+    if(color == 1)
+    {
+        if(type == PAWN)
+        {
+            pos.white_pawns = pos.white_pawns | board;
+        }
+        else if(type == ROOK)
+        {
+            pos.white_rooks = pos.white_rooks | board;
+        }
+        else if(type == NIGHT)
+        {
+            pos.white_nights = pos.white_nights | board;
+        }
+        else if(type == BISHOP)
+        {
+            pos.white_bishops = pos.white_bishops | board;
+        }
+        else if(type == QUEEN)
+        {
+            pos.white_queens = pos.white_queens | board;
+        }
+        else
+        {
+            pos.white_kings = pos.white_kings | board;
+        }
+    }
+    else
+    {
+        if(type == PAWN)
+        {
+            pos.black_pawns = pos.black_pawns | board;
+        }
+        else if(type == ROOK)
+        {
+            pos.black_rooks = pos.black_rooks | board;
+        }
+        else if(type == NIGHT)
+        {
+            pos.black_nights = pos.black_nights | board;
+        }
+        else if(type == BISHOP)
+        {
+            pos.black_bishops = pos.black_bishops | board;
+        }
+        else if(type == QUEEN)
+        {
+            pos.black_queens = pos.black_queens | board;
+        }
+        else
+        {
+            pos.black_kings = pos.black_kings | board;
+        }
+    }
+}
+
+int Engine::get_color_by_bitboard(unsigned long long board)
+{
+    if(board & get_all_white())
+    {
+        return(1);
+    }
+    else
+    {
+        return(0);
+    }
 }
 
 
@@ -758,7 +966,7 @@ unsigned long long Engine::pinned_pieces(int color)
 }
 
 
-void Engine::pop_and_add_regular_moves(int* move_list, unsigned long long board, int curr_pos)
+void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long long board, int curr_pos)
 {
     // while(moves)
     // {
@@ -767,10 +975,12 @@ void Engine::pop_and_add_regular_moves(int* move_list, unsigned long long board,
     // }
 
     unsigned long long new_pos;
+    int piece_taken;
     while(board)
     {
         new_pos = lsb_board(board);
-        move_list[move_list[0]+1] = encode_move(curr_pos, bitboard_to_square(new_pos), REGULAR, 0, 0);
+        piece_taken = get_piece_by_bitboard(1-color, new_pos);
+        move_list[move_list[0]+1] = encode_move(curr_pos, bitboard_to_square(new_pos), REGULAR, piece_taken, 0);
         board = board - new_pos;
         move_list[0]++;
     }
@@ -794,7 +1004,7 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
             // std::cout << bitboard_to_square(one_p) << std::endl;
-            pop_and_add_regular_moves(move_list, pre_check_one_rook_moves(one_p, all_occupied, own_occupied), bitboard_to_square(one_p));
+            pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, all_occupied, own_occupied), bitboard_to_square(one_p));
         }
     }
     else

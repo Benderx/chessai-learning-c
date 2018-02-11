@@ -67,7 +67,7 @@ class Engine
 
         // pushing and popping moves from stack
         void push_move(int move);
-        void pop_move(int move);
+        void pop_move();
 
         //printing
         void print_chess_rep(unsigned long long num);
@@ -119,7 +119,7 @@ class Engine
 
         // pushing and popping moves from stack
         void stack_push(int move);
-        unsigned long long stack_pop();
+        int stack_pop();
 
         // bitboard tricks
         int lsb_digit(unsigned long long board);
@@ -135,12 +135,18 @@ class Engine
 
         // board helper functions
         int bitboard_to_square(unsigned long long piece);
+        unsigned long long square_to_bitboard(int square);
         int get_square(Piece piece, int color);
+        Piece get_piece_by_bitboard(int color, unsigned long long board);
+        Piece get_piece_by_bitboard(unsigned long long board);
+        void remove_piece(int color, int type, unsigned long long board);
+        void place_piece(int color, int type, unsigned long long board);
+        int get_color_by_bitboard(unsigned long long board);
 
         //move gen helpers
         bool check_legal(int move);
         unsigned long long pinned_pieces(int color);
-        void pop_and_add_regular_moves(int* move_list, unsigned long long board, int curr_pos);
+        void pop_and_add_regular_moves(int color, int* move_list, unsigned long long board, int curr_pos);
         void generate_pre_check_moves(int color, int* move_list, unsigned long long pinned);
 
         //attacks and moves
