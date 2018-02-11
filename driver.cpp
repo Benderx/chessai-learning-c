@@ -11,6 +11,16 @@ void print_pieces(Engine* e, std::string c, std::string s, unsigned long long pi
     std::cout << std::endl;
 }
 
+void print_moves(Engine* e, std::string c, int* moves)
+{
+    std::cout << "printing moves for " << c << std::endl;
+    for(int i = 0; i < moves[0]; i++)
+    {
+        std::cout << moves[i+1] << std::endl;
+    }
+
+}
+
 void print_all_pieces(Engine* e)
 {
     print_pieces(e, "", "pieces", e->get_all());
@@ -107,6 +117,20 @@ void test_queen_moves(Engine* e)
     print_pieces(e, "black", "queen moves", e->pre_check_queen_moves(0));
 }
 
+void test_white_moves(Engine* e)
+{
+    e->pos.white_pawns = 0b0000000000000000000000000000000000000000000000101111111000000000;
+    e->pos.black_pawns = 0b0000000001111111010000000000000000000000000000000000000000000000;
+
+    print_pieces(e, "white", "pawns", e->pos.white_pawns);
+    print_pieces(e, "black", "pawns", e->pos.black_pawns);
+
+    print_moves(e, "white", e->generate_legal_moves(1));
+    // std::cout << "why\n";
+    // print_pieces(e, "white", "moves", e->generate_legal_moves(1));
+    // print_pieces(e, "black", "moves", e->pre_check_queen_moves(0));
+}
+
 void test_mask_check(Engine* e)
 {
     print_pieces(e, "pieces", "masked", e->get_all() & e->col_mask[0]);
@@ -142,6 +166,12 @@ int main()
 
     std::cout << "testing queen moves" << std::endl;
     test_queen_moves(e);
+    e->reset_engine();
+
+
+
+    std::cout << "testing white moves" << std::endl;
+    test_white_moves(e);
     e->reset_engine();
 
     return 0;

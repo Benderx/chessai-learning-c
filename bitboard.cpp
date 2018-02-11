@@ -432,7 +432,7 @@ int Engine::encode_move(int start, int end, int m_type, int piece, int promotion
     int encode_type = m_type << 12;
     int encode_piece = piece << 14;
     int encode_promotion = promotion << 17;
-    return(encode_start & encode_end & encode_type & encode_piece & encode_promotion);
+    return(encode_start | encode_end | encode_type | encode_piece | encode_promotion);
 }
 
 // Takes in an int move
@@ -546,7 +546,7 @@ int Engine::lsb_digit(unsigned long long board)
 // Alters nothing
 unsigned long long Engine::lsb_board(unsigned long long board)
 {
-    return(board & -board);
+    return(board & (-board));
 }
 
 
@@ -709,7 +709,7 @@ int Engine::get_square(Piece piece, int color)
 // Some hueristics have been met, the only way to check if a move is legal or not, we must make it.
 bool Engine::check_legal(int move)
 {
-    //
+    
     return(false);
 }
 
@@ -758,25 +758,43 @@ unsigned long long Engine::pinned_pieces(int color)
 }
 
 
+void Engine::pop_and_add_regular_moves(int* move_list, unsigned long long board, int curr_pos)
+{
+    // while(moves)
+    // {
+    //     move_list[index] = encode_move(bitboard_to_square(one_p), bitboard_to_square(temp), REGULAR, 0, 0);
+    //     move_list[0]++;
+    // }
+
+    unsigned long long new_pos;
+    while(board)
+    {
+        new_pos = lsb_board(board);
+        move_list[move_list[0]+1] = encode_move(curr_pos, bitboard_to_square(new_pos), REGULAR, 0, 0);
+        board = board - new_pos;
+        move_list[0]++;
+    }
+}
+
+
 // Generates and fills move_list for a color before checking checks
 // DOES NOT CHECK BOUNDS FOR move_arr_size
-int Engine::generate_pre_check_moves(int color, int* move_list)
+void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long long pinned)
 {
-    unsigned long long p, one_p, all_occupied, own_occupied;
-    int index;
+    unsigned long long p, one_p, all_occupied, own_occupied, temp;
     all_occupied = get_all();
 
     if(color == 1)
     {
         own_occupied = get_all_white();
 
-        p = pos.white_rooks;
+        p = pos.white_rooks & ~pinned;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-            move_list[index] = pre_check_one_rook_moves(one_p, all_occupied, own_occupied);
-            index++;
+            // std::cout << bitboard_to_square(one_p) << std::endl;
+            pop_and_add_regular_moves(move_list, pre_check_one_rook_moves(one_p, all_occupied, own_occupied), bitboard_to_square(one_p));
         }
     }
     else
@@ -784,7 +802,6 @@ int Engine::generate_pre_check_moves(int color, int* move_list)
         own_occupied = get_all_black();
 
     }
-    return index;
 }
 
 
@@ -792,7 +809,8 @@ int Engine::generate_pre_check_moves(int color, int* move_list)
 int* Engine::generate_legal_moves(int color)
 {
     int *move_list = (int*) malloc(move_arr_size * sizeof(int)); 
-    int last_move_index = 0;
+    // int last_move_index = 0;
+    move_list[0] = 0; // encode index in array
 
     unsigned long long pinned = pinned_pieces(color);
     int king_square = get_square(KING, color);
@@ -806,31 +824,23 @@ int* Engine::generate_legal_moves(int color)
     //     // generate<NON_EVASIONS>(pos, moveList)     last_move_index returned
     // }
 
-    last_move_index = generate_pre_check_moves(color, move_list);
+    generate_pre_check_moves(color, move_list, pinned);
 
     int move_iter = 0;
-    while(move_iter < last_move_index)
+    while(move_iter < move_list[0])
     {
-        int move = move_list[move_iter];
-        if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
+        int move = move_list[move_iter+1];
+        // if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
+        if((decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
         {
-            last_move_index -= 1;
-            move_list[move_iter] = move_list[last_move_index];
+            // std::cout << "why\n";
+            move_list[0] -= 1;
+            move_list[move_iter] = move_list[move_list[0]+1];
+            move_iter--;
         }
+        move_iter++;
     }
     return(move_list);
-}
-
-
-void Engine::extract_moves(int* moves, unsigned long long board, int curr_pos, int t, int piece, int promo)
-{
-    int move;
-    while(board)
-    {
-        move = lsb_board(board);
-        encode_move(lsb_digit(curr_pos), lsb_digit(board), t, piece, promo);
-        board = board & (~move);
-    }
 }
 
 

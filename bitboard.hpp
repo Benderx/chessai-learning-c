@@ -140,8 +140,8 @@ class Engine
         //move gen helpers
         bool check_legal(int move);
         unsigned long long pinned_pieces(int color);
-        int generate_pre_check_moves(int color, int* move_list);
-        void extract_moves(int* moves, unsigned long long move_board, int curr_pos, int t, int piece, int promo);
+        void pop_and_add_regular_moves(int* move_list, unsigned long long board, int curr_pos);
+        void generate_pre_check_moves(int color, int* move_list, unsigned long long pinned);
 
         //attacks and moves
         unsigned long long pre_check_white_pawn_moves(unsigned long long white_pawns, unsigned long long all_pieces, unsigned long long all_black_pieces);
