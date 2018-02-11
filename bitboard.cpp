@@ -478,7 +478,7 @@ int Engine::decode_promo(int move)
 // Takes in a move to be added to the move stack
 // Returns nothing
 // Alters the move stack and stack_index value
-void Engine::stack_push(int move)
+void Engine::stack_push(int move)Pla
 {
     // get pointer to stack index
     // get pointer to move_stack
