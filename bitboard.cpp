@@ -676,6 +676,28 @@ void Engine::print_chess_rep(unsigned long long board)
     }
 }
 
+void Engine::print_chess_char()
+{
+    char* b = (char*) malloc(8*8*sizeof(char));
+    for(int i = 0; i<8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            b[j+i*8] = '-';
+        }
+    }
+
+    for(int i = 0; i<8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            std::cout << b[j+i*8];
+        }
+        std::cout << std::endl;
+    }
+
+}
+
 // East << 1
 // Southeast >> 7
 // South >> 8
