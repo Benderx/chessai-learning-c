@@ -30,7 +30,7 @@ class Rand: public Player
 
 		//Methods
 		Rand(int col, Engine* engine);
-		unsigned long long move();
+		unsigned long long move(int* move_list);
 
 	private:
 };

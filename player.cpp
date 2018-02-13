@@ -19,14 +19,13 @@ Rand::Rand(int col, Engine* engine) : Player(col, engine)
 	//
 }
 
-unsigned long long Rand::move()
+unsigned long long Rand::move(int* move_list)
 {
-	int* move_list = e->generate_legal_moves(color);
+	// int* move_list = e->generate_legal_moves(color);
 	int num_moves = move_list[0];
 	move_list++;
 
-
-	std::cout << "yo" << std::endl;
+	return move_list[0];
 }
 
 // class Rand

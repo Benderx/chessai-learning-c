@@ -27,6 +27,7 @@ void print_moves(Engine* e, std::string c, int* moves)
         e->pop_move();
     }
     std::cout << "total legal moves: " << moves[0] << std::endl;
+    free(moves);
 }
 
 void print_all_pieces(Engine* e)
@@ -159,6 +160,7 @@ void write_all_possible_moves(std::ofstream* file, Engine* e, int* moves)
         write_board(file, e);
         e->pop_move();
     }
+    free(moves);
 }
 
 int main()

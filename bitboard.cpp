@@ -24,7 +24,7 @@ void Engine::init_engine()
     max_move_length = 500; // This assumes there are only 500 possible legal moves at any one time (affects move array intilization)
     move_arr_size = 500;
 
-    move_stack = (int*) malloc(max_move_length * sizeof(int));
+    move_stack = (int*) malloc((max_move_length + 1) * sizeof(int)); // +1 because pushing moves is nesseccary to chekc fo legality
     stack_index = -1;
 
     in_check = false;
@@ -1431,7 +1431,7 @@ int Engine::is_terminal(int color, int* moves)
         }
         return(2);
     }
-    return(0);
+    return(-1);
 }
 
 bool Engine::get_in_check(int color)
