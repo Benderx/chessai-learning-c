@@ -48,7 +48,8 @@ int main()
         if(term != -1)
         {
             std::cout << "game over, result is: " << term << std::endl;
-
+            e->print_chess_char();
+            
             free(e);
             free(players);
             free(move_list);

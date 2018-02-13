@@ -544,7 +544,7 @@ void Engine::pop_move()
     if(taken_piece_type)
     {
         std::cout << taken_piece_type << std::endl;
-        exit(0);
+        // exit(0);
         place_piece(1-color, taken_piece_type, curr_piece_loc);
     }
 
