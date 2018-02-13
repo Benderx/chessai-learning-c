@@ -117,6 +117,7 @@ class Engine
         int decode_type(int move);
         int decode_piece(int move);
         int decode_promo(int move);
+        std::string piece_type_to_string(int move);
         void print_move_info(int move);
 
         // pushing and popping moves from stack

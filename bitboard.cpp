@@ -475,41 +475,58 @@ int Engine::decode_promo(int move)
     return((move >> 17) & 3);
 }
 
-void Engine::print_move_info(int move)
+std::string Engine::piece_type_to_string(int piece)
 {
-    int piece;
-    std::string piece_name;
-    
-    piece = get_piece_by_bitboard(square_to_bitboard(decode_from(move)));
     if(piece == PAWN)
     {
-        piece_name = "pawn";
+        return("pawn");
     }
     else if(piece == ROOK)
     {
-        piece_name = "rook";
+        return("rook");
     }
     else if(piece == NIGHT)
     {
-        piece_name = "night";
+        return("night");
     }
     else if(piece == BISHOP)
     {
-    piece_name = "bishop";
+    return("bishop");
     }
     else if(piece == QUEEN)
     {
-        piece_name = "queen";
+        return("queen");
     }
     else if(piece == KING)
     {
-        piece_name = "king";
+        return("king");
+    }
+    else if(piece == NONE)
+    {
+        return("nothing");
     }
     else
     {
-        piece_name = "WARNING, PIECE INFO IS GARBAGE";
+        return("WARNING, PIECE INFO IS GARBAGE");
     }
-    std::cout << "moving " << piece_name << " from " << decode_from(move) << " to " << decode_to(move) << std::endl;
+}
+
+void Engine::print_move_info(int move)
+{
+    int piece, piece_taken;
+    std::string piece_name, piece_taken_name;
+    int move_type;
+    
+    piece = get_piece_by_bitboard(square_to_bitboard(decode_from(move)));
+    piece_taken = decode_piece(move);
+
+    piece_name = piece_type_to_string(piece);
+    piece_taken_name = piece_type_to_string(piece_taken);
+
+    move_type = decode_type(move);
+
+    std::cout << "moving " << piece_name << " from " << decode_from(move) << " to " << decode_to(move) << 
+                " and taking " << piece_taken_name << " move_type: " << move_type << std::endl;
 }
 
 // Takes in a move to be added to the move stack
@@ -580,7 +597,7 @@ void Engine::pop_move()
 
     if(taken_piece_type)
     {
-        std::cout << taken_piece_type << std::endl;
+        // std::cout << taken_piece_type << std::endl;
         // exit(0);
         place_piece(1-color, taken_piece_type, curr_piece_loc);
     }
@@ -1098,6 +1115,7 @@ unsigned long long* Engine::get_board_rep()
 bool Engine::check_legal(int move, int color)
 {
     std::cout << "checking legality of: " << move << std::endl;
+    print_move_info(move);
     push_move(move);
     if(get_in_check(color))
     {
