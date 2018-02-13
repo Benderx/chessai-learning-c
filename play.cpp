@@ -37,10 +37,11 @@ int main()
     int term;
     int move;
 
+    e->print_chess_char();
+    std::cout << std::endl;
+
     while(moves_made < max_moves-1)
     {
-        e->print_chess_char();
-
         curr_player = players[color];
         int* move_list = e->generate_legal_moves(color);
 
@@ -48,8 +49,8 @@ int main()
         if(term != -1)
         {
             std::cout << "game over, result is: " << term << std::endl;
-            e->print_chess_char();
-            
+            // e->print_chess_char();
+
             free(e);
             free(players);
             free(move_list);
@@ -59,8 +60,10 @@ int main()
         std::cout << color_to_string(color) << " to move." << std::endl;
         std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
         move = curr_player->move(move_list);
+        std::cout <<  "making move: " << move << std::endl;
         e->push_move(move);
 
+        e->print_chess_char();
         std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
 
         moves_made++;
