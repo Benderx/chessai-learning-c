@@ -170,7 +170,6 @@ int main()
     std::ofstream* file = new std::ofstream();
     file->open("games/game0.txt");
 
-
     test_mask_check(e);
     e->reset_engine();
 

@@ -152,31 +152,38 @@ class Engine
         void generate_pre_check_moves(int color, int* move_list, unsigned long long pinned);
 
         //attacks and moves
+        bool get_in_check(int color);
+
+
+        unsigned long long pre_check_white_pawn_attacks(unsigned long long white_pawns);
+        unsigned long long pre_check_black_pawn_attacks(unsigned long long black_pawns);
         unsigned long long pre_check_white_pawn_moves(unsigned long long white_pawns, unsigned long long all_pieces, unsigned long long all_black_pieces);
         unsigned long long pre_check_black_pawn_moves(unsigned long long black_pawns, unsigned long long all_pieces, unsigned long long all_white_pieces);
 
-        unsigned long long pre_check_king_moves(unsigned long long king_rep, unsigned long long same_occupied);
+        unsigned long long pre_check_king_attacks(unsigned long long kings);
+        unsigned long long pre_check_king_moves(unsigned long long kings, unsigned long long own_occupied);
         unsigned long long pre_check_king_moves(int color);
 
+        unsigned long long pre_check_night_attacks(unsigned long long nights);
         unsigned long long pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied);
         unsigned long long pre_check_night_moves(int color);
 
-        unsigned long long pre_check_one_bishop_attacks(unsigned long long bishop, unsigned long long all_occupied);
-        unsigned long long pre_check_bishop_attacks(unsigned long long bishops, unsigned long long all_occupied);
+        unsigned long long pre_check_one_bishop_attacks(unsigned long long bishop);
+        unsigned long long pre_check_bishop_attacks(unsigned long long bishops);
         unsigned long long pre_check_one_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_bishop_moves(int color);
         unsigned long long pre_check_bishop_moves(unsigned long long piece, int color);
 
-        unsigned long long pre_check_one_rook_attacks(unsigned long long rook, unsigned long long all_occupied);
-        unsigned long long pre_check_rook_attacks(unsigned long long rooks, unsigned long long all_occupied);
+        unsigned long long pre_check_one_rook_attacks(unsigned long long rook);
+        unsigned long long pre_check_rook_attacks(unsigned long long rooks);
         unsigned long long pre_check_one_rook_moves(unsigned long long rook, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_rook_moves(unsigned long long rooks, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_rook_moves(int color);
         unsigned long long pre_check_rook_moves(unsigned long long piece, int color);
 
-        unsigned long long pre_check_one_queen_attacks(unsigned long long queen, unsigned long long all_occupied);
-        unsigned long long pre_check_queen_attacks(unsigned long long queens, unsigned long long all_occupied);
+        unsigned long long pre_check_one_queen_attacks(unsigned long long queen);
+        unsigned long long pre_check_queen_attacks(unsigned long long queens);
         unsigned long long pre_check_one_queen_moves(unsigned long long queen, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_queen_moves(unsigned long long queens, unsigned long long all_occupied, unsigned long long own_occupied);
         unsigned long long pre_check_queen_moves(int color);
