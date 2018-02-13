@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits>
+#include <time.h>
 
 // g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp -std=c++14 -o run
 
@@ -21,6 +22,7 @@ std::string color_to_string(int color)
 
 int main()
 {
+    srand(time(NULL));
     Engine* e = new Engine();
     
     Rand** players = (Rand**) malloc(2 * sizeof(Rand*));

@@ -516,7 +516,7 @@ void Engine::push_move(int move)
     if(taken_piece_type)
     {
         // int taken_piece_type = get_piece_by_bitboard(1-color, taken_piece_loc);
-        std::cout << taken_piece_type << std::endl;
+        // std::cout << taken_piece_type << std::endl;
         remove_piece(1-color, taken_piece_type, taken_piece_loc);
     }
 
