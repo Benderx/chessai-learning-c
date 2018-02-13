@@ -517,7 +517,6 @@ void Engine::push_move(int move)
     {
         // int taken_piece_type = get_piece_by_bitboard(1-color, taken_piece_loc);
         std::cout << taken_piece_type << std::endl;
-        exit(0);
         remove_piece(1-color, taken_piece_type, taken_piece_loc);
     }
 
@@ -1059,9 +1058,15 @@ unsigned long long* Engine::get_board_rep()
 
 
 // Some hueristics have been met, the only way to check if a move is legal or not, we must make it.
-bool Engine::check_legal(int move)
+bool Engine::check_legal(int move, int color)
 {
-    
+    push_move(move);
+    if(get_in_check(color))
+    {
+        pop_move();
+        return false;
+    }
+    pop_move();
     return(true);
 }
 
@@ -1405,9 +1410,9 @@ int* Engine::generate_legal_moves(int color)
     {
         int move = move_list[move_iter+1];
         // if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
-        if((decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
+        if((decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move, color)))
         {
-            std::cout << king_square << std::endl;
+            // std::cout << king_square << std::endl;
             move_list[0] -= 1;
             move_list[move_iter] = move_list[move_list[0]+1];
             move_iter--;
@@ -1421,9 +1426,9 @@ int* Engine::generate_legal_moves(int color)
 // 0 for black winning
 // 1 for white winning
 // 2 for draw
-int Engine::is_terminal(int color, int* moves)
+int Engine::is_terminal(int color, int* move_list)
 {
-    if(moves[0] == 0)
+    if(move_list[0] == 0)
     {
         if(get_in_check(color))
         {

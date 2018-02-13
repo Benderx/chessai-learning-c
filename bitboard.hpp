@@ -146,7 +146,7 @@ class Engine
         unsigned long long* get_board_rep();
 
         //move gen helpers
-        bool check_legal(int move);
+        bool check_legal(int move, int color);
         unsigned long long pinned_pieces(int color);
         void pop_and_add_regular_moves(int color, int* move_list, unsigned long long board, int curr_pos);
         void generate_pre_check_moves(int color, int* move_list, unsigned long long pinned);
