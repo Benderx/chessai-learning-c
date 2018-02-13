@@ -1,6 +1,8 @@
 #include "bitboard.hpp"
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+#include <fstream>
 
 // g++ bitboard.hpp bitboard.cpp driver.cpp -std=c++14 -o run
 
@@ -143,15 +145,24 @@ void test_mask_check(Engine* e)
     print_pieces(e, "pieces", "masked", e->get_all() & e->col_mask[0]);
 }
 
-void write_board()
+void write_board(std::ofstream* file, Engine* e)
 {
-    //
+    unsigned long long* rep = e->get_board_rep();
+    std::cout << "yaboi" << std::endl;
+    for(int i = 0; i < 12; i++)
+    {
+        (*file) << rep[i] << "\n";
+    }
 }
 
 int main()
 {
     Engine* e = new Engine();
     print_all_pieces(e);
+
+    std::ofstream* file = new std::ofstream();
+    file->open("games/game0.txt");
+
 
     test_mask_check(e);
     e->reset_engine();
@@ -181,10 +192,14 @@ int main()
     e->reset_engine();
 
 
-
     std::cout << "testing white moves" << std::endl;
     test_white_moves(e);
     e->reset_engine();
+
+
+
+    write_board(file, e);
+    file->close();
 
     return 0;
 }
