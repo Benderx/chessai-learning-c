@@ -71,6 +71,7 @@ class Engine
 
         //printing
         void print_chess_rep(unsigned long long num);
+        void print_chess_chars(unsigned long long num);
 
         //move gen
         int* generate_legal_moves(int color);
