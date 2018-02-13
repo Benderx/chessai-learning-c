@@ -994,6 +994,8 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
     unsigned long long p, one_p, all_occupied, own_occupied, temp, enemy_occupied;
     all_occupied = get_all();
 
+    bool print = false;
+
     if(color == 1)
     {
         own_occupied = get_all_white();
@@ -1004,6 +1006,17 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing white rook boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing white rook boardrep2" << std::endl;
+                print_chess_rep(pre_check_one_rook_moves(one_p, all_occupied, own_occupied));
+                std::cout << "printing white rook boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
             pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
@@ -1014,20 +1027,227 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-            std::cout << "printing boardrep" << std::endl;
-            // print_chess_rep(one_p);
-            // std::cout << "printing boardrep2" << std::endl;
-            print_chess_rep(pre_check_white_pawn_moves(one_p, all_occupied, own_occupied));
-            // std::cout << "printing boardrep3" << std::endl;
-            // print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+
+            if(print)
+            {
+                std::cout << "printing white pawn boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing white pawn boardrep2" << std::endl;
+                print_chess_rep(pre_check_white_pawn_moves(one_p, all_occupied, enemy_occupied));
+                std::cout << "printing white pawn boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
             pop_and_add_regular_moves(color, move_list, pre_check_white_pawn_moves(one_p, 
                 all_occupied, enemy_occupied), bitboard_to_square(one_p));
         }
+
+        p = pos.white_bishops & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing white bishops boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing white bishops boardrep2" << std::endl;
+                print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
+                std::cout << "printing white bishops boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
+                all_occupied, enemy_occupied), bitboard_to_square(one_p));
+        }
+
+        p = pos.white_nights & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing white night boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing white night boardrep2" << std::endl;
+                print_chess_rep(pre_check_night_moves(one_p, own_occupied));
+                std::cout << "printing white night boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_night_moves(one_p, 
+                own_occupied), bitboard_to_square(one_p));
+        }
+
+        p = pos.white_queens & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing white queen boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing white queen boardrep2" << std::endl;
+                print_chess_rep(pre_check_one_queen_moves(one_p, all_occupied, own_occupied));
+                std::cout << "printing white queen boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_one_queen_moves(one_p, 
+                all_occupied, own_occupied), bitboard_to_square(one_p));
+        }
+
+        p = pos.white_kings & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing white king boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing white king boardrep2" << std::endl;
+                print_chess_rep(pre_check_king_moves(one_p, own_occupied));
+                std::cout << "printing white king boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
+                own_occupied), bitboard_to_square(one_p));
+        }
+
     }
     else
     {
         own_occupied = get_all_black();
+        enemy_occupied = get_all_white();
 
+        p = pos.black_rooks & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing black rook boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing black rook boardrep2" << std::endl;
+                print_chess_rep(pre_check_one_rook_moves(one_p, all_occupied, own_occupied));
+                std::cout << "printing black rook boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
+                all_occupied, own_occupied), bitboard_to_square(one_p));
+        }
+
+
+        p = pos.black_pawns & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing black pawn boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing black pawn boardrep2" << std::endl;
+                print_chess_rep(pre_check_black_pawn_moves(one_p, all_occupied, enemy_occupied));
+                std::cout << "printing black pawn boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_black_pawn_moves(one_p, 
+                all_occupied, enemy_occupied), bitboard_to_square(one_p));
+        }
+
+        p = pos.black_bishops & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing black bishops boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing black bishops boardrep2" << std::endl;
+                print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
+                std::cout << "printing black bishops boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
+                all_occupied, enemy_occupied), bitboard_to_square(one_p));
+        }
+
+        p = pos.black_nights & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing black night boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing black night boardrep2" << std::endl;
+                print_chess_rep(pre_check_night_moves(one_p, own_occupied));
+                std::cout << "printing black night boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_night_moves(one_p, 
+                own_occupied), bitboard_to_square(one_p));
+        }
+
+        p = pos.black_queens & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing black queen boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing black queen boardrep2" << std::endl;
+                print_chess_rep(pre_check_one_queen_moves(one_p, all_occupied, own_occupied));
+                std::cout << "printing black queen boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_one_queen_moves(one_p, 
+                all_occupied, own_occupied), bitboard_to_square(one_p));
+        }
+
+        p = pos.black_kings & ~pinned;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+
+            if(print)
+            {
+                std::cout << "printing black king boardrep" << std::endl;
+                print_chess_rep(one_p);
+                std::cout << "printing black king boardrep2" << std::endl;
+                print_chess_rep(pre_check_king_moves(one_p, own_occupied));
+                std::cout << "printing black king boardrep3" << std::endl;
+                print_chess_rep(square_to_bitboard(bitboard_to_square(one_p)));
+            }
+
+            pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
+                own_occupied), bitboard_to_square(one_p));
+        }
     }
 }
 
