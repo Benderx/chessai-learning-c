@@ -687,6 +687,106 @@ void Engine::print_chess_char()
         }
     }
 
+    unsigned long long p;
+    unsigned long long one_p;
+
+    p = pos.white_pawns;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        std::cout << "Awww fuck I'm a pawn and I'm on rank: " << get_rank(one_p) << std::endl;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'P';
+    }
+
+    p = pos.black_pawns;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'p';
+    }
+
+    p = pos.white_rooks;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'R';
+    }
+
+    p = pos.black_rooks;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'r';
+    }
+
+    p = pos.white_nights;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'N';
+    }
+
+    p = pos.black_nights;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'n';
+    }
+
+    p = pos.white_bishops;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'B';
+    }
+
+    p = pos.black_bishops;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'b';
+    }
+
+    p = pos.white_kings;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'K';
+    }
+
+    p = pos.black_kings;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'k';
+    }
+
+    p = pos.white_queens;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'Q';
+    }
+
+    p = pos.black_queens;
+    while(p)
+    {
+        one_p = lsb_board(p);
+        p = p & ~one_p;
+        b[get_file(one_p)+8*(7-get_rank(one_p))] = 'q';
+    }
+
     for(int i = 0; i<8; i++)
     {
         for(int j = 0; j < 8; j++)
