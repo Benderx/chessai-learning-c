@@ -1062,7 +1062,7 @@ unsigned long long* Engine::get_board_rep()
 bool Engine::check_legal(int move)
 {
     
-    return(false);
+    return(true);
 }
 
 
@@ -1423,11 +1423,11 @@ int Engine::is_terminal(int color, int* moves)
     {
         if(get_in_check(color))
         {
-            return 1-color;
+            return(1-color);
         }
-        return 2;
+        return(2);
     }
-    return 0;
+    return(0);
 }
 
 bool Engine::get_in_check(int color)

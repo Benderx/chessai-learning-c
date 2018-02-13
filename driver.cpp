@@ -19,13 +19,12 @@ void print_moves(Engine* e, std::string c, int* moves)
     std::cout << "printing moves for " << c << std::endl;
     for(int i = 0; i < moves[0]; i++)
     {
-        std::cout << "making move " << moves[i+1] << std::endl;
+        // std::cout << "making move " << moves[i+1] << std::endl << std::endl;
+        std::cout << std::endl;
         e->push_move(moves[i+1]);
-        // e->print_chess_rep(e->get_all());
+        e->print_chess_char();
+        std::cout << std::endl;
         e->pop_move();
-        // std::cout << "popped" << std::endl;
-        // e->print_chess_rep(e->get_all());
-        // exit(0);
     }
     std::cout << "total legal moves: " << moves[0] << std::endl;
 }
@@ -165,52 +164,53 @@ void write_all_possible_moves(std::ofstream* file, Engine* e, int* moves)
 int main()
 {
     Engine* e = new Engine();
-    print_all_pieces(e);
+    // print_all_pieces(e);
 
     std::ofstream* file = new std::ofstream();
     file->open("games/game0.txt");
 
-    test_mask_check(e);
-    e->reset_engine();
+    // test_mask_check(e);
+    // e->reset_engine();
 
-    std::cout << "testing pawn moves" << std::endl;
-    test_pawn_moves(e);
-    e->reset_engine();
+    // std::cout << "testing pawn moves" << std::endl;
+    // test_pawn_moves(e);
+    // e->reset_engine();
 
-    std::cout << "testing king moves" << std::endl;
-    test_king_moves(e);
-    e->reset_engine();
+    // std::cout << "testing king moves" << std::endl;
+    // test_king_moves(e);
+    // e->reset_engine();
 
-    std::cout << "testing night moves" << std::endl;
-    test_night_moves(e);
-    e->reset_engine();
+    // std::cout << "testing night moves" << std::endl;
+    // test_night_moves(e);
+    // e->reset_engine();
 
-    std::cout << "testing bishop moves" << std::endl;
-    test_bishop_moves(e);
-    e->reset_engine();
+    // std::cout << "testing bishop moves" << std::endl;
+    // test_bishop_moves(e);
+    // e->reset_engine();
 
-    std::cout << "testing rook moves" << std::endl;
-    test_rook_moves(e);
-    e->reset_engine();
+    // std::cout << "testing rook moves" << std::endl;
+    // test_rook_moves(e);
+    // e->reset_engine();
 
-    std::cout << "testing queen moves" << std::endl;
-    test_queen_moves(e);
-    e->reset_engine();
+    // std::cout << "testing queen moves" << std::endl;
+    // test_queen_moves(e);
+    // e->reset_engine();
+
+    // std::cout << "testing white moves" << std::endl;
+    // test_white_moves(e);
+    // e->reset_engine();
 
 
-    std::cout << "testing white moves" << std::endl;
-    test_white_moves(e);
-    e->reset_engine();
+    print_moves(e, "white", e->generate_legal_moves(1));
 
 
     write_all_possible_moves(file, e, e->generate_legal_moves(1));
-    // write_board(file, e);
 
-    file->close();
-
-    print_all_pieces(e);
+    // print_all_pieces(e);
     std::cout << "\nCurrent board rep\n";
     e->print_chess_char();
+    
 
+    file->close();
     return 0;
 }
