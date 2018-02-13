@@ -38,7 +38,7 @@ int main()
     while(moves_made < max_moves-1)
     {
         e->print_chess_char();
-        
+
         curr_player = players[color];
         int* move_list = e->generate_legal_moves(color);
 
@@ -54,6 +54,7 @@ int main()
         }
 
         std::cout << color_to_string(color) << " to move." << std::endl;
+        std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
         move = curr_player->move(move_list);
         e->push_move(move);
 
@@ -66,5 +67,5 @@ int main()
 
     free(e);
     free(players);
-    return 2;
+    return(2);
 }

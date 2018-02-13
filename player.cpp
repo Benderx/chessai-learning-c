@@ -25,7 +25,7 @@ unsigned long long Rand::move(int* move_list)
 	int num_moves = move_list[0];
 	move_list++;
 
-	return move_list[0];
+	return move_list[rand() % num_moves];
 }
 
 // class Rand
