@@ -1114,16 +1114,17 @@ unsigned long long* Engine::get_board_rep()
 // Some hueristics have been met, the only way to check if a move is legal or not, we must make it.
 bool Engine::check_legal(int move, int color)
 {
-    std::cout << "checking legality of: " << move << std::endl;
-    print_move_info(move);
-    push_move(move);
-    if(get_in_check(color))
-    {
-        pop_move();
-        return(false);
-    }
-    pop_move();
-    return(true);
+    return false;
+    // std::cout << "checking legality of: " << move << std::endl;
+    // print_move_info(move);
+    // push_move(move);
+    // if(get_in_check(color))
+    // {
+    //     pop_move();
+    //     return(false);
+    // }
+    // pop_move();
+    // return(true);
 }
 
 
