@@ -61,6 +61,7 @@ int main()
         std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
         move = curr_player->move(move_list);
         std::cout <<  "making move: " << move << std::endl;
+        e->print_move_info(move);
         e->push_move(move);
 
         e->print_chess_char();

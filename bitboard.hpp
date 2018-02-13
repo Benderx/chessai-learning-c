@@ -117,6 +117,7 @@ class Engine
         int decode_type(int move);
         int decode_piece(int move);
         int decode_promo(int move);
+        void print_move_info(int move);
 
         // pushing and popping moves from stack
         void stack_push(int move);

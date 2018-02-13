@@ -475,6 +475,43 @@ int Engine::decode_promo(int move)
     return((move >> 17) & 3);
 }
 
+void Engine::print_move_info(int move)
+{
+    int piece;
+    std::string piece_name;
+    
+    piece = get_piece_by_bitboard(square_to_bitboard(decode_from(move)));
+    if(piece == PAWN)
+    {
+        piece_name = "pawn";
+    }
+    else if(piece == ROOK)
+    {
+        piece_name = "rook";
+    }
+    else if(piece == NIGHT)
+    {
+        piece_name = "night";
+    }
+    else if(piece == BISHOP)
+    {
+    piece_name = "bishop";
+    }
+    else if(piece == QUEEN)
+    {
+        piece_name = "queen";
+    }
+    else if(piece == KING)
+    {
+        piece_name = "king";
+    }
+    else
+    {
+        piece_name = "WARNING, PIECE INFO IS GARBAGE";
+    }
+    std::cout << "moving " << piece_name << " from " << decode_from(move) << " to " << decode_to(move) << std::endl;
+}
+
 // Takes in a move to be added to the move stack
 // Returns nothing
 // Alters the move stack and stack_index value
