@@ -207,5 +207,10 @@ int main()
     // write_board(file, e);
 
     file->close();
+
+    print_all_pieces(e);
+    std::cout << "\nCurrent board rep\n";
+    e->print_chess_char();
+
     return 0;
 }
