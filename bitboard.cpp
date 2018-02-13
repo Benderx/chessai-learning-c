@@ -695,7 +695,6 @@ void Engine::print_chess_char()
     {
         one_p = lsb_board(p);
         p = p & ~one_p;
-        std::cout << "Awww fuck I'm a pawn and I'm on rank: " << get_rank(one_p) << std::endl;
         b[get_file(one_p)+8*(7-get_rank(one_p))] = 'P';
     }
 
@@ -1414,6 +1413,22 @@ int* Engine::generate_legal_moves(int color)
     return(move_list);
 }
 
+// -1 for not over
+// 0 for black winning
+// 1 for white winning
+// 2 for draw
+int Engine::is_terminal(int color, int* moves)
+{
+    if(moves[0] == 0)
+    {
+        if(get_in_check(color))
+        {
+            return 1-color;
+        }
+        return 2;
+    }
+    return 0;
+}
 
 bool Engine::get_in_check(int color)
 {

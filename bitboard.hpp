@@ -152,6 +152,7 @@ class Engine
         void generate_pre_check_moves(int color, int* move_list, unsigned long long pinned);
 
         //attacks and moves
+        int is_terminal(int color, int* moves);
         bool get_in_check(int color);
 
 
