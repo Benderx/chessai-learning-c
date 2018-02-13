@@ -5,6 +5,8 @@ general notes:
 look into this https://stackoverflow.com/questions/25802605/what-does-performing-a-byteswap-mean
 
 
+First square (bottom left) is square 0
+
 pre_check_one_bishop_moves:
     original code:
         // unsigned long long line_mask = diagonalMaskEx[bishop_square]; // excludes square of slider

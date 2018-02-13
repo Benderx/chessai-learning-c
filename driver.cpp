@@ -15,13 +15,13 @@ void print_pieces(Engine* e, std::string c, std::string s, unsigned long long pi
 
 void print_moves(Engine* e, std::string c, int* moves)
 {
-    print_pieces(e, "", "pieces", e->get_all());
+    // print_pieces(e, "", "pieces", e->get_all());
     std::cout << "printing moves for " << c << std::endl;
     for(int i = 0; i < moves[0]; i++)
     {
         std::cout << "making move " << moves[i+1] << std::endl;
         e->push_move(moves[i+1]);
-        e->print_chess_rep(e->get_all());
+        // e->print_chess_rep(e->get_all());
         e->pop_move();
         // std::cout << "popped" << std::endl;
         // e->print_chess_rep(e->get_all());
@@ -135,9 +135,6 @@ void test_white_moves(Engine* e)
     print_pieces(e, "black", "pawns", e->pos.black_pawns);
 
     print_moves(e, "white", e->generate_legal_moves(1));
-    // std::cout << "why\n";
-    // print_pieces(e, "white", "moves", e->generate_legal_moves(1));
-    // print_pieces(e, "black", "moves", e->pre_check_queen_moves(0));
 }
 
 void test_mask_check(Engine* e)
@@ -148,10 +145,20 @@ void test_mask_check(Engine* e)
 void write_board(std::ofstream* file, Engine* e)
 {
     unsigned long long* rep = e->get_board_rep();
-    std::cout << "yaboi" << std::endl;
     for(int i = 0; i < 12; i++)
     {
         (*file) << rep[i] << "\n";
+    }
+}
+
+void write_all_possible_moves(std::ofstream* file, Engine* e, int* moves)
+{
+    std::cout << "writing all legal moves for white" << std::endl;
+    for(int i = 0; i < moves[0]; i++)
+    {
+        e->push_move(moves[i+1]);
+        write_board(file, e);
+        e->pop_move();
     }
 }
 
@@ -197,9 +204,9 @@ int main()
     e->reset_engine();
 
 
+    write_all_possible_moves(file, e, e->generate_legal_moves(1));
+    // write_board(file, e);
 
-    write_board(file, e);
     file->close();
-
     return 0;
 }
