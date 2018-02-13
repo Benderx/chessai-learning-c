@@ -917,6 +917,25 @@ int Engine::get_color_by_bitboard(unsigned long long board)
     }
 }
 
+unsigned long long* Engine::get_board_rep()
+{
+    unsigned long long* rep = (unsigned long long*) malloc(12 * sizeof(unsigned long long));
+    rep[0] = pos.white_pawns;
+    rep[1] = pos.white_rooks;
+    rep[2] = pos.white_nights;
+    rep[3] = pos.white_bishops;
+    rep[4] = pos.white_queens;
+    rep[5] = pos.white_kings;
+
+    rep[6] = pos.black_pawns;
+    rep[7] = pos.black_rooks;
+    rep[8] = pos.black_nights;
+    rep[9] = pos.black_bishops;
+    rep[10] = pos.black_queens;
+    rep[11] = pos.black_kings;
+    return rep;
+}
+
 
 // Some hueristics have been met, the only way to check if a move is legal or not, we must make it.
 bool Engine::check_legal(int move)

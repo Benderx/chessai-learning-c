@@ -142,6 +142,7 @@ class Engine
         void remove_piece(int color, int type, unsigned long long board);
         void place_piece(int color, int type, unsigned long long board);
         int get_color_by_bitboard(unsigned long long board);
+        unsigned long long* get_board_rep();
 
         //move gen helpers
         bool check_legal(int move);
