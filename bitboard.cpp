@@ -1122,6 +1122,9 @@ void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long 
         new_pos = lsb_board(board);
         piece_taken = get_piece_by_bitboard(1-color, new_pos);
 
+        // std::cout << "okmyman " << bitboard_to_square(new_pos) << ", " << move_list[0] << std::endl;
+        // print_chess_rep(board);
+
         // std::cout << "YABOI^2 " << bitboard_to_square(new_pos) << ", " << move_list[0] << std::endl;
         // print_chess_rep(new_pos);
 
@@ -1197,10 +1200,11 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
                 print_chess_rep(one_p);
                 std::cout << "printing white bishops boardrep2" << std::endl;
                 print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
+                // exit(0);
             }
 
             pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
-                all_occupied, enemy_occupied), bitboard_to_square(one_p));
+                all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
         p = pos.white_nights & ~pinned;
@@ -1315,7 +1319,7 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             }
 
             pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
-                all_occupied, enemy_occupied), bitboard_to_square(one_p));
+                all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
         p = pos.black_nights & ~pinned;

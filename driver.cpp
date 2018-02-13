@@ -19,7 +19,7 @@ void print_moves(Engine* e, std::string c, int* moves)
     std::cout << "printing moves for " << c << std::endl;
     for(int i = 0; i < moves[0]; i++)
     {
-        // std::cout << "making move " << moves[i+1] << std::endl << std::endl;
+        std::cout << "making move " << moves[i+1] << std::endl << std::endl;
         std::cout << std::endl;
         e->push_move(moves[i+1]);
         e->print_chess_char();
