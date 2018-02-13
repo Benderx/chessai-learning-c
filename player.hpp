@@ -29,7 +29,7 @@ class Rand: public Player
 		Engine *e;
 
 		//Methods
-		Rand(int col, Engine *engine);
+		Rand(int col, Engine* engine);
 		unsigned long long move();
 
 	private:
