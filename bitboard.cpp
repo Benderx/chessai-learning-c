@@ -74,7 +74,7 @@ void Engine::init_position(unsigned long long *board_data)
 
 void Engine::init_lsb_lookup()
 {
-    for(int i=0;i<63;i++)
+    for(int i=0;i<64;i++)
     {
         lsb_lookup.insert({(unsigned long long) std::pow(2,i),i});
     }
@@ -1114,17 +1114,17 @@ unsigned long long* Engine::get_board_rep()
 // Some hueristics have been met, the only way to check if a move is legal or not, we must make it.
 bool Engine::check_legal(int move, int color)
 {
-    return false;
-    // std::cout << "checking legality of: " << move << std::endl;
-    // print_move_info(move);
-    // push_move(move);
-    // if(get_in_check(color))
-    // {
-    //     pop_move();
-    //     return(false);
-    // }
-    // pop_move();
-    // return(true);
+    // return false;
+    std::cout << "checking legality of: " << move << std::endl;
+    print_move_info(move);
+    push_move(move);
+    if(get_in_check(color))
+    {
+        pop_move();
+        return(false);
+    }
+    pop_move();
+    return(true);
 }
 
 
@@ -1191,7 +1191,19 @@ void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long 
         // print_chess_rep(new_pos);
 
         move_list[move_list[0]+1] = encode_move(curr_pos, bitboard_to_square(new_pos), REGULAR, piece_taken, 0);
-        // std::cout << "move: " << move_list[move_list[0]+1] << ", " << std::endl;
+        // if(piece_type_to_string(get_piece_by_bitboard(square_to_bitboard(decode_from(move_list[move_list[0]+1])))) == "nothing")
+        // {
+        //     std::cout << "moves in move_list: " << move_list[0] << std::endl;
+        //     std::cout << "all_moves" << std::endl;
+        //     print_chess_rep(board);
+        //     std::cout << "one_move" << std::endl;
+        //     print_chess_rep(new_pos);
+        //     std::cout << "bitboard_to_square one move: " << bitboard_to_square(new_pos) << std::endl;
+        //     std::cout << "piece_taken: " << piece_taken << std::endl;
+        //     std::cout << "curr_pos: " << curr_pos << std::endl;
+        //     print_chess_rep(new_pos);
+        //     exit(0);
+        // }
         board = board - new_pos;
         move_list[0]++;
     }
