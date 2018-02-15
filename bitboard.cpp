@@ -1488,9 +1488,9 @@ int* Engine::generate_legal_moves(int color)
     {
         int move = move_list[move_iter+1];
         // if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
-        if((decode_from(move) == king_square || decode_type(move) == ENPASSANT || check_status) && ~(check_legal(move, color)))
+        if((decode_from(move) == king_square || decode_type(move) == ENPASSANT || check_status) && !(check_legal(move, color)))
         {
-            // std::cout << king_square << std::endl;
+            std::cout << "removing move cause not legal: " << move << std::endl;
             move_list[move_iter+1] = move_list[move_list[0]];
             move_list[0]--;
             move_iter--;
