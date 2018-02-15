@@ -1473,18 +1473,20 @@ int* Engine::generate_legal_moves(int color)
     unsigned long long pinned = pinned_pieces(color);
     int king_square = bitboard_to_square(get_bitboard_of_piece(KING, color));
 
-    // std::cout << "\n\nKING SQUARE IS " << king_square << "COLOR IS" << color << "\n\n";
-    // std::cout << "\n\nKING SQUARE BITBOARD IS" << "\n";
-    // print_chess_rep(get_bitboard_of_piece(KING, color));
-    // std::cout << "\n\n";
-    // print_chess_char();
 
-    // if(!get_bitboard_of_piece(KING, color))
-    // {
-    //     print_chess_rep(pos.black_kings);
-    //     std::cout << (KING == KING) << "\n";
-    //     exit(0);
-    // }
+    if(!get_bitboard_of_piece(KING, color))
+    {
+        std::cout << "\n\nKING SQUARE IS " << king_square << "COLOR IS" << color << "\n\n";
+        std::cout << "\n\nKING SQUARE BITBOARD IS" << "\n";
+        print_chess_rep(get_bitboard_of_piece(KING, color));
+        std::cout << "\n\n";
+        print_chess_char();
+
+        print_chess_rep(pos.white_kings);
+        print_chess_rep(pos.black_kings);
+        std::cout << (KING == KING) << "\n";
+        exit(0);
+    }
 
     // if(in_check)
     // {
@@ -1614,10 +1616,10 @@ unsigned long long Engine::pre_check_white_pawn_attacks(unsigned long long white
 unsigned long long Engine::pre_check_black_pawn_attacks(unsigned long long black_pawns)
 {
     // left side, filter out left file
-    unsigned long long pawn_left = (black_pawns & ~col_mask[0]) >> 9;
+    unsigned long long pawn_left = (black_pawns & ~col_mask[0]) >> 7;
 
     // right side, filter out right file
-    unsigned long long pawn_right = (black_pawns & ~col_mask[7]) >> 7;
+    unsigned long long pawn_right = (black_pawns & ~col_mask[7]) >> 9;
 
     // or together pawn attacks
     return(pawn_left | pawn_right);

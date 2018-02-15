@@ -79,9 +79,13 @@ int main()
     Rand* curr_player;
     int result;
 
+    for(int i = 0; i < 100; i++)
+    {
+        result = play_game(e, players, curr_player);
+        e->print_chess_char();
+        e->reset_engine();        
+    }
 
-    result = play_game(e, players, curr_player);
-    e->reset_engine();
 
 
     free(players[0]);
