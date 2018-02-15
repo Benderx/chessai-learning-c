@@ -1117,19 +1117,19 @@ unsigned long long* Engine::get_board_rep()
 bool Engine::check_legal(int move, int color)
 {
     // return false;
-    // std::cout << "checking legality of: " << move << std::endl;
-    // print_move_info(move);
+    std::cout << "checking legality of: " << move << std::endl;
+    print_move_info(move);
     push_move(move);
-    // print_chess_char();
+    print_chess_char();
     if(get_in_check(color))
     {
-        // std::cout << "popping, NOT LEGAL: " << move << std::endl;
+        std::cout << "popping, NOT LEGAL: " << move << std::endl;
         // print_chess_char();
         pop_move();
         // print_chess_char();
         return(false);
     }
-    // std::cout << "popping, LEGAL: " << move << std::endl;
+    std::cout << "popping, LEGAL: " << move << std::endl;
     // print_chess_char();
     pop_move();
     // print_chess_char();
@@ -1616,10 +1616,10 @@ unsigned long long Engine::pre_check_white_pawn_attacks(unsigned long long white
 unsigned long long Engine::pre_check_black_pawn_attacks(unsigned long long black_pawns)
 {
     // left side, filter out left file
-    unsigned long long pawn_left = (black_pawns & ~col_mask[0]) >> 7;
+    unsigned long long pawn_left = (black_pawns & ~col_mask[0]) >> 9;
 
     // right side, filter out right file
-    unsigned long long pawn_right = (black_pawns & ~col_mask[7]) >> 9;
+    unsigned long long pawn_right = (black_pawns & ~col_mask[7]) >> 7;
 
     // or together pawn attacks
     return(pawn_left | pawn_right);
