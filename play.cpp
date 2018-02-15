@@ -44,7 +44,7 @@ int play_game(Engine* e, Rand** players, Rand* curr_player)
             // e->print_chess_char();
 
             free(move_list);
-            return term;
+            return(term);
         }
 
         std::cout << color_to_string(color) << " to move." << std::endl;
@@ -62,8 +62,8 @@ int play_game(Engine* e, Rand** players, Rand* curr_player)
         free(move_list);
     }
 
-    std::cout << "game over, result is draw from making max moves:" << max_moves << std::endl;
-    return 2; // draw
+    std::cout << "game over, result is draw from making max moves: " << max_moves << std::endl;
+    return(2); // draw
 }
 
 
@@ -84,8 +84,9 @@ int main()
     e->reset_engine();
 
 
-    free(curr_player);
-    free(e);
+    free(players[0]);
+    free(players[1]);
     free(players);
-    return(2);
+    free(e);
+    return(0);
 }
