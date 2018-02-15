@@ -730,7 +730,7 @@ unsigned long long Engine::horizontal_flip(unsigned long long x)
 }
 
 
-//REWRITE
+// 4ns
 unsigned long long Engine::vertical_flip(unsigned long long x)
 {
     return __builtin_bswap64(x);
@@ -906,16 +906,19 @@ void Engine::print_chess_char()
 // Northeast << 9
 
 //check implementation
+// 315 ns per (due to lsb_digit)
 int Engine::bitboard_to_square(unsigned long long piece)
 {
     return(lsb_digit(piece));
 }
 
+// ~3ns
 unsigned long long Engine::square_to_bitboard(int square)
 {
     return(1ULL << square);
 }
 
+// ~3ns
 unsigned long long Engine::get_bitboard_of_piece(Piece piece, int color)
 {
     if(color == 1)
@@ -954,6 +957,7 @@ unsigned long long Engine::get_bitboard_of_piece(Piece piece, int color)
     // } 
 }
 
+// 15ns
 Piece Engine::get_piece_by_bitboard(int color, unsigned long long board)
 {
     unsigned long long pawns, rooks, nights, bishops, queens, kings;
@@ -1006,6 +1010,7 @@ Piece Engine::get_piece_by_bitboard(int color, unsigned long long board)
     }
 }
 
+// 30ns
 Piece Engine::get_piece_by_bitboard(unsigned long long board)
 {
     return(get_piece_by_bitboard(get_color_by_bitboard(board), board));
@@ -1184,6 +1189,7 @@ bool Engine::check_legal(int move, int color)
 
 
 // Returns a bitboard of pieces that are pinned against their king 
+// 1000ns
 unsigned long long Engine::pinned_pieces(int color)
 {
     unsigned long long defenders;
@@ -1268,6 +1274,7 @@ void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long 
 
 // Generates and fills move_list for a color before checking checks
 // DOES NOT CHECK BOUNDS FOR move_arr_size
+// 5000 ns
 void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long long pinned)
 {
     unsigned long long p, one_p, all_occupied, own_occupied, temp, enemy_occupied;

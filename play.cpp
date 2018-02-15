@@ -86,7 +86,7 @@ int main()
 
     Rand* curr_player;
     int result;
-    int* num_moves = (int*) malloc(sizeof(int));;
+    int* num_moves = (int*) malloc(sizeof(int));
 
 
 
@@ -97,21 +97,26 @@ int main()
     num_moves[0] = 0;
     t1 = std::chrono::system_clock::now();
     
-    // for(int i = 0; i < 1000; i++)
-    // {
-    //     result = play_game(e, players, curr_player, num_moves);
-    //     // e->print_chess_char();
-    //     e->reset_engine();        
-    // }
-    
-    for(int i = 0; i < 10000000; i++)
+    for(int i = 0; i < 1000; i++)
     {
-        result = e->vertical_flip(e->pos.black_kings);        
+        result = play_game(e, players, curr_player, num_moves);
+        // e->print_chess_char();
+        e->reset_engine();        
     }
+    
+    // int* garbage = (int*) malloc(10000 * sizeof(int));
+    // garbage[0] = 0;
+    // for(int i = 0; i < 100000; i++)
+    // {
+    //     e->generate_pre_check_moves(1, garbage, 0); 
+    //     // e->generate_pre_check_moves(1, garbage, 0); 
+    //     // garbage[0] = 0;
+    //     // result = e->get_bitboard_of_piece(KING, 1);
+    // }
 
     t2 = std::chrono::system_clock::now();
     time_cast_result = cast_nano(t2 - t1);
-    double temp = (double) time_cast_result.count() / 10000000;
+    double temp = (double) time_cast_result.count() / 100000;
     // double temp = (double) time_cast_result.count() / num_moves[0];
 
     std::cout << "total moves made: " << num_moves[0] << " with " << temp << " nanoseconds per move" << std::endl;
