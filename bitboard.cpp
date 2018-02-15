@@ -695,7 +695,7 @@ unsigned long long Engine::horizontal_flip(unsigned long long x)
 //REWRITE
 unsigned long long Engine::vertical_flip(unsigned long long x)
 {
-    // return __builtin_bswap64(x);
+    return __builtin_bswap64(x);
     return (x >> 56) |
           ((x<<40) & 0x00FF000000000000) |
           ((x<<24) & 0x0000FF0000000000) |
@@ -704,6 +704,14 @@ unsigned long long Engine::vertical_flip(unsigned long long x)
           ((x>>24) & 0x0000000000FF0000) |
           ((x>>40) & 0x000000000000FF00) |
           (x << 56);
+    // return((((unsigned long long) (x) & (unsigned long long) 0x00000000000000ff) << 56) | \
+    // (((unsigned long long) (x) & (unsigned long long) 0x000000000000ff00) << 40) | \
+    // (((unsigned long long) (x) & (unsigned long long) 0x0000000000ff0000) << 24) | \
+    // (((unsigned long long) (x) & (unsigned long long) 0x00000000ff000000) <<  8) | \
+    // (((unsigned long long) (x) & (unsigned long long) 0x000000ff00000000) >>  8) | \
+    // (((unsigned long long) (x) & (unsigned long long) 0x0000ff0000000000) >> 24) | \
+    // (((unsigned long long) (x) & (unsigned long long) 0x00ff000000000000) >> 40) | \
+    // (((unsigned long long) (x) & (unsigned long long) 0xff00000000000000) >> 56));
 }
 
 //REWRITE
@@ -1604,13 +1612,13 @@ bool Engine::get_in_check(int color)
 unsigned long long Engine::pre_check_white_pawn_attacks(unsigned long long white_pawns)
 {
     // left side, filter out left file
-    unsigned long long pawn_left = (white_pawns & ~col_mask[0]) << 7;
+    unsigned long long pawn_right = (white_pawns & ~col_mask[0]) << 7;
 
     // right side, filter out right file
-    unsigned long long pawn_right = (white_pawns & ~col_mask[7]) << 9;
+    unsigned long long pawn_left = (white_pawns & ~col_mask[7]) << 9;
 
     // or together pawn attacks
-    return(pawn_left | pawn_right);
+    return(pawn_right | pawn_left);
 }
 
 unsigned long long Engine::pre_check_black_pawn_attacks(unsigned long long black_pawns)
@@ -1637,14 +1645,7 @@ unsigned long long Engine::pre_check_white_pawn_moves(unsigned long long white_p
     unsigned long long both_pawn = pawn_one | pawn_two;
 
     // attacks
-    // left side, filter out left file
-    unsigned long long pawn_left = (white_pawns & ~col_mask[0]) << 7;
-
-    // right side, filter out right file
-    unsigned long long pawn_right = (white_pawns & ~col_mask[7]) << 9;
-
-    // or together pawn attacks
-    unsigned long long pawn_attacks = pawn_left | pawn_right;
+    unsigned long long pawn_attacks = pre_check_white_pawn_attacks(white_pawns);
 
     // and together black pieces
     unsigned long long pawn_valid_attacks = pawn_attacks & all_black_pieces;
@@ -1665,14 +1666,7 @@ unsigned long long Engine::pre_check_black_pawn_moves(unsigned long long black_p
     unsigned long long both_pawn = pawn_one | pawn_two;
 
     // attacks
-    // left side, filter out left file
-    unsigned long long pawn_left = (black_pawns & ~col_mask[0]) >> 7;
-
-    // right side, filter out right file
-    unsigned long long pawn_right = (black_pawns & ~col_mask[7]) >> 9;
-
-    // or together pawn attacks
-    unsigned long long pawn_attacks = pawn_left | pawn_right;
+    unsigned long long pawn_attacks = pre_check_black_pawn_attacks(black_pawns);
 
     // and together black pieces
     unsigned long long pawn_valid_attacks = pawn_attacks & all_white_pieces;
@@ -1779,18 +1773,61 @@ unsigned long long Engine::pre_check_night_moves(int color)
 /////BISHOPS//////
 
 
-unsigned long long Engine::pre_check_one_bishop_attacks(unsigned long long bishop)
+// bishops may be missing the ANTI diagonal: https://chessprogramming.wikispaces.com/Hyperbola+Quintessence
+unsigned long long Engine::pre_check_one_bishop_attacks_ANTI(unsigned long long bishop)
 {
     int* diags = get_diag(get_rank(bishop), get_file(bishop));
-    unsigned long long line_mask = ~bishop & (diag_left_mask[diags[0]] | diag_right_mask[diags[1]]); // excludes square of slider
+    unsigned long long line_mask = ~bishop & diag_right_mask[diags[1]]; // excludes square of slider
     free(diags);
 
     unsigned long long forward = get_all() & line_mask; // also performs the first subtraction by clearing the s in o
     unsigned long long reverse = vertical_flip(forward); // o'-s'
+
     forward = forward - bishop; // o -2s
     reverse = reverse - vertical_flip(bishop); // o'-2s'
     forward = forward ^ vertical_flip(reverse);
     return forward & line_mask;      // mask the line again
+}
+
+
+unsigned long long Engine::pre_check_one_bishop_attacks(unsigned long long bishop)
+{
+    int* diags = get_diag(get_rank(bishop), get_file(bishop));
+    unsigned long long line_mask = ~bishop & diag_left_mask[diags[0]]; // excludes square of slider
+    free(diags);
+
+    // std::cout << "line_mask" << std::endl;
+    // print_chess_rep(line_mask);
+
+    // std::cout << "get_all()" << std::endl;
+    // print_chess_rep(get_all());
+
+    unsigned long long forward = get_all() & line_mask; // also performs the first subtraction by clearing the s in o
+    unsigned long long reverse = vertical_flip(forward); // o'-s'
+
+    // std::cout << "forward" << std::endl;
+    // print_chess_rep(forward);
+
+
+    // std::cout << "reverse" << std::endl;
+    // print_chess_rep(reverse);
+
+    forward = forward - bishop; // o -2s
+
+    // std::cout << "o - 2s" << std::endl;
+    // print_chess_rep(forward);
+
+    reverse = reverse - vertical_flip(bishop); // o'-2s'
+
+    // std::cout << "o' - 2s'" << std::endl;
+    // print_chess_rep(reverse);
+
+    forward = forward ^ vertical_flip(reverse);
+
+    // std::cout << "forward ^ '(o'-2s')" << std::endl;
+    // print_chess_rep(forward);
+
+    return pre_check_one_bishop_attacks_ANTI(bishop) | (forward & line_mask);      // mask the line again
 }
 
 unsigned long long Engine::pre_check_bishop_attacks(unsigned long long bishops)

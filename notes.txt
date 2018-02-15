@@ -19,6 +19,8 @@ pre_check_one_bishop_moves:
         // forward = forward ^ byteswap(reverse);
         // return forward & line_mask;      // mask the line again
 
+        look into https://ubuntuforums.org/showthread.php?t=1190710 for byteswap
+
 
 probable bug:
     // curr_piece = // LOOKUP VAL -> pointer to piece val on that square

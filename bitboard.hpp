@@ -171,6 +171,7 @@ class Engine
         unsigned long long pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied);
         unsigned long long pre_check_night_moves(int color);
 
+        unsigned long long pre_check_one_bishop_attacks_ANTI(unsigned long long bishop);
         unsigned long long pre_check_one_bishop_attacks(unsigned long long bishop);
         unsigned long long pre_check_bishop_attacks(unsigned long long bishops);
         unsigned long long pre_check_one_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);

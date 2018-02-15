@@ -103,6 +103,49 @@ void test_bishop_moves(Engine* e)
     // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
 }
 
+void test_black_pawn_moves(Engine* e)
+{
+    // e->pos.white_bishops = 0b0000000000000001000000000000000000000000000000000000000000000000;
+    // e->pos.white_pawns = 0b0;
+    e->pos.white_pawns = 0b0000000000000000000000000000000000000000000000001000000000000000;
+
+    // print_all_pieces(e);
+    // print_pieces(e, "white", "bishops", e->pos.white_bishops);
+    // print_pieces(e, "black", "bishops", e->pos.black_bishops);
+
+    print_pieces(e, "black", "pawn attacks", e->pre_check_white_pawn_attacks(e->pos.white_pawns));
+    // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+}
+
+void test_bishop_bug_moves(Engine* e)
+{
+    e->pos.white_pawns = 0b0000000000000000000000000000000000000000000000000000000000000000; // 65280
+    e->pos.white_rooks = 0b0000000000000000000000000000000000000000000000000000000000000000; // 129
+    e->pos.white_nights = 0b0000000000000000000000000000000000000000000000000000000000000000; // 66
+    e->pos.white_bishops = 0b0000000000000000000000000000000000000000000000000000001000000000;
+    e->pos.white_queens = 0b0000000000000000000000000000000000000000000000000000000000000000;
+    e->pos.white_kings = 0b0010000000000000000000000000000000000000000000000000000000000000;
+
+    e->pos.black_pawns = 0b0000000000000000000000000000000000000000000000000000000000000000; // 71776119061217280
+    e->pos.black_rooks = 0b0000000000000000000000000000000000000000000000000000000000000000; // 9295429630892703744
+    e->pos.black_nights = 0b0000000000000000000000000000000000000000000000000000000000000000; // 4755801206503243776
+    e->pos.black_bishops = 0b0000000000000000000000000000000000000000000000000000000000000000;
+    e->pos.black_queens = 0b0000000000000000000000000000000000000000000000000000000000000000;
+    e->pos.black_kings = 0b0000000000000000000000000000000000001000000000000000000000000000;
+
+    e->print_chess_char();
+
+    print_pieces(e, "bishop moves", "from king", e->pre_check_one_bishop_attacks(e->pos.black_kings));
+    std::cout << "chess rep of black kings" << std::endl;
+    e->print_chess_rep(e->pos.black_kings);
+    std::cout << "rank" << e->get_rank(e->pos.black_kings) << std::endl;
+    std::cout << "file" << e->get_file(e->pos.black_kings) << std::endl;
+    std::cout << "diag0" << e->get_diag(e->get_rank(e->pos.black_kings), e->get_file(e->pos.black_kings))[0] << 
+                " diag1 " << e->get_diag(e->get_rank(e->pos.black_kings), e->get_file(e->pos.black_kings))[1] << std::endl; 
+    // print_pieces(e, "", "check legal", e->check_legal(move, 1));
+    // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+}
+
 void test_rook_moves(Engine* e)
 {
     e->pos.white_rooks = 0b0000000000000000000000000000000000000000001000000000000000000000;
@@ -187,9 +230,9 @@ int main()
     // test_night_moves(e);
     // e->reset_engine();
 
-    std::cout << "testing bishop moves" << std::endl;
-    test_bishop_moves(e);
-    e->reset_engine();
+    // std::cout << "testing bishop moves" << std::endl;
+    // test_bishop_moves(e);
+    // e->reset_engine();
 
     // std::cout << "testing rook moves" << std::endl;
     // test_rook_moves(e);
@@ -203,6 +246,13 @@ int main()
     // test_white_moves(e);
     // e->reset_engine();
 
+    // std::cout << "testing strange bug" << std::endl;
+    // test_bishop_bug_moves(e);
+    // e->reset_engine();
+
+    std::cout << "testing pawn bug" << std::endl;
+    test_black_pawn_moves(e);
+    e->reset_engine();
 
     // print_moves(e, "white", e->generate_legal_moves(1));
 
