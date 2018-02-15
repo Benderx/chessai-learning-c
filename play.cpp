@@ -79,10 +79,10 @@ int main()
     Rand* curr_player;
     int result;
 
-    for(int i = 0; i < 100; i++)
+    for(int i = 0; i < 1000; i++)
     {
         result = play_game(e, players, curr_player);
-        e->print_chess_char();
+        // e->print_chess_char();
         e->reset_engine();        
     }
 

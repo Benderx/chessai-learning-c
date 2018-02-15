@@ -1125,19 +1125,19 @@ unsigned long long* Engine::get_board_rep()
 bool Engine::check_legal(int move, int color)
 {
     // return false;
-    std::cout << "checking legality of: " << move << std::endl;
-    print_move_info(move);
+    // std::cout << "checking legality of: " << move << std::endl;
+    // print_move_info(move);
     push_move(move);
-    print_chess_char();
+    // print_chess_char();
     if(get_in_check(color))
     {
-        std::cout << "popping, NOT LEGAL: " << move << std::endl;
+        // std::cout << "popping, NOT LEGAL: " << move << std::endl;
         // print_chess_char();
         pop_move();
         // print_chess_char();
         return(false);
     }
-    std::cout << "popping, LEGAL: " << move << std::endl;
+    // std::cout << "popping, LEGAL: " << move << std::endl;
     // print_chess_char();
     pop_move();
     // print_chess_char();
