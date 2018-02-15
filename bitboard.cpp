@@ -1115,20 +1115,20 @@ unsigned long long* Engine::get_board_rep()
 bool Engine::check_legal(int move, int color)
 {
     // return false;
-    std::cout << "checking legality of: " << move << std::endl;
-    print_move_info(move);
+    // std::cout << "checking legality of: " << move << std::endl;
+    // print_move_info(move);
     push_move(move);
     // print_chess_char();
     if(get_in_check(color))
     {
-        std::cout << "popping, NOT LEGAL: " << move << std::endl;
-        print_chess_char();
+        // std::cout << "popping, NOT LEGAL: " << move << std::endl;
+        // print_chess_char();
         pop_move();
         // print_chess_char();
         return(false);
     }
-    std::cout << "popping, LEGAL: " << move << std::endl;
-    print_chess_char();
+    // std::cout << "popping, LEGAL: " << move << std::endl;
+    // print_chess_char();
     pop_move();
     // print_chess_char();
     return(true);
@@ -1490,7 +1490,7 @@ int* Engine::generate_legal_moves(int color)
         // if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
         if((decode_from(move) == king_square || decode_type(move) == ENPASSANT || check_status) && !(check_legal(move, color)))
         {
-            std::cout << "removing move cause not legal: " << move << std::endl;
+            // std::cout << "removing move cause not legal: " << move << std::endl;
             move_list[move_iter+1] = move_list[move_list[0]];
             move_list[0]--;
             move_iter--;
