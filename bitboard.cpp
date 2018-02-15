@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unordered_map>
 #include <cmath>
+#include <strings.h>
 
 
 
@@ -9,14 +10,12 @@ Engine::Engine()
 {
     init_position();
     init_engine();
-    init_lsb_lookup();
 }
 
 Engine::Engine(unsigned long long* board_data)
 {
     init_position(board_data);
     init_engine();
-    init_lsb_lookup();
 }
 
 void Engine::init_engine()
@@ -25,10 +24,12 @@ void Engine::init_engine()
     move_arr_size = 500;
 
     move_stack = (int*) malloc((max_move_length + 1) * sizeof(int)); // +1 because pushing moves is nesseccary to chekc fo legality
+    // lsb_lookup = (int*) malloc(64 * sizeof(int));
     stack_index = -1;
 
     in_check = false;
     init_masks();
+    init_lsb_lookup();
 }
 
 void Engine::reset_engine()
@@ -78,6 +79,11 @@ void Engine::init_lsb_lookup()
     {
         lsb_lookup.insert({(unsigned long long) std::pow(2,i),i});
     }
+    // for(int i=0;i<64;i++)
+    // {
+    //     lsb_lookup[(int)std::pow(2, i)] = i;
+    // }
+    // std::cout << "we made it\n" << std::endl;
 }
 
 void Engine::init_masks()
@@ -231,6 +237,7 @@ unsigned long long Engine::get_all()
 // Takes in a 64 bit number with single bit
 // Returns the rank piece is on 0-7, bottom to top
 // Alters nothing
+// ~6ns
 int Engine::get_rank(unsigned long long num)
 {
     unsigned long long max0 = 128ULL; // 2^7
@@ -287,6 +294,7 @@ int Engine::get_rank(unsigned long long num)
 // Takes in a 64 bit number with single bit
 // Returns the file piece is on 0-7, left to right
 // Alters nothing 
+// ~9ns
 int Engine::get_file(unsigned long long num)
 {
     switch(num)
@@ -389,7 +397,32 @@ int Engine::get_file(unsigned long long num)
 // Alters nothing
 // Mallocs int array of size 2. Free when done
 // Look here for issues with diag, altered in confusion
-int* Engine::get_diag(int rank, int file)
+
+// old version with malloc
+// int* Engine::get_diag(int rank, int file)
+// {
+//     int total_val = rank+file;
+//     int right;
+
+//     //Total val also equals left diag index
+
+//     if(rank > file) //Above the middle diagonal line r = 7
+//     {
+//         right = 7+(total_val-2*file);
+//     }
+//     else //Below middle line
+//     {
+//         right = 7-(total_val-2*rank);
+//     }
+
+//     int* diag = (int*) malloc(2 * sizeof(int));
+//     diag[0] = total_val;
+//     diag[1] = right;
+
+//     return(diag);
+// }
+
+int Engine::get_diag(int rank, int file)
 {
     int total_val = rank+file;
     int right;
@@ -405,11 +438,12 @@ int* Engine::get_diag(int rank, int file)
         right = 7-(total_val-2*rank);
     }
 
-    int* diag = (int*) malloc(2 * sizeof(int));
-    diag[0] = total_val;
-    diag[1] = right;
+    // int* diag = (int*) malloc(2 * sizeof(int));
+    // diag[0] = total_val;
+    // diag[1] = right;
+    // int ret_val = (total_val << 5) | (total_val << 5);
 
-    return(diag);
+    return(total_val << 5) | (right);
 }
 
 // Takes in move information
@@ -610,15 +644,19 @@ void Engine::pop_move()
 // therefore simply return ((lots of zeros)00000000000010)
 // YOU MAY ASSUME A 1 EXISTS, (0000000000000000000) will not be given
 // n &= (n - 1) to find val of leftmost maybe faster
+// MAPPING IS 311.969ns (using unordered map)
+// look into: https://stackoverflow.com/questions/757059/position-of-least-significant-bit-that-is-set
 int Engine::lsb_digit(unsigned long long board)
 {
     return(lsb_lookup[lsb_board(board)]);
+    // return(ffsll(board)); // i think only works on linux
 }
 
 // Takes in a bitboard
 // Returns a bitboard with soley the least significant bit = 1
 // All other bits = 0
 // Alters nothing
+// 4ns
 unsigned long long Engine::lsb_board(unsigned long long board)
 {
     return(board & (-board));
@@ -1249,13 +1287,13 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing white rook boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing white rook boardrep2" << std::endl;
-                print_chess_rep(pre_check_one_rook_moves(one_p, all_occupied, own_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing white rook boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing white rook boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_one_rook_moves(one_p, all_occupied, own_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
@@ -1268,13 +1306,13 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing white pawn boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing white pawn boardrep2" << std::endl;
-                print_chess_rep(pre_check_white_pawn_moves(one_p, all_occupied, enemy_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing white pawn boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing white pawn boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_white_pawn_moves(one_p, all_occupied, enemy_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_white_pawn_moves(one_p, 
                 all_occupied, enemy_occupied), bitboard_to_square(one_p));
@@ -1286,14 +1324,14 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing white bishops boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing white bishops boardrep2" << std::endl;
-                print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
-                // exit(0);
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing white bishops boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing white bishops boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
+            //     // exit(0);
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
@@ -1305,13 +1343,13 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing white night boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing white night boardrep2" << std::endl;
-                print_chess_rep(pre_check_night_moves(one_p, own_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing white night boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing white night boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_night_moves(one_p, own_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_night_moves(one_p, 
                 own_occupied), bitboard_to_square(one_p));
@@ -1323,35 +1361,30 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing white queen boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing white queen boardrep2" << std::endl;
-                print_chess_rep(pre_check_one_queen_moves(one_p, all_occupied, own_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing white queen boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing white queen boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_one_queen_moves(one_p, all_occupied, own_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_one_queen_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.white_kings & ~pinned;
-        while(p)
-        {
-            one_p = lsb_board(p);
-            p = p & ~one_p;
+        one_p = lsb_board(pos.white_kings & ~pinned);
 
-            if(print)
-            {
-                std::cout << "printing white king boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing white king boardrep2" << std::endl;
-                print_chess_rep(pre_check_king_moves(one_p, own_occupied));
-            }
+        // if(print)
+        // {
+        //     std::cout << "printing white king boardrep" << std::endl;
+        //     print_chess_rep(one_p);
+        //     std::cout << "printing white king boardrep2" << std::endl;
+        //     print_chess_rep(pre_check_king_moves(one_p, own_occupied));
+        // }
 
-            pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
-                own_occupied), bitboard_to_square(one_p));
-        }
+        pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
+            own_occupied), bitboard_to_square(one_p));
 
     }
     else
@@ -1365,13 +1398,13 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing black rook boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing black rook boardrep2" << std::endl;
-                print_chess_rep(pre_check_one_rook_moves(one_p, all_occupied, own_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing black rook boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing black rook boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_one_rook_moves(one_p, all_occupied, own_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
@@ -1384,13 +1417,13 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing black pawn boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing black pawn boardrep2" << std::endl;
-                print_chess_rep(pre_check_black_pawn_moves(one_p, all_occupied, enemy_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing black pawn boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing black pawn boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_black_pawn_moves(one_p, all_occupied, enemy_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_black_pawn_moves(one_p, 
                 all_occupied, enemy_occupied), bitboard_to_square(one_p));
@@ -1402,13 +1435,13 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing black bishops boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing black bishops boardrep2" << std::endl;
-                print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing black bishops boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing black bishops boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
@@ -1420,13 +1453,13 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing black night boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing black night boardrep2" << std::endl;
-                print_chess_rep(pre_check_night_moves(one_p, own_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing black night boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing black night boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_night_moves(one_p, own_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_night_moves(one_p, 
                 own_occupied), bitboard_to_square(one_p));
@@ -1438,35 +1471,30 @@ void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long l
             one_p = lsb_board(p);
             p = p & ~one_p;
 
-            if(print)
-            {
-                std::cout << "printing black queen boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing black queen boardrep2" << std::endl;
-                print_chess_rep(pre_check_one_queen_moves(one_p, all_occupied, own_occupied));
-            }
+            // if(print)
+            // {
+            //     std::cout << "printing black queen boardrep" << std::endl;
+            //     print_chess_rep(one_p);
+            //     std::cout << "printing black queen boardrep2" << std::endl;
+            //     print_chess_rep(pre_check_one_queen_moves(one_p, all_occupied, own_occupied));
+            // }
 
             pop_and_add_regular_moves(color, move_list, pre_check_one_queen_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.black_kings & ~pinned;
-        while(p)
-        {
-            one_p = lsb_board(p);
-            p = p & ~one_p;
+        one_p = lsb_board(pos.black_kings & ~pinned);
 
-            if(print)
-            {
-                std::cout << "printing black king boardrep" << std::endl;
-                print_chess_rep(one_p);
-                std::cout << "printing black king boardrep2" << std::endl;
-                print_chess_rep(pre_check_king_moves(one_p, own_occupied));
-            }
+        // if(print)
+        // {
+        //     std::cout << "printing black king boardrep" << std::endl;
+        //     print_chess_rep(one_p);
+        //     std::cout << "printing black king boardrep2" << std::endl;
+        //     print_chess_rep(pre_check_king_moves(one_p, own_occupied));
+        // }
 
-            pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
-                own_occupied), bitboard_to_square(one_p));
-        }
+        pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
+            own_occupied), bitboard_to_square(one_p));
     }
 }
 
@@ -1774,11 +1802,12 @@ unsigned long long Engine::pre_check_night_moves(int color)
 
 
 // bishops may be missing the ANTI diagonal: https://chessprogramming.wikispaces.com/Hyperbola+Quintessence
-unsigned long long Engine::pre_check_one_bishop_attacks_ANTI(unsigned long long bishop)
+unsigned long long Engine::pre_check_one_bishop_attacks_ANTI(unsigned long long bishop, int right_diag)
 {
-    int* diags = get_diag(get_rank(bishop), get_file(bishop));
-    unsigned long long line_mask = ~bishop & diag_right_mask[diags[1]]; // excludes square of slider
-    free(diags);
+    // int* diags = get_diag(get_rank(bishop), get_file(bishop));
+    // int right_diag = get_diag(get_rank(bishop), get_file(bishop)) >> 5;
+    unsigned long long line_mask = ~bishop & diag_right_mask[right_diag]; // excludes square of slider
+    // free(diags);
 
     unsigned long long forward = get_all() & line_mask; // also performs the first subtraction by clearing the s in o
     unsigned long long reverse = vertical_flip(forward); // o'-s'
@@ -1792,42 +1821,21 @@ unsigned long long Engine::pre_check_one_bishop_attacks_ANTI(unsigned long long 
 
 unsigned long long Engine::pre_check_one_bishop_attacks(unsigned long long bishop)
 {
-    int* diags = get_diag(get_rank(bishop), get_file(bishop));
-    unsigned long long line_mask = ~bishop & diag_left_mask[diags[0]]; // excludes square of slider
-    free(diags);
-
-    // std::cout << "line_mask" << std::endl;
-    // print_chess_rep(line_mask);
-
-    // std::cout << "get_all()" << std::endl;
-    // print_chess_rep(get_all());
+    // int* diags = get_diag(get_rank(bishop), get_file(bishop));
+    int diag = get_diag(get_rank(bishop), get_file(bishop));
+    int left_diag = diag & 0x000000000000000F;
+    int right_diag = diag >> 5;
+    unsigned long long line_mask = ~bishop & diag_left_mask[left_diag]; // excludes square of slider
+    // free(diags);
 
     unsigned long long forward = get_all() & line_mask; // also performs the first subtraction by clearing the s in o
     unsigned long long reverse = vertical_flip(forward); // o'-s'
 
-    // std::cout << "forward" << std::endl;
-    // print_chess_rep(forward);
-
-
-    // std::cout << "reverse" << std::endl;
-    // print_chess_rep(reverse);
-
     forward = forward - bishop; // o -2s
-
-    // std::cout << "o - 2s" << std::endl;
-    // print_chess_rep(forward);
-
     reverse = reverse - vertical_flip(bishop); // o'-2s'
-
-    // std::cout << "o' - 2s'" << std::endl;
-    // print_chess_rep(reverse);
-
     forward = forward ^ vertical_flip(reverse);
 
-    // std::cout << "forward ^ '(o'-2s')" << std::endl;
-    // print_chess_rep(forward);
-
-    return pre_check_one_bishop_attacks_ANTI(bishop) | (forward & line_mask);      // mask the line again
+    return pre_check_one_bishop_attacks_ANTI(bishop, right_diag) | (forward & line_mask);      // mask the line again
 }
 
 unsigned long long Engine::pre_check_bishop_attacks(unsigned long long bishops)

@@ -108,7 +108,8 @@ class Engine
         // get rank/file/diag info
         int get_rank(unsigned long long num);
         int get_file(unsigned long long num);
-        int* get_diag(int rank, int file);
+        // int* get_diag(int rank, int file);
+        int get_diag(int rank, int file);
 
         // move encoding and decoding
         int encode_move(int start, int end, int m_type, int piece, int promotion);
@@ -171,7 +172,7 @@ class Engine
         unsigned long long pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied);
         unsigned long long pre_check_night_moves(int color);
 
-        unsigned long long pre_check_one_bishop_attacks_ANTI(unsigned long long bishop);
+        unsigned long long pre_check_one_bishop_attacks_ANTI(unsigned long long bishop, int right_diag);
         unsigned long long pre_check_one_bishop_attacks(unsigned long long bishop);
         unsigned long long pre_check_bishop_attacks(unsigned long long bishops);
         unsigned long long pre_check_one_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);
@@ -203,6 +204,7 @@ class Engine
         bool in_check;
 
         std::unordered_map<unsigned long long, int> lsb_lookup;
+        // int* lsb_lookup;
 
         const int index64[64] = {
             0,  1, 48,  2, 57, 49, 28,  3,
