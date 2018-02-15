@@ -1118,12 +1118,19 @@ bool Engine::check_legal(int move, int color)
     std::cout << "checking legality of: " << move << std::endl;
     print_move_info(move);
     push_move(move);
+    // print_chess_char();
     if(get_in_check(color))
     {
+        std::cout << "popping, NOT LEGAL: " << move << std::endl;
+        print_chess_char();
         pop_move();
+        // print_chess_char();
         return(false);
     }
+    std::cout << "popping, LEGAL: " << move << std::endl;
+    print_chess_char();
     pop_move();
+    // print_chess_char();
     return(true);
 }
 
@@ -1191,6 +1198,7 @@ void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long 
         // print_chess_rep(new_pos);
 
         move_list[move_list[0]+1] = encode_move(curr_pos, bitboard_to_square(new_pos), REGULAR, piece_taken, 0);
+        // std::cout << "but how: " << move_list[move_list[0]+1] << ", " << piece_type_to_string(get_piece_by_bitboard(square_to_bitboard(decode_from(move_list[move_list[0]+1])))) << std::endl;
         // if(piece_type_to_string(get_piece_by_bitboard(square_to_bitboard(decode_from(move_list[move_list[0]+1])))) == "nothing")
         // {
         //     std::cout << "moves in move_list: " << move_list[0] << std::endl;
@@ -1475,15 +1483,16 @@ int* Engine::generate_legal_moves(int color)
     generate_pre_check_moves(color, move_list, pinned);
 
     int move_iter = 0;
+    bool check_status = get_in_check(color);
     while(move_iter < move_list[0])
     {
         int move = move_list[move_iter+1];
         // if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
-        if((decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move, color)))
+        if((decode_from(move) == king_square || decode_type(move) == ENPASSANT || check_status) && ~(check_legal(move, color)))
         {
             // std::cout << king_square << std::endl;
-            move_list[move_iter+1] = move_list[move_list[0]+1];
-            move_list[0] -= 1;
+            move_list[move_iter+1] = move_list[move_list[0]];
+            move_list[0]--;
             move_iter--;
         }
         move_iter++;
