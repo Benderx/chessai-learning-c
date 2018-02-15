@@ -870,7 +870,7 @@ unsigned long long Engine::square_to_bitboard(int square)
     return(1ULL << square);
 }
 
-int Engine::get_square(Piece piece, int color)
+int Engine::get_bitboard_of_piece(Piece piece, int color)
 {
     if(color == 1)
     {
@@ -880,6 +880,7 @@ int Engine::get_square(Piece piece, int color)
         }
         else
         {
+            std::cout << "WARNING RETURNING GARBAGE IN GET_SQUARE";
             return(-1);
         }
     }
@@ -892,6 +893,7 @@ int Engine::get_square(Piece piece, int color)
         }
         else
         {
+            std::cout << "WARNING RETURNING GARBAGE IN GET_SQUARE";
             return(-1);
         }
     } 
@@ -1115,20 +1117,20 @@ unsigned long long* Engine::get_board_rep()
 bool Engine::check_legal(int move, int color)
 {
     // return false;
-    // std::cout << "checking legality of: " << move << std::endl;
-    // print_move_info(move);
+    std::cout << "checking legality of: " << move << std::endl;
+    print_move_info(move);
     push_move(move);
     // print_chess_char();
     if(get_in_check(color))
     {
-        // std::cout << "popping, NOT LEGAL: " << move << std::endl;
-        // print_chess_char();
+        std::cout << "popping, NOT LEGAL: " << move << std::endl;
+        print_chess_char();
         pop_move();
         // print_chess_char();
         return(false);
     }
-    // std::cout << "popping, LEGAL: " << move << std::endl;
-    // print_chess_char();
+    std::cout << "popping, LEGAL: " << move << std::endl;
+    print_chess_char();
     pop_move();
     // print_chess_char();
     return(true);
@@ -1469,7 +1471,12 @@ int* Engine::generate_legal_moves(int color)
     move_list[0] = 0; // encode index in array
 
     unsigned long long pinned = pinned_pieces(color);
-    int king_square = bitboard_to_square(get_square(KING, color));
+    int king_square = bitboard_to_square(get_bitboard_of_piece(KING, color));
+
+    std::cout << "\n\nKING SQUARE IS " << king_square << "COLOR IS" << color << "\n\n";
+    std::cout << "\n\nKING SQUARE BITBOARD IS" << "\n";
+    print_chess_rep(get_bitboard_of_piece(KING, color));
+    std::cout << "\n\n";
 
     // if(in_check)
     // {
@@ -1555,7 +1562,7 @@ bool Engine::get_in_check(int color)
         return true;
     }
 
-    rook_attackers = pre_check_rook_attacks(my_king) & (enemy_rooks | enemy_queens);
+    rook_attackers = pre_check_one_rook_attacks(my_king) & (enemy_rooks | enemy_queens);
     if(rook_attackers)
     {
         return true;
@@ -1567,7 +1574,7 @@ bool Engine::get_in_check(int color)
         return true;
     }
 
-    bishop_attackers = pre_check_bishop_attacks(my_king) & (enemy_bishops | enemy_queens);
+    bishop_attackers = pre_check_one_bishop_attacks(my_king) & (enemy_bishops | enemy_queens);
     if(bishop_attackers)
     {
         return true;
@@ -1677,13 +1684,13 @@ unsigned long long Engine::pre_check_king_attacks(unsigned long long kings)
 
     unsigned long long spot_0 = king_mask_file_7 >> 7; // Southeast
     unsigned long long spot_1 = kings >> 8; // South
-    unsigned long long spot_2 = king_mask_file_7 >> 9; // Southwest
-    unsigned long long spot_3 = king_mask_file_7 >> 1; // West
+    unsigned long long spot_2 = king_mask_file_0 >> 9; // Southwest
+    unsigned long long spot_3 = king_mask_file_0 >> 1; // West
 
     unsigned long long spot_4 = king_mask_file_0 << 7; // Northwest
     unsigned long long spot_5 = kings << 8; // North
-    unsigned long long spot_6 = king_mask_file_0 << 9; // Northeast
-    unsigned long long spot_7 = kings << 1; // East
+    unsigned long long spot_6 = king_mask_file_7 << 9; // Northeast
+    unsigned long long spot_7 = king_mask_file_7 << 1; // East
 
     return(spot_0 | spot_1 | spot_2 | spot_3 | spot_4 | spot_5 | spot_6 | spot_7);
 }

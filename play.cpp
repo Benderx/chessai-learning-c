@@ -47,10 +47,10 @@ int play_game(Engine* e, Rand** players, Rand* curr_player)
             return term;
         }
 
-        // std::cout << color_to_string(color) << " to move." << std::endl;
+        std::cout << color_to_string(color) << " to move." << std::endl;
         // std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
         move = curr_player->move(move_list);
-        // std::cout <<  "making move: " << move << std::endl;
+        std::cout <<  "making move: " << move << std::endl;
         e->print_move_info(move);
         e->push_move(move);
 
