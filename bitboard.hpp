@@ -139,7 +139,7 @@ class Engine
         // board helper functions
         int bitboard_to_square(unsigned long long piece);
         unsigned long long square_to_bitboard(int square);
-        int get_bitboard_of_piece(Piece piece, int color);
+        unsigned long long get_bitboard_of_piece(Piece piece, int color);
         Piece get_piece_by_bitboard(int color, unsigned long long board);
         Piece get_piece_by_bitboard(unsigned long long board);
         void remove_piece(int color, int type, unsigned long long board);

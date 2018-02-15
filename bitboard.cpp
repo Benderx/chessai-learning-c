@@ -870,7 +870,7 @@ unsigned long long Engine::square_to_bitboard(int square)
     return(1ULL << square);
 }
 
-int Engine::get_bitboard_of_piece(Piece piece, int color)
+unsigned long long Engine::get_bitboard_of_piece(Piece piece, int color)
 {
     if(color == 1)
     {
@@ -1117,20 +1117,20 @@ unsigned long long* Engine::get_board_rep()
 bool Engine::check_legal(int move, int color)
 {
     // return false;
-    std::cout << "checking legality of: " << move << std::endl;
-    print_move_info(move);
+    // std::cout << "checking legality of: " << move << std::endl;
+    // print_move_info(move);
     push_move(move);
     // print_chess_char();
     if(get_in_check(color))
     {
-        std::cout << "popping, NOT LEGAL: " << move << std::endl;
-        print_chess_char();
+        // std::cout << "popping, NOT LEGAL: " << move << std::endl;
+        // print_chess_char();
         pop_move();
         // print_chess_char();
         return(false);
     }
-    std::cout << "popping, LEGAL: " << move << std::endl;
-    print_chess_char();
+    // std::cout << "popping, LEGAL: " << move << std::endl;
+    // print_chess_char();
     pop_move();
     // print_chess_char();
     return(true);
@@ -1473,10 +1473,18 @@ int* Engine::generate_legal_moves(int color)
     unsigned long long pinned = pinned_pieces(color);
     int king_square = bitboard_to_square(get_bitboard_of_piece(KING, color));
 
-    std::cout << "\n\nKING SQUARE IS " << king_square << "COLOR IS" << color << "\n\n";
-    std::cout << "\n\nKING SQUARE BITBOARD IS" << "\n";
-    print_chess_rep(get_bitboard_of_piece(KING, color));
-    std::cout << "\n\n";
+    // std::cout << "\n\nKING SQUARE IS " << king_square << "COLOR IS" << color << "\n\n";
+    // std::cout << "\n\nKING SQUARE BITBOARD IS" << "\n";
+    // print_chess_rep(get_bitboard_of_piece(KING, color));
+    // std::cout << "\n\n";
+    // print_chess_char();
+
+    // if(!get_bitboard_of_piece(KING, color))
+    // {
+    //     print_chess_rep(pos.black_kings);
+    //     std::cout << (KING == KING) << "\n";
+    //     exit(0);
+    // }
 
     // if(in_check)
     // {
