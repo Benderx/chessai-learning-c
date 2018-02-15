@@ -1482,19 +1482,19 @@ int* Engine::generate_legal_moves(int color)
     int king_square = bitboard_to_square(get_bitboard_of_piece(KING, color));
 
 
-    if(!get_bitboard_of_piece(KING, color))
-    {
-        std::cout << "\n\nKING SQUARE IS " << king_square << "COLOR IS" << color << "\n\n";
-        std::cout << "\n\nKING SQUARE BITBOARD IS" << "\n";
-        print_chess_rep(get_bitboard_of_piece(KING, color));
-        std::cout << "\n\n";
-        print_chess_char();
+    // if(!get_bitboard_of_piece(KING, color))
+    // {
+    //     std::cout << "\n\nKING SQUARE IS " << king_square << "COLOR IS" << color << "\n\n";
+    //     std::cout << "\n\nKING SQUARE BITBOARD IS" << "\n";
+    //     print_chess_rep(get_bitboard_of_piece(KING, color));
+    //     std::cout << "\n\n";
+    //     print_chess_char();
 
-        print_chess_rep(pos.white_kings);
-        print_chess_rep(pos.black_kings);
-        std::cout << (KING == KING) << "\n";
-        exit(0);
-    }
+    //     print_chess_rep(pos.white_kings);
+    //     print_chess_rep(pos.black_kings);
+    //     std::cout << (KING == KING) << "\n";
+    //     exit(0);
+    // }
 
     // if(in_check)
     // {

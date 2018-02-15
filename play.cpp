@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <limits>
 #include <time.h>
+#include <chrono>
 
 // g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp -std=c++14 -o run
 
@@ -21,7 +22,13 @@ std::string color_to_string(int color)
 }
 
 
-int play_game(Engine* e, Rand** players, Rand* curr_player)
+std::chrono::duration<double, std::nano> cast_nano(std::chrono::duration<double> x)
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(x);
+}
+
+
+int play_game(Engine* e, Rand** players, Rand* curr_player, int* num_moves)
 {
     int max_moves  = e->get_max_move_length();
     int moves_made = 0;
@@ -53,6 +60,7 @@ int play_game(Engine* e, Rand** players, Rand* curr_player)
         // std::cout <<  "making move: " << move << std::endl;
         // e->print_move_info(move);
         e->push_move(move);
+        num_moves[0]++;
 
         // e->print_chess_char();
         // std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
@@ -78,13 +86,29 @@ int main()
 
     Rand* curr_player;
     int result;
+    int* num_moves = (int*) malloc(sizeof(int));;
 
+
+
+    // timing
+    std::chrono::time_point<std::chrono::system_clock> t1, t2;
+    std::chrono::duration<double, std::nano> time_cast_result;
+
+    num_moves[0] = 0;
+    t1 = std::chrono::system_clock::now();
+    
     for(int i = 0; i < 1000; i++)
     {
-        result = play_game(e, players, curr_player);
+        result = play_game(e, players, curr_player, num_moves);
         // e->print_chess_char();
         e->reset_engine();        
     }
+    
+    t2 = std::chrono::system_clock::now();
+    time_cast_result = cast_nano(t2 - t1);
+    double temp = (double) time_cast_result.count() / num_moves[0];
+
+    std::cout << "total moves made: " << num_moves[0] << " with " << temp << " nanoseconds per move" << std::endl;
 
 
 
@@ -92,5 +116,6 @@ int main()
     free(players[1]);
     free(players);
     free(e);
+    free(num_moves);
     return(0);
 }
