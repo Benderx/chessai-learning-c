@@ -1,6 +1,6 @@
 
 CC = g++
-CFLAGS = -std=c++14 -O3 -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized
+CFLAGS = -std=c++14 -O3 -funroll-loops -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized
 HEADERS = bitboard.hpp player.hpp
 DRIVER_OBJECTS = bitboard.cpp driver.cpp
 PLAY_OBJECTS = bitboard.cpp player.cpp play.cpp
