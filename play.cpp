@@ -9,6 +9,9 @@
 
 // g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp -std=c++14 -o run
 
+//optimized
+// g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp -std=c++14 -O3 -funroll-loops -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized  -o run
+
 std::string color_to_string(int color)
 {
     if(color == 1)
@@ -110,7 +113,7 @@ int main()
     // {
     //     e->generate_pre_check_moves(1, garbage, 0); 
     //     // e->generate_pre_check_moves(1, garbage, 0); 
-    //     // garbage[0] = 0;
+    //     garbage[0] = 0;
     //     // result = e->get_bitboard_of_piece(KING, 1);
     // }
 
