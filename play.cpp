@@ -47,7 +47,7 @@ int play_game(Engine* e, Rand** players, Rand* curr_player, int* num_moves)
         term = e->is_terminal(color, move_list);
         if(term != -1)
         {
-            std::cout << "game over, result is: " << term << " in " << moves_made  << " moves" << std::endl;
+            // std::cout << "game over, result is: " << term << " in " << moves_made  << " moves" << std::endl;
             // e->print_chess_char();
 
             free(move_list);
@@ -70,7 +70,7 @@ int play_game(Engine* e, Rand** players, Rand* curr_player, int* num_moves)
         free(move_list);
     }
 
-    std::cout << "game over, result is draw from making max moves: " << max_moves << std::endl;
+    // std::cout << "game over, result is draw from making max moves: " << max_moves << std::endl;
     return(2); // draw
 }
 
@@ -97,7 +97,7 @@ int main()
     num_moves[0] = 0;
     t1 = std::chrono::system_clock::now();
     
-    for(int i = 0; i < 1000; i++)
+    for(int i = 0; i < 10000; i++)
     {
         result = play_game(e, players, curr_player, num_moves);
         // e->print_chess_char();
@@ -116,8 +116,8 @@ int main()
 
     t2 = std::chrono::system_clock::now();
     time_cast_result = cast_nano(t2 - t1);
-    double temp = (double) time_cast_result.count() / 100000;
-    // double temp = (double) time_cast_result.count() / num_moves[0];
+    // double temp = (double) time_cast_result.count() / 10000;
+    double temp = (double) time_cast_result.count() / num_moves[0];
 
     std::cout << "total moves made: " << num_moves[0] << " with " << temp << " nanoseconds per move" << std::endl;
 

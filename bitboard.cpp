@@ -650,6 +650,7 @@ int Engine::lsb_digit(unsigned long long board)
 {
     return(lsb_lookup[lsb_board(board)]);
     // return(ffsll(board)); // i think only works on linux
+    // return __builtin_ffsll (board);
 }
 
 // Takes in a bitboard
