@@ -89,6 +89,7 @@ int main()
 
     Rand* curr_player;
     int result;
+    unsigned long long result2;
     int* num_moves = (int*) malloc(sizeof(int));
 
 
@@ -109,20 +110,24 @@ int main()
     
     // int* garbage = (int*) malloc(10000 * sizeof(int));
     // garbage[0] = 0;
-    // for(int i = 0; i < 100000; i++)
+    // for(int i = 0; i < 10000000; i++)
     // {
-    //     e->generate_pre_check_moves(1, garbage, 0); 
     //     // e->generate_pre_check_moves(1, garbage, 0); 
-    //     garbage[0] = 0;
+    //     result = e->lsb_digit(e->pos.white_kings);
+    //     std::cout << result << std::endl; 
+    //     exit(0);
+    //     // garbage[0] = 0;
     //     // result = e->get_bitboard_of_piece(KING, 1);
+    //     // result2 = e->get_all();
     // }
 
     t2 = std::chrono::system_clock::now();
     time_cast_result = cast_nano(t2 - t1);
-    // double temp = (double) time_cast_result.count() / 10000;
+    // double temp = (double) time_cast_result.count() / 10000000;
     double temp = (double) time_cast_result.count() / num_moves[0];
 
     std::cout << "total moves made: " << num_moves[0] << " with " << temp << " nanoseconds per move" << std::endl;
+    std::cout << "resulting in NPS of: " << 1.0 / (temp * .000000001) << std::endl;
 
 
 

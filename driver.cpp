@@ -207,6 +207,26 @@ void write_all_possible_moves(std::ofstream* file, Engine* e, int* moves)
     free(moves);
 }
 
+void very_strange_check_glitch(Engine* e)
+{
+    e->load_in_string("r-----n-"
+                    "p--p---k"
+                    "q---N-nb"
+                    "---bpr--"
+                    "P-P---p-"
+                    "RP--B--P"
+                    "------p-"
+                    "-NK----R");
+
+    e->print_chess_char();
+    std::cout << e->get_in_check(0) << std::endl;
+    // print_pieces(e, "white", "bishops", e->pos.white_bishops);
+    // print_pieces(e, "black", "bishops", e->pos.black_bishops);
+
+    // print_pieces(e, "white", "bishop moves", e->pre_check_one_bishop_attacks(0b0000000000000001000000000000000000000000000000000000000000000000));
+    // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+}
+
 int main()
 {
     Engine* e = new Engine();
@@ -222,37 +242,13 @@ int main()
     // test_pawn_moves(e);
     // e->reset_engine();
 
-    // std::cout << "testing king moves" << std::endl;
-    // test_king_moves(e);
-    // e->reset_engine();
-
-    // std::cout << "testing night moves" << std::endl;
-    // test_night_moves(e);
-    // e->reset_engine();
-
-    // std::cout << "testing bishop moves" << std::endl;
-    // test_bishop_moves(e);
-    // e->reset_engine();
-
-    // std::cout << "testing rook moves" << std::endl;
-    // test_rook_moves(e);
-    // e->reset_engine();
-
-    // std::cout << "testing queen moves" << std::endl;
-    // test_queen_moves(e);
-    // e->reset_engine();
-
-    // std::cout << "testing white moves" << std::endl;
-    // test_white_moves(e);
-    // e->reset_engine();
-
-    // std::cout << "testing strange bug" << std::endl;
-    // test_bishop_bug_moves(e);
-    // e->reset_engine();
-
-    std::cout << "testing pawn bug" << std::endl;
-    test_black_pawn_moves(e);
+    std::cout << "testing weird bug" << std::endl;
+    very_strange_check_glitch(e);
     e->reset_engine();
+
+    // std::cout << "testing pawn bug" << std::endl;
+    // test_black_pawn_moves(e);
+    // e->reset_engine();
 
     // print_moves(e, "white", e->generate_legal_moves(1));
 

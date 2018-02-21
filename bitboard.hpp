@@ -112,12 +112,13 @@ class Engine
         int get_diag(int rank, int file);
 
         // move encoding and decoding
-        int encode_move(int start, int end, int m_type, int piece, int promotion);
+        int encode_move(int start, int end, int m_type, int piece, int promotion, int color);
         int decode_from(int move);
         int decode_to(int move);
         int decode_type(int move);
         int decode_piece(int move);
         int decode_promo(int move);
+        int decode_color(int move);
         std::string piece_type_to_string(int move);
         void print_move_info(int move);
 
@@ -147,16 +148,22 @@ class Engine
         void place_piece(int color, int type, unsigned long long board);
         int get_color_by_bitboard(unsigned long long board);
         unsigned long long* get_board_rep();
+        void load_in_string(std::string rep);
 
         //move gen helpers
         bool check_legal(int move, int color);
         unsigned long long pinned_pieces(int color);
         void pop_and_add_regular_moves(int color, int* move_list, unsigned long long board, int curr_pos);
-        void generate_pre_check_moves(int color, int* move_list, unsigned long long pinned);
+        void generate_pre_check_moves(int color, int* move_list);
+        // void generate_pre_check_moves_single_check(int color, int* move_list, unsigned long long attackers, unsigned long long blocks);
+        void generate_pre_check_moves_single_check(int color, int* move_list, unsigned long long legal_defense);
+        void generate_pre_check_moves_double_check(int color, int* move_list);
+
 
         //attacks and moves
         int is_terminal(int color, int* moves);
         bool get_in_check(int color);
+        unsigned long long* get_attackers_blocks(int color);
 
 
         unsigned long long pre_check_white_pawn_attacks(unsigned long long white_pawns);

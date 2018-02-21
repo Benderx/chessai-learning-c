@@ -227,7 +227,7 @@ unsigned long long Engine::get_all_black()
     return(pos.black_pawns | pos.black_rooks | pos.black_nights | pos.black_bishops | pos.black_kings | pos.black_queens);
 }
 
-
+// Andrew's Linux Labtop: with flags: ~11.7ns without: ~32ns (probably due to inlining)
 unsigned long long Engine::get_all()
 {
     return(get_all_white() | get_all_black());
@@ -237,7 +237,7 @@ unsigned long long Engine::get_all()
 // Takes in a 64 bit number with single bit
 // Returns the rank piece is on 0-7, bottom to top
 // Alters nothing
-// ~6ns
+// Andrew's Linux Labtop: with flags: ~6ns without: ~16.5ns (idk why)
 int Engine::get_rank(unsigned long long num)
 {
     unsigned long long max0 = 128ULL; // 2^7
@@ -422,6 +422,7 @@ int Engine::get_file(unsigned long long num)
 //     return(diag);
 // }
 
+// Andrew's Linux Labtop: with flags: ~6ns without: ~16ns (probs inline)
 int Engine::get_diag(int rank, int file)
 {
     int total_val = rank+file;
@@ -443,6 +444,7 @@ int Engine::get_diag(int rank, int file)
     // diag[1] = right;
     // int ret_val = (total_val << 5) | (total_val << 5);
 
+
     return(total_val << 5) | (right);
 }
 
@@ -459,14 +461,15 @@ int Engine::get_diag(int rank, int file)
 // Piece to promote pawn to
 // Return an int representing all above info
 // Alters nothing
-int Engine::encode_move(int start, int end, int m_type, int piece, int promotion)
+int Engine::encode_move(int start, int end, int m_type, int piece, int promotion, int color)
 {
     int encode_start = start;
     int encode_end = end << 6;
     int encode_type = m_type << 12;
     int encode_piece = piece << 14;
     int encode_promotion = promotion << 17;
-    return(encode_start | encode_end | encode_type | encode_piece | encode_promotion);
+    int encode_color = color << 20;
+    return(encode_start | encode_end | encode_type | encode_piece | encode_promotion | encode_color);
 }
 
 // Takes in an int move
@@ -507,6 +510,14 @@ int Engine::decode_piece(int move)
 int Engine::decode_promo(int move)
 {
     return((move >> 17) & 3);
+}
+
+// Takes in an int move
+// Returns color
+// Alters nothing
+int Engine::decode_color(int move)
+{
+    return(move >> 20);
 }
 
 std::string Engine::piece_type_to_string(int piece)
@@ -596,7 +607,8 @@ void Engine::push_move(int move)
     unsigned long long curr_piece_loc = square_to_bitboard(start);
     unsigned long long taken_piece_loc = square_to_bitboard(end);
 
-    color = get_color_by_bitboard(curr_piece_loc);
+    // color = get_color_by_bitboard(curr_piece_loc);
+    color = decode_color(move);
 
     int curr_piece_type = get_piece_by_bitboard(color, curr_piece_loc);
     remove_piece(color, curr_piece_type, curr_piece_loc);
@@ -624,7 +636,8 @@ void Engine::pop_move()
     unsigned long long curr_piece_loc = square_to_bitboard(end);
     unsigned long long orig_piece_loc = square_to_bitboard(start);
 
-    color = get_color_by_bitboard(curr_piece_loc);
+    // color = get_color_by_bitboard(curr_piece_loc);
+    color = decode_color(move);
 
     int curr_piece_type = get_piece_by_bitboard(color, curr_piece_loc);
     remove_piece(color, curr_piece_type, curr_piece_loc);
@@ -644,14 +657,22 @@ void Engine::pop_move()
 // therefore simply return ((lots of zeros)00000000000010)
 // YOU MAY ASSUME A 1 EXISTS, (0000000000000000000) will not be given
 // n &= (n - 1) to find val of leftmost maybe faster
-// MAPPING IS 311.969ns (using unordered map)
 // look into: https://stackoverflow.com/questions/757059/position-of-least-significant-bit-that-is-set
-int Engine::lsb_digit(unsigned long long board)
-{
-    return(lsb_lookup[lsb_board(board)]);
-    // return(ffsll(board)); // i think only works on linux
-    // return __builtin_ffsll (board);
-}
+#ifdef __linux__ // much faster than WIN32 
+    int Engine::lsb_digit(unsigned long long board)
+    {
+        // return(ffsll(board)); // i think only works on linux
+        return __builtin_ffsll (board) - 1;
+    }
+#elif _WIN32
+    int Engine::lsb_digit(unsigned long long board)
+    {
+        return(lsb_lookup[lsb_board(board)]);
+    }
+#else
+
+#endif
+
 
 // Takes in a bitboard
 // Returns a bitboard with soley the least significant bit = 1
@@ -734,7 +755,7 @@ unsigned long long Engine::horizontal_flip(unsigned long long x)
 // 4ns
 unsigned long long Engine::vertical_flip(unsigned long long x)
 {
-    return __builtin_bswap64(x);
+    return __builtin_bswap64(x); // maybe only linux? check
     return (x >> 56) |
           ((x<<40) & 0x00FF000000000000) |
           ((x<<24) & 0x0000FF0000000000) |
@@ -774,6 +795,93 @@ void Engine::print_chess_rep(unsigned long long board)
         std::bitset<8> lol(row);
         std::cout << lol << std::endl;
     }
+}
+
+void Engine::load_in_string(std::string rep)
+{
+    int index = 63;
+    unsigned long long wp = 0, bp = 0;
+    unsigned long long wr = 0, br = 0;
+    unsigned long long wn = 0, bn = 0;
+    unsigned long long wb = 0, bb = 0;
+    unsigned long long wq = 0, bq = 0;
+    unsigned long long wk = 0, bk = 0;
+
+    for(unsigned int i = 0; i < rep.length(); i++)
+    {
+        if(rep[i] == 'P')
+        {
+            wp = wp | 1ULL << index;
+        }
+        else if(rep[i] == 'R')
+        {
+            wr = wr | 1ULL << index;
+        }
+        else if(rep[i] == 'N')
+        {
+            wn = wn | 1ULL << index;
+        }
+        else if(rep[i] == 'B')
+        {
+            wb = wb | 1ULL << index;
+        }
+        else if(rep[i] == 'Q')
+        {
+            wq = wq | 1ULL << index;
+        }
+        else if(rep[i] == 'K')
+        {
+            wk = wk | 1ULL << index;
+        }
+
+        else if(rep[i] == 'p')
+        {
+            bp = bp | 1ULL << index;
+        }
+        else if(rep[i] == 'r')
+        {
+            br = br | 1ULL << index;
+        }
+        else if(rep[i] == 'n')
+        {
+            bn = bn | 1ULL << index;
+        }
+        else if(rep[i] == 'b')
+        {
+            bb = bb | 1ULL << index;
+        }
+        else if(rep[i] == 'q')
+        {
+            bq = bq | 1ULL << index;
+        }
+        else if(rep[i] == 'k')
+        {
+            bk = bk | 1ULL << index;
+        }
+        else if(rep[i] == '-')
+        {
+            // lol
+        }
+        else
+        {
+            index++;
+        }
+        index--;
+    }
+
+    pos.white_pawns = horizontal_flip(wp);
+    pos.white_rooks = horizontal_flip(wr); 
+    pos.white_nights = horizontal_flip(wn);     
+    pos.white_bishops = horizontal_flip(wb);
+    pos.white_queens = horizontal_flip(wq);
+    pos.white_kings = horizontal_flip(wk);
+
+    pos.black_pawns = horizontal_flip(bp); 
+    pos.black_rooks = horizontal_flip(br); 
+    pos.black_nights = horizontal_flip(bn); 
+    pos.black_bishops = horizontal_flip(bb);
+    pos.black_queens = horizontal_flip(bq);
+    pos.black_kings = horizontal_flip(bk);
 }
 
 void Engine::print_chess_char()
@@ -894,7 +1002,6 @@ void Engine::print_chess_char()
         }
         std::cout << std::endl;
     }
-
 }
 
 // East << 1
@@ -946,16 +1053,7 @@ unsigned long long Engine::get_bitboard_of_piece(Piece piece, int color)
             std::cout << "WARNING RETURNING GARBAGE IN GET_SQUARE";
             return(-1);
         }
-    } 
-    // if(color)
-    // {
-
-    // }
-    // // black
-    // else
-    // {
-
-    // } 
+    }
 }
 
 // 15ns
@@ -1252,7 +1350,7 @@ void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long 
         // std::cout << "YABOI^2 " << bitboard_to_square(new_pos) << ", " << move_list[0] << std::endl;
         // print_chess_rep(new_pos);
 
-        move_list[move_list[0]+1] = encode_move(curr_pos, bitboard_to_square(new_pos), REGULAR, piece_taken, 0);
+        move_list[move_list[0]+1] = encode_move(curr_pos, bitboard_to_square(new_pos), REGULAR, piece_taken, 0, color);
         // std::cout << "but how: " << move_list[move_list[0]+1] << ", " << piece_type_to_string(get_piece_by_bitboard(square_to_bitboard(decode_from(move_list[move_list[0]+1])))) << std::endl;
         // if(piece_type_to_string(get_piece_by_bitboard(square_to_bitboard(decode_from(move_list[move_list[0]+1])))) == "nothing")
         // {
@@ -1276,233 +1374,257 @@ void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long 
 // Generates and fills move_list for a color before checking checks
 // DOES NOT CHECK BOUNDS FOR move_arr_size
 // 5000 ns
-void Engine::generate_pre_check_moves(int color, int* move_list, unsigned long long pinned)
+void Engine::generate_pre_check_moves(int color, int* move_list)
 {
-    unsigned long long p, one_p, all_occupied, own_occupied, temp, enemy_occupied;
+    unsigned long long p, one_p, all_occupied, own_occupied, enemy_occupied;
     all_occupied = get_all();
-
-
-    bool print = false;
 
     if(color == 1)
     {
         own_occupied = get_all_white();
         enemy_occupied = get_all_black();
 
-        p = pos.white_rooks & ~pinned;
+        p = pos.white_rooks;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing white rook boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing white rook boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_one_rook_moves(one_p, all_occupied, own_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
 
-        p = pos.white_pawns & ~pinned;
+        p = pos.white_pawns;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing white pawn boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing white pawn boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_white_pawn_moves(one_p, all_occupied, enemy_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_white_pawn_moves(one_p, 
                 all_occupied, enemy_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.white_bishops & ~pinned;
+        p = pos.white_bishops;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing white bishops boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing white bishops boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
-            //     // exit(0);
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.white_nights & ~pinned;
+        p = pos.white_nights;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing white night boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing white night boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_night_moves(one_p, own_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_night_moves(one_p, 
                 own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.white_queens & ~pinned;
+        p = pos.white_queens;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing white queen boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing white queen boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_one_queen_moves(one_p, all_occupied, own_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_one_queen_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-        one_p = lsb_board(pos.white_kings & ~pinned);
-
-        // if(print)
-        // {
-        //     std::cout << "printing white king boardrep" << std::endl;
-        //     print_chess_rep(one_p);
-        //     std::cout << "printing white king boardrep2" << std::endl;
-        //     print_chess_rep(pre_check_king_moves(one_p, own_occupied));
-        // }
-
+        one_p = lsb_board(pos.white_kings);
         pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
             own_occupied), bitboard_to_square(one_p));
-
     }
     else
     {
         own_occupied = get_all_black();
         enemy_occupied = get_all_white();
 
-        p = pos.black_rooks & ~pinned;
+        p = pos.black_rooks;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing black rook boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing black rook boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_one_rook_moves(one_p, all_occupied, own_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
 
-        p = pos.black_pawns & ~pinned;
+        p = pos.black_pawns;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing black pawn boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing black pawn boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_black_pawn_moves(one_p, all_occupied, enemy_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_black_pawn_moves(one_p, 
                 all_occupied, enemy_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.black_bishops & ~pinned;
+        p = pos.black_bishops;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing black bishops boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing black bishops boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_one_bishop_moves(one_p, all_occupied, own_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.black_nights & ~pinned;
+        p = pos.black_nights;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing black night boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing black night boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_night_moves(one_p, own_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_night_moves(one_p, 
                 own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.black_queens & ~pinned;
+        p = pos.black_queens;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-
-            // if(print)
-            // {
-            //     std::cout << "printing black queen boardrep" << std::endl;
-            //     print_chess_rep(one_p);
-            //     std::cout << "printing black queen boardrep2" << std::endl;
-            //     print_chess_rep(pre_check_one_queen_moves(one_p, all_occupied, own_occupied));
-            // }
-
             pop_and_add_regular_moves(color, move_list, pre_check_one_queen_moves(one_p, 
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-        one_p = lsb_board(pos.black_kings & ~pinned);
-
-        // if(print)
-        // {
-        //     std::cout << "printing black king boardrep" << std::endl;
-        //     print_chess_rep(one_p);
-        //     std::cout << "printing black king boardrep2" << std::endl;
-        //     print_chess_rep(pre_check_king_moves(one_p, own_occupied));
-        // }
-
+        one_p = lsb_board(pos.black_kings);
         pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
             own_occupied), bitboard_to_square(one_p));
+    }
+}
+
+
+// generates evasive moves
+void Engine::generate_pre_check_moves_single_check(int color, int* move_list, unsigned long long legal_defense)
+{
+    unsigned long long p, one_p, all_occupied, own_occupied, enemy_occupied;
+    all_occupied = get_all();
+
+    if(color == 1)
+    {
+        own_occupied = get_all_white();
+        enemy_occupied = get_all_black();
+
+        p = pos.white_rooks;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
+                all_occupied, own_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+
+        p = pos.white_pawns;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_white_pawn_moves(one_p, 
+                all_occupied, enemy_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+        p = pos.white_bishops;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
+                all_occupied, own_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+        p = pos.white_nights;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_night_moves(one_p, 
+                own_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+        p = pos.white_queens;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_one_queen_moves(one_p, 
+                all_occupied, own_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+        one_p = lsb_board(pos.white_kings);
+        pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
+            own_occupied), bitboard_to_square(one_p));
+    }
+    else
+    {
+        own_occupied = get_all_black();
+        enemy_occupied = get_all_white();
+
+        p = pos.black_rooks;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_one_rook_moves(one_p, 
+                all_occupied, own_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+
+        p = pos.black_pawns;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_black_pawn_moves(one_p, 
+                all_occupied, enemy_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+        p = pos.black_bishops;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_one_bishop_moves(one_p, 
+                all_occupied, own_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+        p = pos.black_nights;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_night_moves(one_p, 
+                own_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+        p = pos.black_queens;
+        while(p)
+        {
+            one_p = lsb_board(p);
+            p = p & ~one_p;
+            pop_and_add_regular_moves(color, move_list, pre_check_one_queen_moves(one_p, 
+                all_occupied, own_occupied) & legal_defense, bitboard_to_square(one_p));
+        }
+
+        one_p = lsb_board(pos.black_kings);
+        pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
+            own_occupied), bitboard_to_square(one_p));
+    }
+}
+
+void Engine::generate_pre_check_moves_double_check(int color, int* move_list)
+{
+    unsigned long long one_p, own_occupied;
+
+    if(color == 1)
+    {
+        one_p = lsb_board(pos.white_kings);
+        pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
+            get_all_white()), bitboard_to_square(one_p));
+    }
+    else
+    {
+        one_p = lsb_board(pos.black_kings);
+        pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
+            get_all_black()), bitboard_to_square(one_p));
     }
 }
 
@@ -1517,39 +1639,37 @@ int* Engine::generate_legal_moves(int color)
     unsigned long long pinned = pinned_pieces(color);
     int king_square = bitboard_to_square(get_bitboard_of_piece(KING, color));
 
+    unsigned long long* check_info = get_attackers_blocks(color);
 
-    // if(!get_bitboard_of_piece(KING, color))
+    // if(check_info[0] != 0)
     // {
-    //     std::cout << "\n\nKING SQUARE IS " << king_square << "COLOR IS" << color << "\n\n";
-    //     std::cout << "\n\nKING SQUARE BITBOARD IS" << "\n";
-    //     print_chess_rep(get_bitboard_of_piece(KING, color));
-    //     std::cout << "\n\n";
-    //     print_chess_char();
-
-    //     print_chess_rep(pos.white_kings);
-    //     print_chess_rep(pos.black_kings);
-    //     std::cout << (KING == KING) << "\n";
-    //     exit(0);
+    //     std::cout << "check_info: " << check_info[0] << std::endl;
+    //     std::cout << "legals" << std::endl;
+    //     print_chess_rep(check_info[1] | check_info[2]);
     // }
 
-    // if(in_check)
-    // {
-    //     // generate<EVASIONS>(pos, moveList)         last_move_index returned
-    // }
-    // else
-    // {
-    //     // generate<NON_EVASIONS>(pos, moveList)     last_move_index returned
-    // }
-
-    generate_pre_check_moves(color, move_list, pinned);
+    if(check_info[0]) // in check
+    {
+        if(check_info[0] > 1) // double check
+        {
+            generate_pre_check_moves_double_check(color, move_list);
+        }
+        else // single check
+        {
+            generate_pre_check_moves_single_check(color, move_list, check_info[1] | check_info[2]);
+        }
+    }
+    else
+    {
+        generate_pre_check_moves(color, move_list);
+    }
 
     int move_iter = 0;
-    bool check_status = get_in_check(color);
     while(move_iter < move_list[0])
     {
         int move = move_list[move_iter+1];
-        // if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && ~(check_legal(move)))
-        if((decode_from(move) == king_square || decode_type(move) == ENPASSANT || check_status) && !(check_legal(move, color)))
+        // if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT || check_status) && !(check_legal(move, color)))
+        if((pinned || decode_from(move) == king_square || decode_type(move) == ENPASSANT) && !(check_legal(move, color)))
         {
             // std::cout << "removing move cause not legal: " << move << std::endl;
             move_list[move_iter+1] = move_list[move_list[0]];
@@ -1558,6 +1678,7 @@ int* Engine::generate_legal_moves(int color)
         }
         move_iter++;
     }
+    free(check_info);
     return(move_list);
 }
 
@@ -1640,6 +1761,80 @@ bool Engine::get_in_check(int color)
         return true;
     }
     return false;
+}
+
+
+// will store how many attackers in info[0], attacker squares in info[1], and blocking squares in info[2]
+unsigned long long* Engine::get_attackers_blocks(int color)
+{
+    unsigned long long my_king;
+    unsigned long long enemy_pawns, enemy_rooks, enemy_nights, enemy_bishops, enemy_queens;
+    unsigned long long pawn_attackers, rook_attackers, night_attackers, bishop_attackers;
+    unsigned long long card_attacks, diag_attacks;
+
+    unsigned long long* info = (unsigned long long*) calloc(3, sizeof(unsigned long long));
+
+    if(color == 1)
+    {
+        my_king = pos.white_kings;
+
+        enemy_pawns = pos.black_pawns;
+        enemy_rooks = pos.black_rooks;
+        enemy_nights = pos.black_nights;
+        enemy_bishops = pos.black_bishops;
+        enemy_queens = pos.black_queens;
+
+        pawn_attackers = pre_check_white_pawn_attacks(my_king) & enemy_pawns;
+    }
+    else
+    {
+        my_king = pos.black_kings;
+
+        enemy_pawns = pos.white_pawns;
+        enemy_rooks = pos.white_rooks;
+        enemy_nights = pos.white_nights;
+        enemy_bishops = pos.white_bishops;
+        enemy_queens = pos.white_queens;
+
+        pawn_attackers = pre_check_black_pawn_attacks(my_king) & enemy_pawns;
+    }
+
+    // i believe it is impossible to hit more than one check with any of these 4 ifs
+
+    if(pawn_attackers)
+    {
+        info[0]++;
+        info[1] = pawn_attackers;
+    }
+
+    card_attacks = pre_check_one_rook_attacks(my_king);
+    rook_attackers = card_attacks & (enemy_rooks | enemy_queens);
+    if(rook_attackers)
+    {
+        info[0]++;
+        info[1] = rook_attackers;
+        info[2] = card_attacks & pre_check_one_rook_attacks(rook_attackers);
+    }
+
+    diag_attacks = pre_check_one_bishop_attacks(my_king);
+    bishop_attackers = diag_attacks & (enemy_bishops | enemy_queens);
+    if(bishop_attackers)
+    {
+        info[0]++;
+        info[1] = bishop_attackers;
+        info[2] = diag_attacks & pre_check_one_bishop_attacks(bishop_attackers);
+    }
+
+    night_attackers = pre_check_night_attacks(my_king) & enemy_nights;
+    if(night_attackers)
+    {
+        info[0]++;
+        info[1] = night_attackers;
+    }
+    
+    // king_attackers = pre_check_king_attacks(my_king) & enemy_kings;
+    
+    return(info);
 }
 
 
@@ -1831,8 +2026,9 @@ unsigned long long Engine::pre_check_one_bishop_attacks(unsigned long long bisho
 {
     // int* diags = get_diag(get_rank(bishop), get_file(bishop));
     int diag = get_diag(get_rank(bishop), get_file(bishop));
-    int left_diag = diag & 0x000000000000000F;
-    int right_diag = diag >> 5;
+    int left_diag = diag >> 5;
+    int right_diag = diag & 0x000000000000000F;
+
     unsigned long long line_mask = ~bishop & diag_left_mask[left_diag]; // excludes square of slider
     // free(diags);
 
