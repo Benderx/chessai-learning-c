@@ -73,9 +73,6 @@ class Engine
         void print_chess_rep(unsigned long long num);
         void print_chess_char();
 
-        //move gen
-        int* generate_legal_moves(int color);
-
 
         // TEMPORARILY PUBLIC
 
@@ -150,17 +147,16 @@ class Engine
         unsigned long long* get_board_rep();
         void load_in_string(std::string rep);
 
-        //move gen helpers
-        bool check_legal(int move, int color);
-        unsigned long long pinned_pieces(int color);
+        //move gen
         void pop_and_add_regular_moves(int color, int* move_list, unsigned long long board, int curr_pos);
         void generate_pre_check_moves(int color, int* move_list);
-        // void generate_pre_check_moves_single_check(int color, int* move_list, unsigned long long attackers, unsigned long long blocks);
         void generate_pre_check_moves_single_check(int color, int* move_list, unsigned long long legal_defense);
         void generate_pre_check_moves_double_check(int color, int* move_list);
+        int* generate_legal_moves(int color);
 
-
-        //attacks and moves
+        // board state helpers
+        unsigned long long pinned_pieces(int color);
+        bool check_legal(int move, int color);
         int is_terminal(int color, int* moves);
         bool get_in_check(int color);
         unsigned long long* get_attackers_blocks(int color);

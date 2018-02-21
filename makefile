@@ -1,9 +1,9 @@
 
 CC = g++
-CFLAGS = -std=c++14 -O3 -funroll-loops -Ofast -march=native -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized
+CFLAGS = -std=c++14 -Ofast -flto -funroll-loops -march=native -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized
 HEADERS = bitboard.hpp player.hpp
-DRIVER_OBJECTS = bitboard.cpp driver.cpp
-PLAY_OBJECTS = bitboard.cpp player.cpp play.cpp
+DRIVER_OBJECTS = bitboard.cpp driver.cpp move_generation.cpp piece_logic.cpp
+PLAY_OBJECTS = bitboard.cpp player.cpp play.cpp move_generation.cpp piece_logic.cpp
 
 
 all: driver play
