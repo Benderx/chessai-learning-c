@@ -30,3 +30,12 @@ probable bug:
     i think theres a logic error there, its in Engine::push_move
     happens again here,         // taken_piece = //LOOKUP VAL -> pointer to piece val on that square
             taken_piece = taken_piece & (UINT64_MAX-bb_end);
+
+Current enhancement list:
+minimax ai'
+GUI for watching games
+human interactable
+continue to benchmark functions
+realistic inputs
+enpassant
+castle
