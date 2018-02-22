@@ -247,15 +247,15 @@ unsigned long long Engine::pre_check_bishop_moves(int color)
     }
 }
 
-unsigned long long Engine::pre_check_bishop_moves(unsigned long long piece, int color)
+unsigned long long Engine::pre_check_bishop_moves(unsigned long long bishop, int color)
 {
     if(color == 1)
     {
-        return(pre_check_bishop_moves(piece, get_all(), get_all_white()));
+        return(pre_check_bishop_moves(bishop, get_all(), get_all_white()));
     }
     else
     {
-        return(pre_check_bishop_moves(piece, get_all(), get_all_black()));
+        return(pre_check_bishop_moves(bishop, get_all(), get_all_black()));
     }
 }
 
@@ -330,15 +330,15 @@ unsigned long long Engine::pre_check_rook_moves(int color)
     }
 }
 
-unsigned long long Engine::pre_check_rook_moves(unsigned long long piece, int color)
+unsigned long long Engine::pre_check_rook_moves(unsigned long long rook, int color)
 {
     if(color == 1)
     {
-        return(pre_check_rook_moves(piece, get_all(), get_all_white()));
+        return(pre_check_rook_moves(rook, get_all(), get_all_white()));
     }
     else
     {
-        return(pre_check_rook_moves(piece, get_all(), get_all_black()));
+        return(pre_check_rook_moves(rook, get_all(), get_all_black()));
     }
 }
 
@@ -397,16 +397,155 @@ unsigned long long Engine::pre_check_queen_moves(int color)
     }
 }
 
-unsigned long long Engine::pre_check_queen_moves(unsigned long long piece, int color)
+unsigned long long Engine::pre_check_queen_moves(unsigned long long queen, int color)
 {
     if(color == 1)
     {
-        return pre_check_bishop_moves(piece, get_all(), get_all_white()) | 
-            pre_check_rook_moves(piece, get_all(), get_all_white());
+        return pre_check_bishop_moves(queen, get_all(), get_all_white()) | 
+            pre_check_rook_moves(queen, get_all(), get_all_white());
     }
     else
     {
-        return pre_check_bishop_moves(piece, get_all(), get_all_black()) | 
-            pre_check_rook_moves(piece, get_all(), get_all_black());
+        return pre_check_bishop_moves(queen, get_all(), get_all_black()) | 
+            pre_check_rook_moves(queen, get_all(), get_all_black());
     }
+}
+
+
+
+
+// FLOODS
+
+unsigned long long Engine::vert_flood(unsigned long long rooks)
+{
+    return(north_flood(rooks) | south_flood(rooks));
+}
+
+unsigned long long Engine::hori_flood(unsigned long long rooks)
+{
+    return(east_flood(rooks) | west_flood(rooks));
+}
+
+
+unsigned long long Engine::north_flood(unsigned long long rooks)
+{
+    unsigned long long north_flood = 0;
+    unsigned long long empty_squares = ~get_all();
+
+    while(rooks) 
+    {
+        north_flood = north_flood | rooks;
+        rooks = (rooks << 8) & empty_squares;
+    }
+    return(north_flood << 8);
+}
+
+unsigned long long Engine::south_flood(unsigned long long rooks)
+{
+    unsigned long long south_flood = 0;
+    unsigned long long empty_squares = ~get_all();
+
+    while(rooks) 
+    {
+        south_flood = south_flood | rooks;
+        rooks = (rooks >> 8) & empty_squares;
+    }
+    return(south_flood >> 8);
+}
+
+
+unsigned long long Engine::east_flood(unsigned long long rooks)
+{
+    unsigned long long east_flood = 0;
+    unsigned long long empty_squares = ~get_all() & ~col_mask[7];
+    rooks = rooks & ~col_mask[7];
+
+    while(rooks) 
+    {
+        east_flood = east_flood | rooks;
+        rooks = (rooks << 1) & empty_squares;
+    }
+    return((east_flood & ~col_mask[7]) << 1);
+}
+
+unsigned long long Engine::west_flood(unsigned long long rooks)
+{
+    unsigned long long west_flood = 0;
+    unsigned long long empty_squares = ~get_all() & ~col_mask[0];
+    rooks = rooks & ~col_mask[0];
+
+    while(rooks) 
+    {
+        west_flood = west_flood | rooks;
+        rooks = (rooks >> 1) & empty_squares;
+    }
+    return((west_flood & ~col_mask[0]) >> 1);
+}
+
+
+unsigned long long Engine::left_diag_flood(unsigned long long bishops)
+{
+    return(north_west_flood(bishops) | south_east_flood(bishops));
+}
+
+unsigned long long Engine::right_diag_flood(unsigned long long bishops)
+{
+    return(north_east_flood(bishops) | south_west_flood(bishops));
+}
+
+
+unsigned long long Engine::north_east_flood(unsigned long long bishops)
+{
+    unsigned long long east_flood = 0;
+    unsigned long long empty_squares = ~get_all() & ~col_mask[7];
+    bishops = bishops & ~col_mask[7];
+
+    while(bishops) 
+    {
+        east_flood = east_flood | bishops;
+        bishops = (bishops << 9) & empty_squares;
+    }
+    return((east_flood & ~col_mask[7]) << 9);
+}
+
+unsigned long long Engine::south_east_flood(unsigned long long bishops)
+{
+    unsigned long long east_flood = 0;
+    unsigned long long empty_squares = ~get_all() & ~col_mask[7];
+    bishops = bishops & ~col_mask[7];
+
+    while(bishops) 
+    {
+        east_flood = east_flood | bishops;
+        bishops = (bishops >> 7) & empty_squares;
+    }
+    return((east_flood & ~col_mask[7]) >> 7);
+}
+
+unsigned long long Engine::south_west_flood(unsigned long long bishops)
+{
+    unsigned long long west_flood = 0;
+    unsigned long long empty_squares = ~get_all() & ~col_mask[0];
+    bishops = bishops & ~col_mask[0];
+
+    while(bishops) 
+    {
+        west_flood = west_flood | bishops;
+        bishops = (bishops >> 9) & empty_squares;
+    }
+    return((west_flood & ~col_mask[0]) >> 9);
+}
+
+unsigned long long Engine::north_west_flood(unsigned long long bishops)
+{
+    unsigned long long west_flood = 0;
+    unsigned long long empty_squares = ~get_all() & ~col_mask[0];
+    bishops = bishops & ~col_mask[0];
+
+    while(bishops) 
+    {
+        west_flood = west_flood | bishops;
+        bishops = (bishops << 7) & empty_squares;
+    }
+    return((west_flood & ~col_mask[0]) << 7);
 }
