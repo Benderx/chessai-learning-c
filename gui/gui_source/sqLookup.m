@@ -1,7 +1,7 @@
 function [xRange,yRange,color] = sqLookup(sq)
 %sqLookup Returns number ranges corresponding to a square number
 %   Takes in a square number between 1-64
-%   Returns:
+%   Returns: The x and y pixel ranges corresponding to the square number
 row = 7-double(idivide(sq-1,int8(8)));
 col = mod(sq-1,8);
 color = mod(row+col,2);
