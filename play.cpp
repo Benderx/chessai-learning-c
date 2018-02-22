@@ -106,6 +106,7 @@ int main()
         result = play_game(e, players, curr_player, num_moves);
         // e->print_chess_char();
         e->reset_engine();        
+        // std::cout << "game" << std::endl;
     }
     
     // int* garbage = (int*) malloc(10000 * sizeof(int));

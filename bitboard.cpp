@@ -566,7 +566,7 @@ int Engine::stack_pop()
 
 // Takes in a move, alters the BitboardEngine's representation to the NEXT state based on the CURRENT move action
 // Currently 
-void Engine::push_move(int move)
+void Engine::push_psuedo_move(int move)
 {
     stack_push(move);
     int start = decode_from(move);
@@ -593,8 +593,13 @@ void Engine::push_move(int move)
     place_piece(color, curr_piece_type, taken_piece_loc);
 }
 
+void Engine::push_move(int move)
+{
+    push_psuedo_move(move);
+}
+
 // Takes in a move, alters the BitboardEngine's representation to the PREVIOUS state based on the LAST move action
-void Engine::pop_move()
+void Engine::pop_psuedo_move()
 {
     int move = stack_pop();
 
@@ -620,6 +625,11 @@ void Engine::pop_move()
     }
 
     place_piece(color, curr_piece_type, orig_piece_loc);
+}
+
+void Engine::pop_move()
+{
+    pop_psuedo_move();
 }
 
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
@@ -1203,48 +1213,6 @@ unsigned long long* Engine::get_board_rep()
 }
 
 
-// Returns a bitboard of pieces that are pinned against their king 
-// 1000ns
-unsigned long long Engine::pinned_pieces(int color)
-{
-    unsigned long long defenders;
-    unsigned long long enemy_rook;
-    unsigned long long enemy_bishop;
-    unsigned long long enemy_queen;
-    // unsigned long long enemy_pieces;
-
-    unsigned long long attacker_squares;
-
-    // CHECK COLORS
-    // Replace king with enemy queen
-    // Find kings defenders
-    // Declare enemy
-    // white
-    if(color == 1)
-    {
-        defenders = pre_check_one_queen_attacks(pos.white_kings) & get_all_white();
-        enemy_rook = pos.black_rooks;
-        enemy_bishop = pos.black_bishops;
-        enemy_queen = pos.black_queens;
-        // enemy_pieces = get_all_black();
-    }
-    // black
-    else
-    {
-        defenders = pre_check_one_queen_attacks(pos.black_kings) & get_all_black();
-        enemy_rook = pos.white_rooks;
-        enemy_bishop = pos.white_bishops;
-        enemy_queen = pos.white_queens;
-        // enemy_pieces = get_all_white();
-    }
-    // Compile all squares under attack from enemy
-    attacker_squares = pre_check_rook_attacks(enemy_rook | enemy_queen) | 
-                        pre_check_bishop_attacks(enemy_bishop | enemy_queen);
-
-
-    // Defenders in attacker squares are pinned pieces
-    return(defenders & attacker_squares);
-}
 
 
 
