@@ -160,14 +160,15 @@ class Engine
 
         //move gen
         void pop_and_add_regular_moves(int color, int* move_list, unsigned long long board, int curr_pos);
-        void generate_moves(int color, int* move_list);
-        void generate_moves_pinned(int color, int* move_list, unsigned long long pinned);
-        void generate_moves_single_check(int color, int* move_list, unsigned long long legal_defense);
-        void generate_moves_pinned_single_check(int color, int* move_list, unsigned long long legal_defense, unsigned long long pinned);
-        void generate_moves_double_check(int color, int* move_list);
+        void generate_moves(int color, int* move_list, unsigned long long danger);
+        void generate_moves_pinned(int color, int* move_list, unsigned long long danger, unsigned long long pinned);
+        void generate_moves_single_check(int color, int* move_list, unsigned long long danger, unsigned long long legal_defense);
+        void generate_moves_pinned_single_check(int color, int* move_list, unsigned long long danger, unsigned long long legal_defense, unsigned long long pinned);
+        void generate_moves_double_check(int color, int* move_list, unsigned long long danger);
         void pin_card_helper(int color, Piece p, unsigned long long board, unsigned long long los, int* move_list);
         void pin_diag_helper(int color, Piece p, unsigned long long board, unsigned long long los, int* move_list);
         unsigned long long pinned_pieces(int color, int* move_list);
+        unsigned long long danger_squares(int color);
         int* generate_legal_moves(int color);
 
         // board state helpers
@@ -218,18 +219,18 @@ class Engine
         unsigned long long vert_flood(unsigned long long rooks);
         unsigned long long hori_flood(unsigned long long rooks);
 
-        unsigned long long north_flood(unsigned long long rooks);
-        unsigned long long south_flood(unsigned long long rooks);
-        unsigned long long east_flood(unsigned long long rooks);
-        unsigned long long west_flood(unsigned long long rooks);
+        unsigned long long north_flood(unsigned long long rooks, unsigned long long prop);
+        unsigned long long south_flood(unsigned long long rooks, unsigned long long prop);
+        unsigned long long east_flood(unsigned long long rooks, unsigned long long prop);
+        unsigned long long west_flood(unsigned long long rooks, unsigned long long prop);
 
         unsigned long long left_diag_flood(unsigned long long bishops);
         unsigned long long right_diag_flood(unsigned long long bishops);
 
-        unsigned long long north_east_flood(unsigned long long bishops);
-        unsigned long long south_east_flood(unsigned long long bishops);
-        unsigned long long south_west_flood(unsigned long long bishops);
-        unsigned long long north_west_flood(unsigned long long bishops);
+        unsigned long long north_east_flood(unsigned long long bishops, unsigned long long prop);
+        unsigned long long south_east_flood(unsigned long long bishops, unsigned long long prop);
+        unsigned long long south_west_flood(unsigned long long bishops, unsigned long long prop);
+        unsigned long long north_west_flood(unsigned long long bishops, unsigned long long prop);
 
 
     private: 
