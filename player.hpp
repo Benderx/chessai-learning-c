@@ -9,13 +9,12 @@
 class Player
 {
 	public:
-		//Vars
 		int color;
 		Engine *e;
 
-		//Methods
 		Player(int col, Engine *engine);
 		int get_color();
+		virtual unsigned long long move(int* move_list)=0;
 
 	private:
 
@@ -24,12 +23,16 @@ class Player
 class Rand: public Player
 {
 	public:
-		//Var
-		int color;
-		Engine *e;
-
-		//Methods
 		Rand(int col, Engine* engine);
+		unsigned long long move(int* move_list);
+
+	private:
+};
+
+class Minimax: public Player
+{
+	public:
+		Minimax(int col, Engine* engine);
 		unsigned long long move(int* move_list);
 
 	private:

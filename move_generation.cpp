@@ -175,7 +175,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
         own_occupied = get_all_white();
         enemy_occupied = get_all_black();
 
-        p = pos.white_rooks & !pinned;
+        p = pos.white_rooks & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -185,7 +185,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
         }
 
 
-        p = pos.white_pawns & !pinned;
+        p = pos.white_pawns & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -194,7 +194,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
                 all_occupied, enemy_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.white_bishops & !pinned;
+        p = pos.white_bishops & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -203,7 +203,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.white_nights & !pinned;
+        p = pos.white_nights & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -212,7 +212,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
                 own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.white_queens & !pinned;
+        p = pos.white_queens & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -230,7 +230,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
         own_occupied = get_all_black();
         enemy_occupied = get_all_white();
 
-        p = pos.black_rooks & !pinned;
+        p = pos.black_rooks & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -240,7 +240,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
         }
 
 
-        p = pos.black_pawns & !pinned;
+        p = pos.black_pawns & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -249,7 +249,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
                 all_occupied, enemy_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.black_bishops & !pinned;
+        p = pos.black_bishops & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -258,7 +258,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.black_nights & !pinned;
+        p = pos.black_nights & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -267,7 +267,7 @@ void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long
                 own_occupied), bitboard_to_square(one_p));
         }
 
-        p = pos.black_queens & !pinned;
+        p = pos.black_queens & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -410,7 +410,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
         own_occupied = get_all_white();
         enemy_occupied = get_all_black();
 
-        p = pos.white_rooks & !pinned;
+        p = pos.white_rooks & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -420,7 +420,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
         }
 
 
-        p = pos.white_pawns & !pinned;
+        p = pos.white_pawns & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -429,7 +429,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
                 all_occupied, enemy_occupied) & legal_defense, bitboard_to_square(one_p));
         }
 
-        p = pos.white_bishops & !pinned;
+        p = pos.white_bishops & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -438,7 +438,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
                 all_occupied, own_occupied) & legal_defense, bitboard_to_square(one_p));
         }
 
-        p = pos.white_nights & !pinned;
+        p = pos.white_nights & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -447,7 +447,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
                 own_occupied) & legal_defense, bitboard_to_square(one_p));
         }
 
-        p = pos.white_queens & !pinned;
+        p = pos.white_queens & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -465,7 +465,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
         own_occupied = get_all_black();
         enemy_occupied = get_all_white();
 
-        p = pos.black_rooks & !pinned;
+        p = pos.black_rooks & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -475,7 +475,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
         }
 
 
-        p = pos.black_pawns & !pinned;
+        p = pos.black_pawns & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -484,7 +484,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
                 all_occupied, enemy_occupied) & legal_defense, bitboard_to_square(one_p));
         }
 
-        p = pos.black_bishops & !pinned;
+        p = pos.black_bishops & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -493,7 +493,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
                 all_occupied, own_occupied) & legal_defense, bitboard_to_square(one_p));
         }
 
-        p = pos.black_nights & !pinned;
+        p = pos.black_nights & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -502,7 +502,7 @@ void Engine::generate_moves_pinned_single_check(int color, int* move_list, unsig
                 own_occupied) & legal_defense, bitboard_to_square(one_p));
         }
 
-        p = pos.black_queens & !pinned;
+        p = pos.black_queens & pinned;
         while(p)
         {
             one_p = lsb_board(p);
@@ -760,15 +760,26 @@ unsigned long long Engine::danger_squares(int color)
 // Generates and returns a list of legal moves for a color
 int* Engine::generate_legal_moves(int color)
 {
-    int *move_list = (int*) malloc(move_arr_size * sizeof(int)); 
     // int last_move_index = 0;
-    move_list[0] = 0; // encode index in array
+    // move_list = (int*) malloc(move_arr_size * sizeof(int));
+    move_list[0] = 0; // reset index to 0
 
     unsigned long long pinned;
     int king_square = bitboard_to_square(get_bitboard_of_piece(KING, color));
 
     unsigned long long* check_info = get_attackers_blocks(color);
-    unsigned long long danger = !danger_squares(color);
+    unsigned long long danger = ~danger_squares(color);
+
+    // std::cout << "in_check" << std::endl;
+    // std::cout << check_info[0] << std::endl;
+    // std::cout << "in_check2" << std::endl;
+    // std::cout << get_in_check(color) << std::endl;
+    // std::cout << "danger" << std::endl;
+    // print_chess_rep(danger);
+    // std::cout << "pinned" << std::endl;
+    // print_chess_rep(pinned);
+
+    
     // if(check_info[0] != 0)
     // {
     //     std::cout << "check_info: " << check_info[0] << std::endl;
@@ -786,7 +797,7 @@ int* Engine::generate_legal_moves(int color)
 
     if(!check_info[0]) // not in check
     {
-        pinned = pinned_pieces(color, move_list);
+        // pinned = ~pinned_pieces(color, move_list);
         if(pinned)
         {
             generate_moves_pinned(color, move_list, danger, pinned);
@@ -804,7 +815,7 @@ int* Engine::generate_legal_moves(int color)
         }
         else // single check
         {
-            pinned = pinned_pieces(color, move_list);
+            // pinned = ~pinned_pieces(color, move_list);
             if(pinned)
             {
                 generate_moves_pinned_single_check(color, move_list, danger, check_info[1] | check_info[2], pinned);

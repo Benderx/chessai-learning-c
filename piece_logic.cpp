@@ -264,6 +264,29 @@ unsigned long long Engine::pre_check_bishop_moves(unsigned long long bishop, int
 /////ROOKS//////
 
 // check args
+// unsigned long long Engine::pre_check_one_rook_attacks(unsigned long long rook)
+// {
+//     unsigned long long row = get_rank(rook);
+//     unsigned long long col = get_file(rook);
+
+//     unsigned long long s = rook;
+//     unsigned long long o = get_all();
+
+//     unsigned long long o_rev = reverse_64_bits(o);
+//     unsigned long long s_rev = reverse_64_bits(s);
+
+//     unsigned long long hori = (o - 2*s) ^ reverse_64_bits(o_rev - 2*s_rev);
+//     hori = hori & row_mask[row];
+
+
+//     unsigned long long o_mask = o & col_mask[col];
+//     unsigned long long o_rev_mask = reverse_64_bits(o_mask);
+//     unsigned long long vert = (o_mask - 2*s) ^ reverse_64_bits(o_rev_mask - 2*s_rev);
+//     vert = vert & col_mask[col];
+
+//     return(hori | vert);
+// }
+
 unsigned long long Engine::pre_check_one_rook_attacks(unsigned long long rook)
 {
     unsigned long long row = get_rank(rook);
@@ -272,20 +295,21 @@ unsigned long long Engine::pre_check_one_rook_attacks(unsigned long long rook)
     unsigned long long s = rook;
     unsigned long long o = get_all();
 
-    unsigned long long o_rev = reverse_64_bits(o);
-    unsigned long long s_rev = reverse_64_bits(s);
+    unsigned long long o_rev = vertical_flip(o);
+    unsigned long long s_rev = vertical_flip(s);
 
-    unsigned long long hori = (o - 2*s) ^ reverse_64_bits(o_rev - 2*s_rev);
+    unsigned long long hori = (o - 2*s) ^ vertical_flip(o_rev - 2*s_rev);
     hori = hori & row_mask[row];
 
 
     unsigned long long o_mask = o & col_mask[col];
-    unsigned long long o_rev_mask = reverse_64_bits(o_mask);
-    unsigned long long vert = (o_mask - 2*s) ^ reverse_64_bits(o_rev_mask - 2*s_rev);
+    unsigned long long o_rev_mask = vertical_flip(o_mask);
+    unsigned long long vert = (o_mask - 2*s) ^ vertical_flip(o_rev_mask - 2*s_rev);
     vert = vert & col_mask[col];
 
     return(hori | vert);
 }
+
 
 unsigned long long Engine::pre_check_rook_attacks(unsigned long long rooks)
 {

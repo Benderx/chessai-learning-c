@@ -21,7 +21,8 @@ Engine::Engine(unsigned long long* board_data)
 void Engine::init_engine()
 {
     max_move_length = 500; // This assumes there are only 500 possible legal moves at any one time (affects move array intilization)
-    move_arr_size = 500;
+    move_arr_size = 500; // how many legal moves can be filled
+    move_list = (int*) malloc(move_arr_size * sizeof(int));
 
     move_stack = (int*) malloc((max_move_length + 1) * sizeof(int)); // +1 because pushing moves is nesseccary to chekc fo legality
     // lsb_lookup = (int*) malloc(64 * sizeof(int));
@@ -688,25 +689,25 @@ unsigned long long Engine::msb_digit(unsigned long long board)
 // https://stackoverflow.com/questions/25802605/what-does-performing-a-byteswap-mean
 unsigned long long Engine::reverse_8_bits(unsigned long long x)
 {
-    return (x * 0x0202020202 & 0x010884422010) % 1023;
+    return(x * 0x0202020202 & 0x010884422010) % 1023;
 }
 
 
 unsigned long long Engine::reverse_64_bits(unsigned long long x)
 {
-    return vertical_flip(horizontal_flip(x));
+    return(vertical_flip(horizontal_flip(x)));
     // return (x * np.uint64(0x0202020202) & np.uint64(0x010884422010)) % np.uint64(1023);
 }
 
 unsigned long long Engine::horizontal_flip(unsigned long long x)
 {
-    unsigned long long k1 = 0x5555555555555555;
-    unsigned long long k2 = 0x3333333333333333;
-    unsigned long long k4 = 0x0f0f0f0f0f0f0f0f;
-    x = ((x >> 1) & k1) + 2 * (x & k1);
-    x = ((x >> 2) & k2) + 4 * (x & k2);
-    x = ((x >> 4) & k4) + 16 * (x & k4);
-    return x;
+    // unsigned long long k1 = 0x5555555555555555;
+    // unsigned long long k2 = 0x3333333333333333;
+    // unsigned long long k4 = 0x0f0f0f0f0f0f0f0f;
+    x = ((x >> 1) & 0x5555555555555555) + 2 * (x & 0x5555555555555555);
+    x = ((x >> 2) & 0x3333333333333333) + 4 * (x & 0x3333333333333333);
+    x = ((x >> 4) & 0x0f0f0f0f0f0f0f0f) + 16 * (x & 0x0f0f0f0f0f0f0f0f);
+    return(x);
 }
 
 

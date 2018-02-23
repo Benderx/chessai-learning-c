@@ -6,6 +6,7 @@
 #include <limits>
 #include <time.h>
 #include <chrono>
+#include <vector>
 
 // g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp -std=c++14 -o run
 
@@ -31,21 +32,22 @@ std::chrono::duration<double, std::nano> cast_nano(std::chrono::duration<double>
 }
 
 
-int play_game(Engine* e, Rand** players, Rand* curr_player, int* num_moves)
+int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
 {
     int max_moves  = e->get_max_move_length();
     int moves_made = 0;
     int color = 1;
     int term;
     int move;
+    int* move_list;
 
     // e->print_chess_char();
     // std::cout << std::endl;
 
     while(moves_made < max_moves)
     {
-        curr_player = players[color];
-        int* move_list = e->generate_legal_moves(color);
+        // curr_player = players[color];
+        move_list = e->generate_legal_moves(color);
 
         term = e->is_terminal(color, move_list);
         if(term != -1)
@@ -53,13 +55,13 @@ int play_game(Engine* e, Rand** players, Rand* curr_player, int* num_moves)
             // std::cout << "game over, result is: " << term << " in " << moves_made  << " moves" << std::endl;
             // e->print_chess_char();
 
-            free(move_list);
+            // free(move_list);
             return(term);
         }
 
         // std::cout << color_to_string(color) << " to move." << std::endl;
         // std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
-        move = curr_player->move(move_list);
+        move = players[color]->move(move_list);
         // std::cout <<  "making move: " << move << std::endl;
         // e->print_move_info(move);
         e->push_move(move);
@@ -70,7 +72,7 @@ int play_game(Engine* e, Rand** players, Rand* curr_player, int* num_moves)
 
         moves_made++;
         color = 1-color;
-        free(move_list);
+        // free(move_list);
     }
 
     // std::cout << "game over, result is draw from making max moves: " << max_moves << std::endl;
@@ -83,11 +85,11 @@ int main()
     srand(time(NULL));
     Engine* e = new Engine();
     
-    Rand** players = (Rand**) malloc(2 * sizeof(Rand*));
-    players[1] = new Rand(1, e); // white
-    players[0] = new Rand(0, e); // black
+    // Player** players = (Player**) malloc(2 * sizeof(Player*));
+    std::vector<Player*> players;
+    players.push_back(new Rand(0, e)); // black
+    players.push_back(new Rand(1, e)); // white
 
-    Rand* curr_player;
     int result;
     unsigned long long result2;
     int* num_moves = (int*) malloc(sizeof(int));
@@ -101,11 +103,12 @@ int main()
     num_moves[0] = 0;
     t1 = std::chrono::system_clock::now();
     
-    for(int i = 0; i < 10000; i++)
+    for(int i = 0; i < 100000; i++)
     {
-        result = play_game(e, players, curr_player, num_moves);
+        result = play_game(e, players, num_moves);
         // e->print_chess_char();
-        e->reset_engine();        
+        e->reset_engine();  
+        // exit(0);      
         // std::cout << "game" << std::endl;
     }
     
@@ -113,13 +116,16 @@ int main()
     // garbage[0] = 0;
     // for(int i = 0; i < 10000000; i++)
     // {
-    //     // e->generate_pre_check_moves(1, garbage, 0); 
-    //     result = e->lsb_digit(e->pos.white_kings);
-    //     std::cout << result << std::endl; 
-    //     exit(0);
-    //     // garbage[0] = 0;
-    //     // result = e->get_bitboard_of_piece(KING, 1);
-    //     // result2 = e->get_all();
+        // e->generate_pre_check_moves(1, garbage, 0); 
+        // result = e->lsb_digit(e->pos.white_kings);
+        // result2 = e->reverse_64_bits(e->pos.white_pawns);
+        // result = e->bitboard_to_square(e->get_bitboard_of_piece(KING, 1));
+        // result2 = e->pre_check_rook_moves(e->pos.white_rooks);
+        // std::cout << result << std::endl; 
+        // exit(0);
+        // garbage[0] = 0;
+        // result = e->get_bitboard_of_piece(KING, 1);
+        // result2 = e->get_all();
     // }
 
     t2 = std::chrono::system_clock::now();
@@ -131,10 +137,6 @@ int main()
     std::cout << "resulting in NPS of: " << 1.0 / (temp * .000000001) << std::endl;
 
 
-
-    free(players[0]);
-    free(players[1]);
-    free(players);
     free(e);
     free(num_moves);
     return(0);

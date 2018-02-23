@@ -242,6 +242,7 @@ class Engine
         bool in_check;
 
         std::unordered_map<unsigned long long, int> lsb_lookup;
+        int *move_list; 
         // int* lsb_lookup;
 
         const int index64[64] = {
