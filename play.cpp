@@ -54,25 +54,22 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
         {
             // std::cout << "game over, result is: " << term << " in " << moves_made  << " moves" << std::endl;
             // e->print_chess_char();
-
-            // free(move_list);
             return(term);
         }
 
-        // std::cout << color_to_string(color) << " to move." << std::endl;
-        // std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
+        std::cout << color_to_string(color) << " to move." << std::endl;
+        std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
         move = players[color]->move(move_list);
-        // std::cout <<  "making move: " << move << std::endl;
-        // e->print_move_info(move);
+        std::cout <<  "making move: " << move << std::endl;
+        e->print_move_info(move);
         e->push_move(move);
         num_moves[0]++;
 
-        // e->print_chess_char();
-        // std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
+        e->print_chess_char();
+        std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
 
         moves_made++;
         color = 1-color;
-        // free(move_list);
     }
 
     // std::cout << "game over, result is draw from making max moves: " << max_moves << std::endl;
@@ -88,7 +85,7 @@ int main()
     // Player** players = (Player**) malloc(2 * sizeof(Player*));
     std::vector<Player*> players;
     players.push_back(new Rand(0, e)); // black
-    players.push_back(new Rand(1, e)); // white
+    players.push_back(new Minimax(1, e)); // white
 
     int result;
     unsigned long long result2;
