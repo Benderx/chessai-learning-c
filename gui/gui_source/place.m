@@ -1,5 +1,5 @@
 function board = place(board,sq,piece)
-%sqLookup Returns number ranges corresponding to a square number
+%place Returns number ranges corresponding to a square number
 %   Takes in a base board
 %   Takes in a square number between 1-64
 %   Takes a 100x100 pixel piece image
