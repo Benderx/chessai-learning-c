@@ -12,8 +12,8 @@ function [game_data, moves] = readGame(file)
 
 fileID = fopen(file);
 pieces = 12;
-base = ['%d, '];
-fmt = [repmat(base, 1, pieces-1) '%d\n'];
+base = ['%lu, '];
+fmt = [repmat(base, 1, pieces-1) '%lu\n'];
 [raw_data, count] = fscanf(fileID, fmt);
 tot_moves = count/pieces;
 game_data = reshape(raw_data,pieces,tot_moves);
