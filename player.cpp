@@ -33,11 +33,10 @@ Rand::Rand(int col, Engine* engine) : Player(col, engine)
 
 int Rand::move(int* move_list)
 {
-    // int* move_list = e->generate_legal_moves(color);
-    int num_moves = move_list[0];
-    move_list++;
+    int* rand_list = e->generate_legal_moves(color);
+    int num_moves = rand_list[0];
 
-    return(move_list[rand() % num_moves]);
+    return(rand_list[(rand() % num_moves) + 1]);
 }
 
 
