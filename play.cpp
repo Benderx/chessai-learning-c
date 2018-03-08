@@ -40,6 +40,7 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
     int term;
     int move;
     int* move_list;
+    int file_num = 1;
 
     // e->print_chess_char();
     // std::cout << std::endl;
@@ -50,9 +51,9 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
         move_list = e->generate_legal_moves(color);
 
         term = e->is_terminal(color, move_list);
+        e->write_move_to_file(file_num);
         if(term != -1)
         {
-            // std::cout << "game over, result is: " << term << " in " << moves_made  << " moves" << std::endl;
             // e->print_chess_char();
             return(term);
         }
@@ -69,23 +70,32 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
         std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
 
         moves_made++;
+        std::cout << moves_made << std::endl;
+        std::cout << max_moves << std::endl;
+
+        if(moves_made < max_moves)
+        {
+            std::cout << "You're not insane\n" << std::endl;
+        }
+
         color = 1-color;
     }
 
-    // std::cout << "game over, result is draw from making max moves: " << max_moves << std::endl;
     return(2); // draw
 }
 
 
 int main()
 {
+    int games = 1;
+
     srand(time(NULL));
     Engine* e = new Engine();
     
     // Player** players = (Player**) malloc(2 * sizeof(Player*));
     std::vector<Player*> players;
-    players.push_back(new Rand(0, e)); // black
-    players.push_back(new Minimax(1, e)); // white
+    players.push_back(new Minimax(0, e)); // black
+    players.push_back(new Rand(1, e)); // white
 
     int result;
     unsigned long long result2;
@@ -100,7 +110,7 @@ int main()
     num_moves[0] = 0;
     t1 = std::chrono::system_clock::now();
     
-    for(int i = 0; i < 100000; i++)
+    for(int i = 0; i < games; i++)
     {
         result = play_game(e, players, num_moves);
         // e->print_chess_char();
