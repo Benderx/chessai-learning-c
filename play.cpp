@@ -96,7 +96,7 @@ int main()
     
     // Player** players = (Player**) malloc(2 * sizeof(Player*));
     std::vector<Player*> players;
-    players.push_back(new Minimax(0, e)); // black
+    players.push_back(new Rand(0, e)); // black
     players.push_back(new Rand(1, e)); // white
 
     int result;
