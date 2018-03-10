@@ -32,7 +32,7 @@ std::chrono::duration<double, std::nano> cast_nano(std::chrono::duration<double>
 }
 
 
-int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
+int play_game(Engine* e, std::vector<Player*> players, int* num_moves, int game_num)
 {
     int max_moves  = e->get_max_move_length();
     int moves_made = 0;
@@ -40,7 +40,6 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
     int term;
     int move;
     int* move_list;
-    int file_num = 1;
 
     // e->print_chess_char();
     // std::cout << std::endl;
@@ -51,10 +50,13 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
         move_list = e->generate_legal_moves(color);
 
         term = e->is_terminal(color, move_list);
-        e->write_move_to_file(file_num);
+        e->write_move_to_file(game_num);
+        std::cout << "We are on: "<< moves_made << "/"<< max_moves <<std::endl;
         if(term != -1)
         {
             // e->print_chess_char();
+            std::cout << "The winner is: " << term << std::endl;
+            e->print_chess_char();
             return(term);
         }
 
@@ -70,24 +72,18 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
         std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
 
         moves_made++;
-        std::cout << moves_made << std::endl;
-        std::cout << max_moves << std::endl;
-
-        if(moves_made < max_moves)
-        {
-            std::cout << "You're not insane\n" << std::endl;
-        }
 
         color = 1-color;
     }
 
+    std::cout << "There is a draw" << std::endl;
     return(2); // draw
 }
 
 
 int main()
 {
-    int games = 1;
+    int games_to_play = 1;
 
     srand(time(NULL));
     Engine* e = new Engine();
@@ -110,9 +106,9 @@ int main()
     num_moves[0] = 0;
     t1 = std::chrono::system_clock::now();
     
-    for(int i = 0; i < games; i++)
+    for(int i = 0; i < games_to_play; i++)
     {
-        result = play_game(e, players, num_moves);
+        result = play_game(e, players, num_moves,i);
         // e->print_chess_char();
         e->reset_engine();  
         // exit(0);      
