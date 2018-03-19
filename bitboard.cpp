@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <strings.h>
+#include <fstream>
 
 
 
@@ -45,16 +46,16 @@ void Engine::init_position()
     pos.white_pawns = 0b0000000000000000000000000000000000000000000000001111111100000000; // 65280
     pos.white_rooks = 0b0000000000000000000000000000000000000000000000000000000010000001; // 129
     pos.white_nights = 0b0000000000000000000000000000000000000000000000000000000001000010; // 66
-    pos.white_bishops = 0b0000000000000000000000000000000000000000000000000000000000100100;
-    pos.white_queens = 0b0000000000000000000000000000000000000000000000000000000000001000;
-    pos.white_kings = 0b0000000000000000000000000000000000000000000000000000000000010000;
+    pos.white_bishops = 0b0000000000000000000000000000000000000000000000000000000000100100; // 36
+    pos.white_queens = 0b0000000000000000000000000000000000000000000000000000000000001000; // 8
+    pos.white_kings = 0b0000000000000000000000000000000000000000000000000000000000010000; // 16
 
     pos.black_pawns = 0b0000000011111111000000000000000000000000000000000000000000000000; // 71776119061217280
     pos.black_rooks = 0b1000000100000000000000000000000000000000000000000000000000000000; // 9295429630892703744
     pos.black_nights = 0b0100001000000000000000000000000000000000000000000000000000000000; // 4755801206503243776
-    pos.black_bishops = 0b0010010000000000000000000000000000000000000000000000000000000000;
-    pos.black_queens = 0b0000100000000000000000000000000000000000000000000000000000000000;
-    pos.black_kings = 0b0001000000000000000000000000000000000000000000000000000000000000;
+    pos.black_bishops = 0b0010010000000000000000000000000000000000000000000000000000000000; // 2594073385365405696
+    pos.black_queens = 0b0000100000000000000000000000000000000000000000000000000000000000; // 576460752303423488
+    pos.black_kings = 0b0001000000000000000000000000000000000000000000000000000000000000; // 1152921504606846976
 }
 
 void Engine::init_position(unsigned long long *board_data)
@@ -759,6 +760,33 @@ void Engine::print_chess_rep(unsigned long long board)
     }
 }
 
+//Takes in a file number
+//Writes the boardstate to file
+//Consider open and close functions
+void Engine::write_move_to_file(int file_num)
+{
+    std::string file_name = ".\\games\\game";
+    file_name += std::to_string(file_num) + ".txt";
+
+    std::ofstream file;
+    file.open(file_name, std::fstream::in | std::fstream::out | std::fstream::app);
+
+    file << pos.white_pawns << ", ";
+    file << pos.white_rooks << ", ";
+    file << pos.white_nights << ", ";
+    file << pos.white_bishops << ", ";
+    file << pos.white_queens << ", ";
+    file << pos.white_kings << ", ";
+    file << pos.black_pawns << ", ";
+    file << pos.black_rooks << ", ";
+    file << pos.black_nights << ", ";
+    file << pos.black_bishops << ", ";
+    file << pos.black_queens << ", ";
+    file << pos.black_kings << std::endl;
+
+    file.close();
+}
+
 void Engine::load_in_string(std::string rep)
 {
     int index = 63;
@@ -1260,8 +1288,10 @@ int Engine::is_terminal(int color, int* move_list)
 {
     if(move_list[0] == 0)
     {
+        std::cout << "TERM > " << color << " is out of moves.\n";
         if(get_in_check(color))
         {
+            std::cout << "TERM > " << color << " is in check.\n";
             return(1-color);
         }
         return(2);
