@@ -101,29 +101,33 @@ void Engine::clean_up()
 
 void Engine::init_masks()
 {
+
     row_mask = (unsigned long long*) malloc(8 * sizeof(unsigned long long));    
     fill_row_mask_arr();
 
     col_mask = (unsigned long long*) malloc(8 * sizeof(unsigned long long));
     fill_col_mask_arr();
 
-    diag_left_mask = (unsigned long long*) malloc(15 * sizeof(unsigned long long));
-    fill_diag_left_mask_arr();
     // Diag left masks start on left side and moves from left to right, top to bottom
     // [0] corresponds to bottom left corner
     // [0]-[7] moves up y axis along x=0
     // [7] is top left corner
     // [7]-[14] moves across x-axis along y=7
     // [14] is top right corner
+    diag_left_mask = (unsigned long long*) malloc(15 * sizeof(unsigned long long));
+    fill_diag_left_mask_arr();
 
-    diag_right_mask = (unsigned long long*) malloc(15 * sizeof(unsigned long long));
-    fill_diag_right_mask_arr();
     // Diag right masks start on bottom side and moves from left to right, bottom to top
     // [0] corresponds to bottom right corner
     // [0]-[7] moves down the x axis along y=0
     // [7] is bottom left corner
     // [7]-[14] moves up the y-axis along x=0
     // [14] is top left corner
+    diag_right_mask = (unsigned long long*) malloc(15 * sizeof(unsigned long long));
+    fill_diag_right_mask_arr();
+
+    // square precomputed mask things
+    fill_square_masks();
 }
 
 unsigned long long Engine::make_col_mask(unsigned long long mask)
@@ -222,6 +226,24 @@ void Engine::fill_diag_right_mask_arr()
         diag_right_mask[j] = make_diag_right_mask(start);
         start = start << 8;
     }          
+}
+
+void Engine::fill_square_masks()
+{
+    U64 temp;
+    for(int i = 0; i < 64; i++)
+    {
+        temp = 1ULL << i;    
+
+        int diag = get_diag(get_rank(temp), get_file(temp));
+        int left_diag = diag >> 5;
+        int right_diag = diag & 0x000000000000000F;
+
+
+        square_masks[i].left_diag_mask_excluded = ~temp & diag_left_mask[left_diag];
+        square_masks[i].right_diag_mask_excluded = ~temp & diag_right_mask[right_diag];
+        square_masks[i].file_mask_excluded = ~temp & col_mask[get_file(temp)];
+    }
 }
 
 int Engine::get_max_move_length()

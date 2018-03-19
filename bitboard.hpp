@@ -9,6 +9,9 @@
 #include <unordered_map>
 
 
+typedef unsigned long long U64;
+
+
 enum Piece
 {   
     NONE = 0,
@@ -30,31 +33,39 @@ enum MoveType
 
 struct position
 {
-    unsigned long long white_pawns; // 65280
-    unsigned long long white_rooks; // 129
-    unsigned long long white_nights; // 66
-    unsigned long long white_bishops;
-    unsigned long long white_queens;
-    unsigned long long white_kings;
+    U64 white_pawns; // 65280
+    U64 white_rooks; // 129
+    U64 white_nights; // 66
+    U64 white_bishops;
+    U64 white_queens;
+    U64 white_kings;
 
-    unsigned long long black_pawns; // 71776119061217280
-    unsigned long long black_rooks; // 9295429630892703744
-    unsigned long long black_nights; // 4755801206503243776
-    unsigned long long black_bishops;
-    unsigned long long black_queens;
-    unsigned long long black_kings;
+    U64 black_pawns; // 71776119061217280
+    U64 black_rooks; // 9295429630892703744
+    U64 black_nights; // 4755801206503243776
+    U64 black_bishops;
+    U64 black_queens;
+    U64 black_kings;
 
 
-    unsigned long long left_white_rook_square_moves = 0;
-    unsigned long long right_white_rook_square_moves = 0;
-    unsigned long long left_black_rook_square_moves = 0;
-    unsigned long long right_black_rook_square_moves = 0;
+    U64 left_white_rook_square_moves = 0;
+    U64 right_white_rook_square_moves = 0;
+    U64 left_black_rook_square_moves = 0;
+    U64 right_black_rook_square_moves = 0;
 
-    unsigned long long white_king_square_moves = 0;
-    unsigned long long black_king_square_moves = 0;
+    U64 white_king_square_moves = 0;
+    U64 black_king_square_moves = 0;
 
     int last_pawn_file; // -1 for none    
 };
+
+
+struct
+{
+   U64 left_diag_mask_excluded;
+   U64 right_diag_mask_excluded;
+   U64 file_mask_excluded;
+} square_masks[64]; // 2 KByte
 
 
 
@@ -64,7 +75,7 @@ class Engine
 {
     public:
         Engine();
-        Engine(unsigned long long *board_data);
+        Engine(U64 *board_data);
 
 
         //Vars
@@ -72,48 +83,50 @@ class Engine
 
 
         // Get piece bitboards
-        unsigned long long get_all_white();
-        unsigned long long get_all_black();
-        unsigned long long get_all();
+        U64 get_all_white();
+        U64 get_all_black();
+        U64 get_all();
 
         //printing
-        void print_chess_rep(unsigned long long num);
+        void print_chess_rep(U64 num);
         void print_chess_char();
         void write_move_to_file(int file_num);
 
 
         // TEMPORARILY PUBLIC
 
-        unsigned long long *row_mask;
-        unsigned long long *col_mask;
-        unsigned long long *diag_left_mask;
-        unsigned long long *diag_right_mask;
+        U64 *row_mask;
+        U64 *col_mask;
+        U64 *diag_left_mask;
+        U64 *diag_right_mask;
 
 
         void init_engine();
         void reset_engine();
         void init_position();
-        void init_position(unsigned long long *board_data);
+        void init_position(U64 *board_data);
         void init_lsb_lookup();
         void clean_up();
         
         // masks
         void init_masks();
-        unsigned long long make_col_mask(unsigned long long mask);
+        U64 make_col_mask(U64 mask);
         void fill_col_mask_arr();
-        unsigned long long make_row_mask(unsigned long long mask);
+        U64 make_row_mask(U64 mask);
         void fill_row_mask_arr();
-        unsigned long long make_diag_left_mask(unsigned long long mask);
+        U64 make_diag_left_mask(U64 mask);
         void fill_diag_left_mask_arr();
-        unsigned long long make_diag_right_mask(unsigned long long mask);
+        U64 make_diag_right_mask(U64 mask);
         void fill_diag_right_mask_arr();
+
+        void fill_square_masks();
 
         // maximum number of moves allowed in the game
         int get_max_move_length();
 
         // get rank/file/diag info
-        int get_rank(unsigned long long num);
-        int get_file(unsigned long long num);
+        int get_rank(U64 num);
+        int get_file(U64 num);
         // int* get_diag(int rank, int file);
         int get_diag(int rank, int file);
 
@@ -137,102 +150,104 @@ class Engine
         void pop_move();
 
         // bitboard tricks
-        int lsb_digit(unsigned long long board);
-        unsigned long long lsb_board(unsigned long long board);
-        unsigned long long msb_digit(unsigned long long board);
-        unsigned long long msb_board(unsigned long long board);
+        int lsb_digit(U64 board);
+        U64 lsb_board(U64 board);
+        U64 msb_digit(U64 board);
+        U64 msb_board(U64 board);
 
         // reversing and flipping
-        unsigned long long reverse_8_bits(unsigned long long x);
-        unsigned long long reverse_64_bits(unsigned long long x);
-        unsigned long long horizontal_flip(unsigned long long x);
-        unsigned long long vertical_flip(unsigned long long x);
+        U64 reverse_8_bits(U64 x);
+        U64 reverse_64_bits(U64 x);
+        U64 horizontal_flip(U64 x);
+        U64 vertical_flip(U64 x);
 
         // board helper functions
-        int bitboard_to_square(unsigned long long piece);
-        unsigned long long square_to_bitboard(int square);
-        unsigned long long get_bitboard_of_piece(Piece piece, int color);
-        Piece get_piece_by_bitboard(int color, unsigned long long board);
-        Piece get_piece_by_bitboard(unsigned long long board);
-        void remove_piece(int color, int type, unsigned long long board);
-        void place_piece(int color, int type, unsigned long long board);
-        int get_color_by_bitboard(unsigned long long board);
-        unsigned long long* get_board_rep();
+        int bitboard_to_square(U64 piece);
+        U64 square_to_bitboard(int square);
+        U64 get_bitboard_of_piece(Piece piece, int color);
+        Piece get_piece_by_bitboard(int color, U64 board);
+        Piece get_piece_by_bitboard(U64 board);
+        void remove_piece(int color, int type, U64 board);
+        void place_piece(int color, int type, U64 board);
+        int get_color_by_bitboard(U64 board);
+        U64* get_board_rep();
         void load_in_string(std::string rep);
 
         //move gen
-        void pop_and_add_regular_moves(int color, int* move_list, unsigned long long board, int curr_pos);
-        void generate_moves(int color, int* move_list, unsigned long long danger);
-        void generate_moves_pinned(int color, int* move_list, unsigned long long danger, unsigned long long pinned);
-        void generate_moves_single_check(int color, int* move_list, unsigned long long danger, unsigned long long legal_defense);
-        void generate_moves_pinned_single_check(int color, int* move_list, unsigned long long danger, unsigned long long legal_defense, unsigned long long pinned);
-        void generate_moves_double_check(int color, int* move_list, unsigned long long danger);
-        void pin_card_helper(int color, Piece p, unsigned long long board, unsigned long long los, int* move_list);
-        void pin_diag_helper(int color, Piece p, unsigned long long board, unsigned long long los, int* move_list);
-        unsigned long long pinned_pieces(int color, int* move_list);
-        unsigned long long danger_squares(int color);
+        void pop_and_add_regular_moves(int color, int inv_color, int* move_list, U64 board, int curr_pos);
+        void generate_moves(int color, int* move_list, U64 danger, U64 pinned);
+        // void generate_moves(int color, int* move_list, U64 danger);
+        // void generate_moves_pinned(int color, int* move_list, U64 danger, U64 pinned);
+        void generate_moves_single_check(int color, int* move_list, U64 danger, U64 legal_defense, U64 pinned);
+        // void generate_moves_single_check(int color, int* move_list, U64 danger, U64 legal_defense);
+        // void generate_moves_pinned_single_check(int color, int* move_list, U64 danger, U64 legal_defense, U64 pinned);
+        void generate_moves_double_check(int color, int* move_list, U64 danger);
+        void pin_card_helper(int color, Piece p, U64 board, U64 los, int* move_list);
+        void pin_diag_helper(int color, Piece p, U64 board, U64 los, int* move_list);
+        U64 pinned_pieces(int color, int* move_list);
+        U64 danger_squares(int color);
         int* generate_legal_moves(int color);
 
         // board state helpers
         bool check_legal(int move, int color);
         int is_terminal(int color, int* moves);
         bool get_in_check(int color);
-        unsigned long long* get_attackers_blocks(int color);
+        U64* get_attackers_blocks(int color);
 
 
-        unsigned long long pre_check_white_pawn_attacks(unsigned long long white_pawns);
-        unsigned long long pre_check_black_pawn_attacks(unsigned long long black_pawns);
-        unsigned long long pre_check_white_pawn_moves(unsigned long long white_pawns, unsigned long long all_pieces, unsigned long long all_black_pieces);
-        unsigned long long pre_check_black_pawn_moves(unsigned long long black_pawns, unsigned long long all_pieces, unsigned long long all_white_pieces);
+        U64 pre_check_white_pawn_attacks(U64 white_pawns);
+        U64 pre_check_black_pawn_attacks(U64 black_pawns);
+        U64 pre_check_white_pawn_moves(U64 white_pawns, U64 all_pieces, U64 all_black_pieces);
+        U64 pre_check_black_pawn_moves(U64 black_pawns, U64 all_pieces, U64 all_white_pieces);
 
-        unsigned long long pre_check_king_attacks(unsigned long long kings);
-        unsigned long long pre_check_king_moves(unsigned long long kings, unsigned long long own_occupied);
-        unsigned long long pre_check_king_moves(int color);
+        U64 pre_check_king_attacks(U64 kings);
+        U64 pre_check_king_moves(U64 kings, U64 own_occupied);
+        U64 pre_check_king_moves(int color);
 
-        unsigned long long pre_check_night_attacks(unsigned long long nights);
-        unsigned long long pre_check_night_moves(unsigned long long nights, unsigned long long own_occupied);
-        unsigned long long pre_check_night_moves(int color);
+        U64 pre_check_night_attacks(U64 nights);
+        U64 pre_check_night_moves(U64 nights, U64 own_occupied);
+        U64 pre_check_night_moves(int color);
 
-        unsigned long long pre_check_one_bishop_attacks_ANTI(unsigned long long bishop, int right_diag);
-        unsigned long long pre_check_one_bishop_attacks(unsigned long long bishop);
-        unsigned long long pre_check_bishop_attacks(unsigned long long bishops);
-        unsigned long long pre_check_one_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);
-        unsigned long long pre_check_bishop_moves(unsigned long long bishops, unsigned long long all_occupied, unsigned long long own_occupied);
-        unsigned long long pre_check_bishop_moves(int color);
-        unsigned long long pre_check_bishop_moves(unsigned long long bishops, int color);
-        // unsigned long long bishop_left_flood(unsigned long long bishops1, unsigned long long bishops2);
-        // unsigned long long bishop_right_flood(unsigned long long bishops1, unsigned long long bishops2);
+        U64 pre_check_one_bishop_attacks_ANTI(U64 bishop, int right_diag);
+        U64 pre_check_one_bishop_attacks(U64 bishop);
+        U64 pre_check_bishop_attacks(U64 bishops);
+        U64 pre_check_one_bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied);
+        U64 pre_check_bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied);
+        U64 pre_check_bishop_moves(int color);
+        U64 pre_check_bishop_moves(U64 bishops, int color);
+        // U64 bishop_left_flood(U64 bishops1, U64 bishops2);
+        // U64 bishop_right_flood(U64 bishops1, U64 bishops2);
 
-        unsigned long long pre_check_one_rook_attacks(unsigned long long rook);
-        unsigned long long pre_check_rook_attacks(unsigned long long rooks);
-        unsigned long long pre_check_one_rook_moves(unsigned long long rook, unsigned long long all_occupied, unsigned long long own_occupied);
-        unsigned long long pre_check_rook_moves(unsigned long long rooks, unsigned long long all_occupied, unsigned long long own_occupied);
-        unsigned long long pre_check_rook_moves(int color);
-        unsigned long long pre_check_rook_moves(unsigned long long rooks, int color);
+        U64 pre_check_one_rook_attacks(U64 rook);
+        U64 pre_check_rook_attacks(U64 rooks);
+        U64 pre_check_one_rook_moves(U64 rook, U64 all_occupied, U64 own_occupied);
+        U64 pre_check_rook_moves(U64 rooks, U64 all_occupied, U64 own_occupied);
+        U64 pre_check_rook_moves(int color);
+        U64 pre_check_rook_moves(U64 rooks, int color);
 
-        unsigned long long pre_check_one_queen_attacks(unsigned long long queen);
-        unsigned long long pre_check_queen_attacks(unsigned long long queens);
-        unsigned long long pre_check_one_queen_moves(unsigned long long queen, unsigned long long all_occupied, unsigned long long own_occupied);
-        unsigned long long pre_check_queen_moves(unsigned long long queens, unsigned long long all_occupied, unsigned long long own_occupied);
-        unsigned long long pre_check_queen_moves(int color);
-        unsigned long long pre_check_queen_moves(unsigned long long queens, int color);
+        U64 pre_check_one_queen_attacks(U64 queen);
+        U64 pre_check_queen_attacks(U64 queens);
+        U64 pre_check_one_queen_moves(U64 queen, U64 all_occupied, U64 own_occupied);
+        U64 pre_check_queen_moves(U64 queens, U64 all_occupied, U64 own_occupied);
+        U64 pre_check_queen_moves(int color);
+        U64 pre_check_queen_moves(U64 queens, int color);
 
         //floods
-        unsigned long long vert_flood(unsigned long long rooks);
-        unsigned long long hori_flood(unsigned long long rooks);
+        U64 vert_flood(U64 rooks);
+        U64 hori_flood(U64 rooks);
 
-        unsigned long long north_flood(unsigned long long rooks, unsigned long long prop);
-        unsigned long long south_flood(unsigned long long rooks, unsigned long long prop);
-        unsigned long long east_flood(unsigned long long rooks, unsigned long long prop);
-        unsigned long long west_flood(unsigned long long rooks, unsigned long long prop);
+        U64 north_flood(U64 rooks, U64 prop);
+        U64 south_flood(U64 rooks, U64 prop);
+        U64 east_flood(U64 rooks, U64 prop);
+        U64 west_flood(U64 rooks, U64 prop);
 
-        unsigned long long left_diag_flood(unsigned long long bishops);
-        unsigned long long right_diag_flood(unsigned long long bishops);
+        U64 left_diag_flood(U64 bishops);
+        U64 right_diag_flood(U64 bishops);
 
-        unsigned long long north_east_flood(unsigned long long bishops, unsigned long long prop);
-        unsigned long long south_east_flood(unsigned long long bishops, unsigned long long prop);
-        unsigned long long south_west_flood(unsigned long long bishops, unsigned long long prop);
-        unsigned long long north_west_flood(unsigned long long bishops, unsigned long long prop);
+        U64 north_east_flood(U64 bishops, U64 prop);
+        U64 south_east_flood(U64 bishops, U64 prop);
+        U64 south_west_flood(U64 bishops, U64 prop);
+        U64 north_west_flood(U64 bishops, U64 prop);
 
 
     private: 
@@ -243,7 +258,7 @@ class Engine
         int* move_stack; 
         bool in_check;
 
-        std::unordered_map<unsigned long long, int> lsb_lookup;
+        std::unordered_map<U64, int> lsb_lookup;
         int *move_list; 
         // int* lsb_lookup;
 

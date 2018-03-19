@@ -45,7 +45,7 @@ int Rand::move(int* move_list)
 
 Minimax::Minimax(int col, Engine* engine) : Player(col, engine)
 {
-    depth_search_limit = 3;
+    depth_search_limit = 4;
     // best_holder = {99999999, -99999999};
     // compare_holder = {&std::min, &std::max};
     // compare_holder[0] = &std::min;
@@ -73,7 +73,8 @@ int Minimax::minimax(int depth, int color)
     int num_moves = move_list[0];
     int* copied_move_list = copy_move_list(move_list);
 
-    best = best_holder[color];
+    // best = best_holder[color];
+    best = -9999999;
     // if(color) // true, or white
     // {
     //     for(int i = 0; i < num_moves; i++)
@@ -100,7 +101,7 @@ int Minimax::minimax(int depth, int color)
     for(int i = 0; i < num_moves; i++)
     {
         e->push_move(copied_move_list[i]);
-        temp_holder = minimax(depth-1, 1-color);
+        temp_holder = minimax(depth-1, 1-color) * 1 - color*2;
         best = std::max(best, temp_holder); // function pointer call to corrct comparator (max or mix)
         e->pop_move();
     }
@@ -197,7 +198,7 @@ double Minimax::simple_board_eval_helper(unsigned long long pieces, double val)
     while(pieces)
     {
         accum += val;
-        pieces =  pieces - e->lsb_board(pieces);
+        pieces =  pieces & ~e->lsb_board(pieces);
     }
     return(accum);
 }
@@ -217,7 +218,7 @@ double Minimax::simple_board_eval(int color)
     accum += simple_board_eval_helper(e->pos.black_bishops, -3.1);
     accum += simple_board_eval_helper(e->pos.black_queens, -9);
 
-    return(accum * (1 - 2 * color));
+    return(accum);
 }
 
 int Minimax::decode_terminal_score(int term)

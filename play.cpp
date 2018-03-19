@@ -72,7 +72,7 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
         e->push_move(move);
         num_moves[0]++;
         // exit(0);
-        return(2);
+        // return(2);
         e->print_chess_char();
         std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
 
