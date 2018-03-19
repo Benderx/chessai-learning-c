@@ -50,7 +50,7 @@ void Engine::pop_and_add_regular_moves(int color, int* move_list, unsigned long 
 // 5000 ns
 void Engine::generate_moves(int color, int* move_list, unsigned long long danger)
 {
-    std::cout << "GENERATE_MOVES > I have been called." << std::endl;
+    // std::cout << "GENERATE_MOVES > I have been called." << std::endl;
     unsigned long long p, one_p, all_occupied, own_occupied, enemy_occupied;
     all_occupied = get_all();
 
@@ -164,7 +164,7 @@ void Engine::generate_moves(int color, int* move_list, unsigned long long danger
         pop_and_add_regular_moves(color, move_list, pre_check_king_moves(one_p, 
             own_occupied) & danger, bitboard_to_square(one_p));
     }
-    std::cout << "GENERATE_MOVES > Before check, there are " << move_list[0] << std::endl;
+    // std::cout << "GENERATE_MOVES > Before check, there are " << move_list[0] << std::endl;
 }
 
 void Engine::generate_moves_pinned(int color, int* move_list, unsigned long long danger, unsigned long long pinned)

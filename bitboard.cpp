@@ -1288,10 +1288,10 @@ int Engine::is_terminal(int color, int* move_list)
 {
     if(move_list[0] == 0)
     {
-        std::cout << "TERM > " << color << " is out of moves.\n";
+        // std::cout << "TERM > " << color << " is out of moves.\n";
         if(get_in_check(color))
         {
-            std::cout << "TERM > " << color << " is in check.\n";
+            // std::cout << "TERM > " << color << " is in check.\n";
             return(1-color);
         }
         return(2);
