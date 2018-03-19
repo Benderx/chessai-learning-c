@@ -1,6 +1,6 @@
 
 CC = g++
-CFLAGS = -std=c++14 -Ofast -flto -funroll-loops -march=native -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized
+CFLAGS = -std=c++14 -Ofast -flto -funroll-loops -march=native -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-delete-non-virtual-dtor -g
 # CFLAGS = -std=c++14 -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized
 HEADERS = bitboard.hpp player.hpp
 DRIVER_OBJECTS = bitboard.cpp driver.cpp move_generation.cpp piece_logic.cpp
@@ -18,6 +18,8 @@ play: $(PLAY_OBJECTS)
 clean:
 	-rm -f driver
 	-rm -f play
+	-rm -f callgrind.out.*
+	-rm -f out.log
 
 
 

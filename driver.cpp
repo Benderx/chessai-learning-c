@@ -172,13 +172,23 @@ void test_queen_moves(Engine* e)
 
 void test_white_moves(Engine* e)
 {
-    e->pos.white_pawns = 0b0000000000000000000000000000000000000000000000011111111000000000;
+    e->pos.white_pawns = 0b0000000000000000000000000000000000000000000000000000111000000000;
     // e->pos.black_pawns = 0b0000000001111111010000000000000000000000000000000000000000000000;
 
-    print_pieces(e, "white", "pawns", e->pos.white_pawns);
-    print_pieces(e, "black", "pawns", e->pos.black_pawns);
+    // print_pieces(e, "white", "pawns", e->pos.white_pawns);
+    // print_pieces(e, "black", "pawns", e->pos.black_pawns);
 
     print_moves(e, "white", e->generate_legal_moves(1));
+}
+
+void test_black_moves(Engine* e)
+{
+    e->pos.black_pawns = 0b0000000001100001010000000000000000000000000000000000000000000000;
+
+    // print_pieces(e, "white", "pawns", e->pos.white_pawns);
+    // print_pieces(e, "black", "pawns", e->pos.black_pawns);
+
+    print_moves(e, "black", e->generate_legal_moves(0));
 }
 
 void test_mask_check(Engine* e)
@@ -235,6 +245,12 @@ int main()
     std::ofstream* file = new std::ofstream();
     file->open("games/game0.txt");
 
+
+
+    test_black_moves(e);
+
+
+
     // test_mask_check(e);
     // e->reset_engine();
 
@@ -242,9 +258,9 @@ int main()
     // test_pawn_moves(e);
     // e->reset_engine();
 
-    std::cout << "testing weird bug" << std::endl;
-    very_strange_check_glitch(e);
-    e->reset_engine();
+    // std::cout << "testing weird bug" << std::endl;
+    // very_strange_check_glitch(e);
+    // e->reset_engine();
 
     // std::cout << "testing pawn bug" << std::endl;
     // test_black_pawn_moves(e);

@@ -94,6 +94,7 @@ class Engine
         void init_position();
         void init_position(unsigned long long *board_data);
         void init_lsb_lookup();
+        void clean_up();
         
         // masks
         void init_masks();

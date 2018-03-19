@@ -13,6 +13,13 @@
 //optimized
 // g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp -std=c++14 -O3 -funroll-loops -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized  -o run
 
+
+// to profile: valgrind --tool=callgrind ./play
+// more profiling info: http://zariko.taba.free.fr/c++/callgrind_profile_only_a_part.html
+
+//memleaks and stuff: valgrind --tool=memcheck --leak-check=yes --log-file=out.log ./play
+
+
 std::string color_to_string(int color)
 {
     if(color == 1)
@@ -64,13 +71,15 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
         e->print_move_info(move);
         e->push_move(move);
         num_moves[0]++;
-
+        // exit(0);
+        return(2);
         e->print_chess_char();
         std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
 
         moves_made++;
         color = 1-color;
     }
+
 
     // std::cout << "game over, result is draw from making max moves: " << max_moves << std::endl;
     return(2); // draw
@@ -94,20 +103,21 @@ int main()
 
 
     // timing
-    std::chrono::time_point<std::chrono::system_clock> t1, t2;
-    std::chrono::duration<double, std::nano> time_cast_result;
+    // std::chrono::time_point<std::chrono::system_clock> t1, t2;
+    // std::chrono::duration<double, std::nano> time_cast_result;
 
-    num_moves[0] = 0;
-    t1 = std::chrono::system_clock::now();
+    // num_moves[0] = 0;
+    // t1 = std::chrono::system_clock::now();
+    result = play_game(e, players, num_moves);
     
-    for(int i = 0; i < 100000; i++)
-    {
-        result = play_game(e, players, num_moves);
+    // for(int i = 0; i < 100000; i++)
+    // {
+        // result = play_game(e, players, num_moves);
         // e->print_chess_char();
-        e->reset_engine();  
+        // e->reset_engine();  
         // exit(0);      
         // std::cout << "game" << std::endl;
-    }
+    // }
     
     // int* garbage = (int*) malloc(10000 * sizeof(int));
     // garbage[0] = 0;
@@ -125,16 +135,19 @@ int main()
         // result2 = e->get_all();
     // }
 
-    t2 = std::chrono::system_clock::now();
-    time_cast_result = cast_nano(t2 - t1);
-    // double temp = (double) time_cast_result.count() / 10000000;
-    double temp = (double) time_cast_result.count() / num_moves[0];
+    // t2 = std::chrono::system_clock::now();
+    // time_cast_result = cast_nano(t2 - t1);
+    // // double temp = (double) time_cast_result.count() / 10000000;
+    // double temp = (double) time_cast_result.count() / num_moves[0];
 
-    std::cout << "total moves made: " << num_moves[0] << " with " << temp << " nanoseconds per move" << std::endl;
-    std::cout << "resulting in NPS of: " << 1.0 / (temp * .000000001) << std::endl;
+    // std::cout << "total moves made: " << num_moves[0] << " with " << temp << " nanoseconds per move" << std::endl;
+    // std::cout << "resulting in NPS of: " << 1.0 / (temp * .000000001) << std::endl;
 
-
-    free(e);
+    delete(players[0]);
+    delete(players[1]);
+    players.clear();
+    e->clean_up();
+    delete(e);
     free(num_moves);
     return(0);
 }

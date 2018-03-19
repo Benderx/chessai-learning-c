@@ -87,6 +87,17 @@ void Engine::init_lsb_lookup()
     // std::cout << "we made it\n" << std::endl;
 }
 
+void Engine::clean_up()
+{
+    free(move_list);
+    free(move_stack);
+    free(row_mask);
+    free(col_mask);
+    free(diag_left_mask);
+    free(diag_right_mask);
+}
+
+
 void Engine::init_masks()
 {
     row_mask = (unsigned long long*) malloc(8 * sizeof(unsigned long long));    
