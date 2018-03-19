@@ -60,12 +60,12 @@ struct position
 };
 
 
-struct
+struct precomputed_masks
 {
    U64 left_diag_mask_excluded;
    U64 right_diag_mask_excluded;
    U64 file_mask_excluded;
-} square_masks[64]; // 2 KByte
+}; // 2 KByte
 
 
 
@@ -148,6 +148,7 @@ class Engine
         void push_move(int move);
         void pop_psuedo_move();
         void pop_move();
+        void compute_get_holders();
 
         // bitboard tricks
         int lsb_digit(U64 board);
@@ -208,7 +209,7 @@ class Engine
         U64 pre_check_night_moves(U64 nights, U64 own_occupied);
         U64 pre_check_night_moves(int color);
 
-        U64 pre_check_one_bishop_attacks_ANTI(U64 bishop, int right_diag);
+        U64 pre_check_one_bishop_attacks_ANTI(U64 bishop, int square);
         U64 pre_check_one_bishop_attacks(U64 bishop);
         U64 pre_check_bishop_attacks(U64 bishops);
         U64 pre_check_one_bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied);
@@ -259,8 +260,12 @@ class Engine
         bool in_check;
 
         std::unordered_map<U64, int> lsb_lookup;
-        int *move_list; 
-        // int* lsb_lookup;
+        int *move_list;
+
+        precomputed_masks square_masks[64];
+
+        // get all savers
+        U64 get_all_holder, get_black_holder, get_white_holder;
 
         const int index64[64] = {
             0,  1, 48,  2, 57, 49, 28,  3,

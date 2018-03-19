@@ -168,13 +168,51 @@ U64 Engine::pre_check_night_moves(int color)
 /////BISHOPS//////
 
 
+
+
+// olds
+// U64 Engine::pre_check_one_bishop_attacks_ANTI(U64 bishop, int right_diag)
+// {
+//     // int* diags = get_diag(get_rank(bishop), get_file(bishop));
+//     // int right_diag = get_diag(get_rank(bishop), get_file(bishop)) >> 5;
+//     U64 line_mask = ~bishop & diag_right_mask[right_diag]; // excludes square of slider
+//     // free(diags);
+
+//     U64 forward = get_all() & line_mask; // also performs the first subtraction by clearing the s in o
+//     U64 reverse = vertical_flip(forward); // o'-s'
+
+//     forward = forward - bishop; // o -2s
+//     reverse = reverse - vertical_flip(bishop); // o'-2s'
+//     forward = forward ^ vertical_flip(reverse);
+//     return forward & line_mask;      // mask the line again
+// }
+
+
+// U64 Engine::pre_check_one_bishop_attacks(U64 bishop)
+// {
+//     int diag = get_diag(get_rank(bishop), get_file(bishop));
+//     int left_diag = diag >> 5;
+//     int right_diag = diag & 0x000000000000000F;
+
+//     U64 line_mask = ~bishop & diag_left_mask[left_diag]; // excludes square of slider
+
+//     U64 forward = get_all() & line_mask; // also performs the first subtraction by clearing the s in o
+//     U64 reverse = vertical_flip(forward); // o'-s'
+
+//     forward = forward - bishop; // o -2s
+//     reverse = reverse - vertical_flip(bishop); // o'-2s'
+//     forward = forward ^ vertical_flip(reverse);
+
+//     return pre_check_one_bishop_attacks_ANTI(bishop, right_diag) | (forward & line_mask);      // mask the line again
+// }
+
+
+
+
 // bishops may be missing the ANTI diagonal: https://chessprogramming.wikispaces.com/Hyperbola+Quintessence
-U64 Engine::pre_check_one_bishop_attacks_ANTI(U64 bishop, int right_diag)
+U64 Engine::pre_check_one_bishop_attacks_ANTI(U64 bishop, int square)
 {
-    // int* diags = get_diag(get_rank(bishop), get_file(bishop));
-    // int right_diag = get_diag(get_rank(bishop), get_file(bishop)) >> 5;
-    U64 line_mask = ~bishop & diag_right_mask[right_diag]; // excludes square of slider
-    // free(diags);
+    U64 line_mask = square_masks[square].right_diag_mask_excluded; // excludes square of slider
 
     U64 forward = get_all() & line_mask; // also performs the first subtraction by clearing the s in o
     U64 reverse = vertical_flip(forward); // o'-s'
@@ -188,13 +226,9 @@ U64 Engine::pre_check_one_bishop_attacks_ANTI(U64 bishop, int right_diag)
 
 U64 Engine::pre_check_one_bishop_attacks(U64 bishop)
 {
-    // int* diags = get_diag(get_rank(bishop), get_file(bishop));
-    int diag = get_diag(get_rank(bishop), get_file(bishop));
-    int left_diag = diag >> 5;
-    int right_diag = diag & 0x000000000000000F;
+    int square = bitboard_to_square(bishop);
 
-    U64 line_mask = ~bishop & diag_left_mask[left_diag]; // excludes square of slider
-    // free(diags);
+    U64 line_mask = square_masks[square].left_diag_mask_excluded; // excludes square of slider
 
     U64 forward = get_all() & line_mask; // also performs the first subtraction by clearing the s in o
     U64 reverse = vertical_flip(forward); // o'-s'
@@ -203,7 +237,7 @@ U64 Engine::pre_check_one_bishop_attacks(U64 bishop)
     reverse = reverse - vertical_flip(bishop); // o'-2s'
     forward = forward ^ vertical_flip(reverse);
 
-    return pre_check_one_bishop_attacks_ANTI(bishop, right_diag) | (forward & line_mask);      // mask the line again
+    return pre_check_one_bishop_attacks_ANTI(bishop, square) | (forward & line_mask);      // mask the line again
 }
 
 U64 Engine::pre_check_bishop_attacks(U64 bishops)
@@ -265,65 +299,17 @@ U64 Engine::pre_check_bishop_moves(U64 bishop, int color)
 
 /////ROOKS//////
 
-// check args
+
+//old
 // U64 Engine::pre_check_one_rook_attacks(U64 rook)
 // {
 //     U64 row = get_rank(rook);
 //     U64 col = get_file(rook);
 
-//     U64 s = rook;
-//     U64 o = get_all();
-
-//     U64 o_rev = reverse_64_bits(o);
-//     U64 s_rev = reverse_64_bits(s);
-
-//     U64 hori = (o - 2*s) ^ reverse_64_bits(o_rev - 2*s_rev);
-//     hori = hori & row_mask[row];
-
-
-//     U64 o_mask = o & col_mask[col];
-//     U64 o_rev_mask = reverse_64_bits(o_mask);
-//     U64 vert = (o_mask - 2*s) ^ reverse_64_bits(o_rev_mask - 2*s_rev);
-//     vert = vert & col_mask[col];
-
-//     return(hori | vert);
-// }
-
-
-//old
-U64 Engine::pre_check_one_rook_attacks(U64 rook)
-{
-    U64 row = get_rank(rook);
-    U64 col = get_file(rook);
-
-    U64 o = get_all();
-
-    U64 o_rev = vertical_flip(o);
-    U64 s_rev = vertical_flip(rook);
-
-    U64 hori = (o - 2*rook) ^ vertical_flip(o_rev - 2*s_rev);
-    hori = hori & row_mask[row];
-
-
-    // U64 o_mask = o;
-    U64 o_mask = o & col_mask[col];
-    U64 o_rev_mask = vertical_flip(o_mask);
-    U64 vert = (o_mask - 2*rook) ^ vertical_flip(o_rev_mask - 2*s_rev);
-    vert = vert & col_mask[col];
-
-    return(hori | vert);
-}
-
-
-
-// uh
-// U64 Engine::pre_check_one_rook_attacks(U64 rook)
-// {
-//     int square = bitboard_to_square(rook);
 //     U64 o = get_all();
 
 //     U64 o_rev = vertical_flip(o);
-//     U64 s_rev = vertical_flip(s);
+//     U64 s_rev = vertical_flip(rook);
 
 //     U64 hori = (o - 2*rook) ^ vertical_flip(o_rev - 2*s_rev);
 //     hori = hori & row_mask[row];
@@ -338,20 +324,22 @@ U64 Engine::pre_check_one_rook_attacks(U64 rook)
 //     return(hori | vert);
 // }
 
-// U64 Engine::pre_check_one_rook_attacks(U64 rook)
-// {
-//     int square = bitboard_to_square(rook);
-//     U64 occ = get_all();
 
-//     U64 forward, reverse;
-//     forward  = occ & square_masks[square].file_mask_excluded;
-//     reverse  = vertical_flip(forward);
-//     forward -= rook;
-//     reverse -= vertical_flip(rook);
-//     forward ^= vertical_flip(reverse);
-//     forward &= square_masks[square].file_mask_excluded;
-//     return forward;
-// }
+U64 Engine::pre_check_one_rook_attacks(U64 rook)
+{
+    int square = bitboard_to_square(rook);
+    U64 occ = get_all();
+
+    U64 forward, reverse;
+    forward  = occ & square_masks[square].file_mask_excluded;
+
+    reverse  = vertical_flip(forward);
+    forward -= rook;
+    reverse -= vertical_flip(rook);
+    forward ^= vertical_flip(reverse);
+    forward &= square_masks[square].file_mask_excluded;
+    return forward;
+}
 
 
 U64 Engine::pre_check_rook_attacks(U64 rooks)

@@ -477,11 +477,6 @@ unsigned long long Engine::pinned_pieces(int color, int* move_list)
         {
             pin_diag_helper(color, get_piece_by_bitboard(color, one_p), king_diag & 0x000000000000000F, diag_los, move_list);
         }
-        // print_chess_rep(the_diag_pinned);
-        // std::cout << std::endl;
-        // print_chess_rep(card_los);
-        // print_chess_char();
-        // exit(0);
         the_diag_pinned = the_diag_pinned - one_p;
     }
 

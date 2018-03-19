@@ -21,6 +21,7 @@ Engine::Engine(unsigned long long* board_data)
 
 void Engine::init_engine()
 {
+    compute_get_holders();
     max_move_length = 500; // This assumes there are only 500 possible legal moves at any one time (affects move array intilization)
     move_arr_size = 500; // how many legal moves can be filled
     move_list = (int*) malloc(move_arr_size * sizeof(int));
@@ -32,6 +33,9 @@ void Engine::init_engine()
     in_check = false;
     init_masks();
     init_lsb_lookup();
+
+    // square precomputed mask things
+    fill_square_masks();
 }
 
 void Engine::reset_engine()
@@ -39,6 +43,7 @@ void Engine::reset_engine()
     stack_index = -1;
     in_check = false;
     init_position();
+    compute_get_holders();
 }
 
 void Engine::init_position()
@@ -81,11 +86,6 @@ void Engine::init_lsb_lookup()
     {
         lsb_lookup.insert({(unsigned long long) std::pow(2,i),i});
     }
-    // for(int i=0;i<64;i++)
-    // {
-    //     lsb_lookup[(int)std::pow(2, i)] = i;
-    // }
-    // std::cout << "we made it\n" << std::endl;
 }
 
 void Engine::clean_up()
@@ -125,9 +125,6 @@ void Engine::init_masks()
     // [14] is top left corner
     diag_right_mask = (unsigned long long*) malloc(15 * sizeof(unsigned long long));
     fill_diag_right_mask_arr();
-
-    // square precomputed mask things
-    fill_square_masks();
 }
 
 unsigned long long Engine::make_col_mask(unsigned long long mask)
@@ -233,7 +230,7 @@ void Engine::fill_square_masks()
     U64 temp;
     for(int i = 0; i < 64; i++)
     {
-        temp = 1ULL << i;    
+        temp = 1ULL << i;
 
         int diag = get_diag(get_rank(temp), get_file(temp));
         int left_diag = diag >> 5;
@@ -243,7 +240,11 @@ void Engine::fill_square_masks()
         square_masks[i].left_diag_mask_excluded = ~temp & diag_left_mask[left_diag];
         square_masks[i].right_diag_mask_excluded = ~temp & diag_right_mask[right_diag];
         square_masks[i].file_mask_excluded = ~temp & col_mask[get_file(temp)];
+
+        // printf("square: %i\n", i);
+        // print_chess_rep(square_masks[i].file_mask_excluded);
     }
+    // exit(0);
 }
 
 int Engine::get_max_move_length()
@@ -251,21 +252,39 @@ int Engine::get_max_move_length()
     return(max_move_length);
 }
 
+// old
+// unsigned long long Engine::get_all()
+// {
+//     return(get_all_white() | get_all_black());
+// }
+
+// unsigned long long Engine::get_all_white()
+// {
+//     return(pos.white_pawns | pos.white_rooks | pos.white_nights | pos.white_bishops | pos.white_kings | pos.white_queens);
+// }
+
+
+// unsigned long long Engine::get_all_black()
+// {
+//     return(pos.black_pawns | pos.black_rooks | pos.black_nights | pos.black_bishops | pos.black_kings | pos.black_queens);
+// }
+
 unsigned long long Engine::get_all_white()
 {
-    return(pos.white_pawns | pos.white_rooks | pos.white_nights | pos.white_bishops | pos.white_kings | pos.white_queens);
+    return(get_white_holder);
 }
 
 
 unsigned long long Engine::get_all_black()
 {
-    return(pos.black_pawns | pos.black_rooks | pos.black_nights | pos.black_bishops | pos.black_kings | pos.black_queens);
+    return(get_black_holder);
 }
+
 
 // Andrew's Linux Labtop: with flags: ~11.7ns without: ~32ns (probably due to inlining)
 unsigned long long Engine::get_all()
 {
-    return(get_all_white() | get_all_black());
+    return(get_all_holder);
 }
 
 
@@ -612,7 +631,6 @@ void Engine::push_psuedo_move(int move)
     unsigned long long curr_piece_loc = square_to_bitboard(start);
     unsigned long long taken_piece_loc = square_to_bitboard(end);
 
-    // color = get_color_by_bitboard(curr_piece_loc);
     color = decode_color(move);
 
     int curr_piece_type = get_piece_by_bitboard(color, curr_piece_loc);
@@ -620,12 +638,11 @@ void Engine::push_psuedo_move(int move)
 
     if(taken_piece_type)
     {
-        // int taken_piece_type = get_piece_by_bitboard(1-color, taken_piece_loc);
-        // std::cout << taken_piece_type << std::endl;
         remove_piece(1-color, taken_piece_type, taken_piece_loc);
     }
 
     place_piece(color, curr_piece_type, taken_piece_loc);
+    compute_get_holders();
 }
 
 void Engine::push_move(int move)
@@ -646,7 +663,6 @@ void Engine::pop_psuedo_move()
     unsigned long long curr_piece_loc = square_to_bitboard(end);
     unsigned long long orig_piece_loc = square_to_bitboard(start);
 
-    // color = get_color_by_bitboard(curr_piece_loc);
     color = decode_color(move);
 
     int curr_piece_type = get_piece_by_bitboard(color, curr_piece_loc);
@@ -654,18 +670,25 @@ void Engine::pop_psuedo_move()
 
     if(taken_piece_type)
     {
-        // std::cout << taken_piece_type << std::endl;
-        // exit(0);
         place_piece(1-color, taken_piece_type, curr_piece_loc);
     }
 
     place_piece(color, curr_piece_type, orig_piece_loc);
+    compute_get_holders();
 }
 
 void Engine::pop_move()
 {
     pop_psuedo_move();
 }
+
+void Engine::compute_get_holders()
+{
+    get_white_holder = pos.white_pawns | pos.white_rooks | pos.white_nights | pos.white_bishops | pos.white_kings | pos.white_queens;
+    get_black_holder = pos.black_pawns | pos.black_rooks | pos.black_nights | pos.black_bishops | pos.black_kings | pos.black_queens;
+    get_all_holder = get_white_holder | get_black_holder;
+}
+
 
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
 // Example: the initial white_nights bitboard, the least significant 1 occurs at index 1 (...00001000010)

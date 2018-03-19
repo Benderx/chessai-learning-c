@@ -36,13 +36,13 @@ class Minimax: public Player
 {
     public:
         Minimax(int col, Engine* engine);
-        // int minimax_white(int depth);
-        // int minimax_black(int depth);
-        int minimax(int depth, int color);
+        int minimax_white(int depth);
+        int minimax_black(int depth);
+        // int minimax(int depth, int color);
         int move(int* move_list);
         int* copy_move_list(int* move_list);
         double simple_board_eval_helper(unsigned long long pieces, double val);
-        double simple_board_eval(int color);
+        double simple_board_eval(int color, int* move_list);
         int decode_terminal_score(int term);
 
     private:
