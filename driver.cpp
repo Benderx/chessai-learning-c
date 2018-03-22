@@ -146,17 +146,17 @@ void test_black_pawn_moves(Engine* e)
 //     // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
 // }
 
-void test_rook_moves(Engine* e)
-{
-    e->pos.white_rooks = 0b0000000000000000000000000000000000000000001000000000000000000000;
-    e->pos.black_rooks = 0b0000000000000000000100000000000000000000000000000000000000000000;
+// void test_rook_moves(Engine* e)
+// {
+//     e->pos.white_rooks = 0b0000000000000000000000000000000000000000001000000000000000000000;
+//     e->pos.black_rooks = 0b0000000000000000000100000000000000000000000000000000000000000000;
 
-    print_pieces(e, "white", "rooks", e->pos.white_rooks);
-    print_pieces(e, "black", "rooks", e->pos.black_rooks);
+//     print_pieces(e, "white", "rooks", e->pos.white_rooks);
+//     print_pieces(e, "black", "rooks", e->pos.black_rooks);
 
-    print_pieces(e, "white", "rook moves", e->pre_check_rook_moves(1));
-    print_pieces(e, "black", "rook moves", e->pre_check_rook_moves(0));
-}
+//     print_pieces(e, "white", "rook moves", e->pre_check_rook_moves(1));
+//     print_pieces(e, "black", "rook moves", e->pre_check_rook_moves(0));
+// }
 
 void test_queen_moves(Engine* e)
 {
@@ -189,6 +189,32 @@ void test_black_moves(Engine* e)
     // print_pieces(e, "black", "pawns", e->pos.black_pawns);
 
     print_moves(e, "black", e->generate_legal_moves(0));
+}
+
+void test_rook_moves(Engine* e)
+{
+    e->pos.black_rooks = 0b0000000000000000000000100000000000000000000000000000000000000000;
+
+    // print_pieces(e, "white", "pawns", e->pos.white_pawns);
+    // print_pieces(e, "black", "pawns", e->pos.black_pawns);
+
+    e->print_chess_char();
+
+    int* moves = e->generate_legal_moves(0);
+    for(int i = 0; i < moves[0]; i++)
+    {
+        if(e->decode_from(moves[i+1]) != e->bitboard_to_square(0b0000000000000000000000100000000000000000000000000000000000000000))
+        {
+            continue;
+        }
+
+        std::cout << "making move " << moves[i+1] << std::endl << std::endl;
+        std::cout << std::endl;
+        e->push_move(moves[i+1]);
+        e->print_chess_char();
+        std::cout << std::endl;
+        e->pop_move();
+    }
 }
 
 void test_mask_check(Engine* e)
@@ -247,7 +273,7 @@ int main()
 
 
 
-    test_black_moves(e);
+    test_rook_moves(e);
 
 
 

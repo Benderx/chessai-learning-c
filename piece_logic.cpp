@@ -301,45 +301,58 @@ U64 Engine::pre_check_bishop_moves(U64 bishop, int color)
 
 
 //old
-// U64 Engine::pre_check_one_rook_attacks(U64 rook)
-// {
-//     U64 row = get_rank(rook);
-//     U64 col = get_file(rook);
-
-//     U64 o = get_all();
-
-//     U64 o_rev = vertical_flip(o);
-//     U64 s_rev = vertical_flip(rook);
-
-//     U64 hori = (o - 2*rook) ^ vertical_flip(o_rev - 2*s_rev);
-//     hori = hori & row_mask[row];
-
-
-//     // U64 o_mask = o;
-//     U64 o_mask = o & col_mask[col];
-//     U64 o_rev_mask = vertical_flip(o_mask);
-//     U64 vert = (o_mask - 2*rook) ^ vertical_flip(o_rev_mask - 2*s_rev);
-//     vert = vert & col_mask[col];
-
-//     return(hori | vert);
-// }
-
-
 U64 Engine::pre_check_one_rook_attacks(U64 rook)
 {
-    int square = bitboard_to_square(rook);
-    U64 occ = get_all();
+    U64 row = get_rank(rook);
+    U64 col = get_file(rook);
 
-    U64 forward, reverse;
-    forward  = occ & square_masks[square].file_mask_excluded;
+    U64 o = get_all();
 
-    reverse  = vertical_flip(forward);
-    forward -= rook;
-    reverse -= vertical_flip(rook);
-    forward ^= vertical_flip(reverse);
-    forward &= square_masks[square].file_mask_excluded;
-    return forward;
+    U64 o_rev = vertical_flip(o);
+    U64 s_rev = vertical_flip(rook);
+
+    U64 hori = (o - 2*rook) ^ vertical_flip(o_rev - 2*s_rev);
+    printf("hori\n");
+    print_chess_rep(hori);
+    printf("hori flipped\n");
+    print_chess_rep(vertical_flip(hori));
+    hori = hori & row_mask[row];
+
+
+    // U64 o_mask = o;
+    U64 o_mask = o & col_mask[col];
+    U64 o_rev_mask = vertical_flip(o_mask);
+    U64 vert = (o_mask - 2*rook) ^ vertical_flip(o_rev_mask - 2*s_rev);
+    vert = vert & col_mask[col];
+
+    return(hori | vert);
 }
+
+
+// U64 Engine::pre_check_one_rook_attacks(U64 rook)
+// {
+//     int square = bitboard_to_square(rook);
+//     U64 occ = get_all();
+
+//     printf("masks\n");
+//     print_chess_rep(square_masks[square].file_mask_excluded);
+
+
+//     U64 forward, reverse;
+//     forward  = occ & square_masks[square].file_mask_excluded;
+
+//     reverse  = vertical_flip(forward);
+//     forward -= rook;
+//     printf("forward\n");
+//     print_chess_rep(forward);
+
+//     reverse -= vertical_flip(rook);
+//     forward ^= vertical_flip(reverse);
+//     forward &= square_masks[square].file_mask_excluded;
+
+//     // exit(0);
+//     return forward;
+// }
 
 
 U64 Engine::pre_check_rook_attacks(U64 rooks)

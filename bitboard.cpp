@@ -239,7 +239,7 @@ void Engine::fill_square_masks()
 
         square_masks[i].left_diag_mask_excluded = ~temp & diag_left_mask[left_diag];
         square_masks[i].right_diag_mask_excluded = ~temp & diag_right_mask[right_diag];
-        square_masks[i].file_mask_excluded = ~temp & col_mask[get_file(temp)];
+        square_masks[i].file_mask_excluded = ~temp & (col_mask[get_file(temp)] | row_mask[get_rank(temp)]);
 
         // printf("square: %i\n", i);
         // print_chess_rep(square_masks[i].file_mask_excluded);
