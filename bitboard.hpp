@@ -203,42 +203,42 @@ class Engine
         U64* get_attackers_blocks(int color);
 
 
-        U64 pre_check_white_pawn_attacks(U64 white_pawns);
-        U64 pre_check_black_pawn_attacks(U64 black_pawns);
-        U64 pre_check_white_pawn_moves(U64 white_pawns, U64 all_pieces, U64 all_black_pieces);
-        U64 pre_check_black_pawn_moves(U64 black_pawns, U64 all_pieces, U64 all_white_pieces);
+        U64 white_pawn_attacks(U64 white_pawns);
+        U64 black_pawn_attacks(U64 black_pawns);
+        U64 white_pawn_moves(U64 white_pawns, U64 all_pieces, U64 all_black_pieces);
+        U64 black_pawn_moves(U64 black_pawns, U64 all_pieces, U64 all_white_pieces);
 
-        U64 pre_check_king_attacks(U64 kings);
-        U64 pre_check_king_moves(U64 kings, U64 own_occupied);
-        U64 pre_check_king_moves(int color);
+        U64 king_attacks(U64 kings);
+        U64 king_moves(U64 kings, U64 own_occupied);
+        U64 king_moves(int color);
 
-        U64 pre_check_night_attacks(U64 nights);
-        U64 pre_check_night_moves(U64 nights, U64 own_occupied);
-        U64 pre_check_night_moves(int color);
+        U64 night_attacks(U64 nights);
+        U64 night_moves(U64 nights, U64 own_occupied);
+        U64 night_moves(int color);
 
-        U64 pre_check_one_bishop_attacks_ANTI(U64 bishop, int square);
-        U64 pre_check_one_bishop_attacks(U64 bishop);
-        U64 pre_check_bishop_attacks(U64 bishops);
-        U64 pre_check_one_bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied);
-        U64 pre_check_bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied);
-        U64 pre_check_bishop_moves(int color);
-        U64 pre_check_bishop_moves(U64 bishops, int color);
+        U64 one_bishop_attacks_ANTI(U64 bishop, int square);
+        U64 one_bishop_attacks(U64 bishop);
+        U64 bishop_attacks(U64 bishops);
+        U64 one_bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied);
+        U64 bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied);
+        U64 bishop_moves(int color);
+        U64 bishop_moves(U64 bishops, int color);
         // U64 bishop_left_flood(U64 bishops1, U64 bishops2);
         // U64 bishop_right_flood(U64 bishops1, U64 bishops2);
 
-        U64 pre_check_one_rook_attacks(U64 rook);
-        U64 pre_check_rook_attacks(U64 rooks);
-        U64 pre_check_one_rook_moves(U64 rook, U64 all_occupied, U64 own_occupied);
-        U64 pre_check_rook_moves(U64 rooks, U64 all_occupied, U64 own_occupied);
-        U64 pre_check_rook_moves(int color);
-        U64 pre_check_rook_moves(U64 rooks, int color);
+        U64 one_rook_attacks(U64 rook);
+        U64 rook_attacks(U64 rooks);
+        U64 one_rook_moves(U64 rook, U64 all_occupied, U64 own_occupied);
+        U64 rook_moves(U64 rooks, U64 all_occupied, U64 own_occupied);
+        U64 rook_moves(int color);
+        U64 rook_moves(U64 rooks, int color);
 
-        U64 pre_check_one_queen_attacks(U64 queen);
-        U64 pre_check_queen_attacks(U64 queens);
-        U64 pre_check_one_queen_moves(U64 queen, U64 all_occupied, U64 own_occupied);
-        U64 pre_check_queen_moves(U64 queens, U64 all_occupied, U64 own_occupied);
-        U64 pre_check_queen_moves(int color);
-        U64 pre_check_queen_moves(U64 queens, int color);
+        U64 one_queen_attacks(U64 queen);
+        U64 queen_attacks(U64 queens);
+        U64 one_queen_moves(U64 queen, U64 all_occupied, U64 own_occupied);
+        U64 queen_moves(U64 queens, U64 all_occupied, U64 own_occupied);
+        U64 queen_moves(int color);
+        U64 queen_moves(U64 queens, int color);
 
         //floods
         U64 vert_flood(U64 rooks);

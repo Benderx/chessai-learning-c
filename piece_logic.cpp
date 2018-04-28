@@ -4,7 +4,7 @@ typedef unsigned long long U64;
 
 
 // PAWNS
-U64 Engine::pre_check_white_pawn_attacks(U64 white_pawns)
+U64 Engine::white_pawn_attacks(U64 white_pawns)
 {
     // left side, filter out left file
     U64 pawn_right = (white_pawns & ~col_mask[0]) << 7;
@@ -16,7 +16,7 @@ U64 Engine::pre_check_white_pawn_attacks(U64 white_pawns)
     return(pawn_right | pawn_left);
 }
 
-U64 Engine::pre_check_black_pawn_attacks(U64 black_pawns)
+U64 Engine::black_pawn_attacks(U64 black_pawns)
 {
     // left side, filter out left file
     U64 pawn_left = (black_pawns & ~col_mask[0]) >> 9;
@@ -28,7 +28,7 @@ U64 Engine::pre_check_black_pawn_attacks(U64 black_pawns)
     return(pawn_left | pawn_right);
 }
 
-U64 Engine::pre_check_white_pawn_moves(U64 white_pawns, U64 all_pieces, U64 all_black_pieces)
+U64 Engine::white_pawn_moves(U64 white_pawns, U64 all_pieces, U64 all_black_pieces)
 {
     // pushes all pawns forard one
     U64 pawn_one = (white_pawns << 8) & ~all_pieces; 
@@ -40,7 +40,7 @@ U64 Engine::pre_check_white_pawn_moves(U64 white_pawns, U64 all_pieces, U64 all_
     U64 both_pawn = pawn_one | pawn_two;
 
     // attacks
-    U64 pawn_attacks = pre_check_white_pawn_attacks(white_pawns);
+    U64 pawn_attacks = white_pawn_attacks(white_pawns);
 
     // and together black pieces
     U64 pawn_valid_attacks = pawn_attacks & all_black_pieces;
@@ -49,7 +49,7 @@ U64 Engine::pre_check_white_pawn_moves(U64 white_pawns, U64 all_pieces, U64 all_
     return(both_pawn | pawn_valid_attacks);
 }
 
-U64 Engine::pre_check_black_pawn_moves(U64 black_pawns, U64 all_pieces, U64 all_white_pieces)
+U64 Engine::black_pawn_moves(U64 black_pawns, U64 all_pieces, U64 all_white_pieces)
 {
     // pushes all pawns forard one
     U64 pawn_one = (black_pawns >> 8) & ~all_pieces; 
@@ -61,7 +61,7 @@ U64 Engine::pre_check_black_pawn_moves(U64 black_pawns, U64 all_pieces, U64 all_
     U64 both_pawn = pawn_one | pawn_two;
 
     // attacks
-    U64 pawn_attacks = pre_check_black_pawn_attacks(black_pawns);
+    U64 pawn_attacks = black_pawn_attacks(black_pawns);
 
     // and together black pieces
     U64 pawn_valid_attacks = pawn_attacks & all_white_pieces;
@@ -76,7 +76,7 @@ U64 Engine::pre_check_black_pawn_moves(U64 black_pawns, U64 all_pieces, U64 all_
 
 
 
-U64 Engine::pre_check_king_attacks(U64 kings)
+U64 Engine::king_attacks(U64 kings)
 {
     U64 king_mask_file_0 = kings & ~col_mask[0];
     U64 king_mask_file_7 = kings & ~col_mask[7];
@@ -97,20 +97,20 @@ U64 Engine::pre_check_king_attacks(U64 kings)
 // Takes in king_rep (bitboad representing that colors king location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
 // Returns bitboard representing all possible pre_check moves that the king can make
-U64 Engine::pre_check_king_moves(U64 kings, U64 own_occupied)
+U64 Engine::king_moves(U64 kings, U64 own_occupied)
 {
-    return(pre_check_king_attacks(kings) & ~own_occupied);
+    return(king_attacks(kings) & ~own_occupied);
 }
 
-U64 Engine::pre_check_king_moves(int color)
+U64 Engine::king_moves(int color)
 {
     if(color == 1)
     {
-        return(pre_check_king_moves(pos.white_kings, get_all_white()));
+        return(king_moves(pos.white_kings, get_all_white()));
     }
     else
     {
-        return(pre_check_king_moves(pos.black_kings, get_all_black()));
+        return(king_moves(pos.black_kings, get_all_black()));
     }
 }
 
@@ -118,7 +118,7 @@ U64 Engine::pre_check_king_moves(int color)
 //NIGHTS
 
 
-U64 Engine::pre_check_night_attacks(U64 nights)
+U64 Engine::night_attacks(U64 nights)
 {
     U64 spot_1_clip = ~col_mask[0] & ~col_mask[1];
     U64 spot_2_clip = ~col_mask[0];
@@ -147,20 +147,20 @@ U64 Engine::pre_check_night_attacks(U64 nights)
 // Takes in night_rep (bitboad representing that colors night location)
 // Takes in same_occupied (bitboard representing all pieces of that color)
 // Returns bitboard representing all possible pre_check moves that that night can make
-U64 Engine::pre_check_night_moves(U64 nights, U64 own_occupied)
+U64 Engine::night_moves(U64 nights, U64 own_occupied)
 {
-    return(pre_check_night_attacks(nights) & ~own_occupied);
+    return(night_attacks(nights) & ~own_occupied);
 }
 
-U64 Engine::pre_check_night_moves(int color)
+U64 Engine::night_moves(int color)
 {
     if(color == 1)
     {
-        return(pre_check_night_moves(pos.white_nights, get_all_white()));
+        return(night_moves(pos.white_nights, get_all_white()));
     }
     else
     {
-        return(pre_check_night_moves(pos.black_nights, get_all_black()));
+        return(night_moves(pos.black_nights, get_all_black()));
     }
 }
 
@@ -171,7 +171,7 @@ U64 Engine::pre_check_night_moves(int color)
 
 
 // olds
-// U64 Engine::pre_check_one_bishop_attacks_ANTI(U64 bishop, int right_diag)
+// U64 Engine::one_bishop_attacks_ANTI(U64 bishop, int right_diag)
 // {
 //     // int* diags = get_diag(get_rank(bishop), get_file(bishop));
 //     // int right_diag = get_diag(get_rank(bishop), get_file(bishop)) >> 5;
@@ -188,7 +188,7 @@ U64 Engine::pre_check_night_moves(int color)
 // }
 
 
-// U64 Engine::pre_check_one_bishop_attacks(U64 bishop)
+// U64 Engine::one_bishop_attacks(U64 bishop)
 // {
 //     int diag = get_diag(get_rank(bishop), get_file(bishop));
 //     int left_diag = diag >> 5;
@@ -203,14 +203,14 @@ U64 Engine::pre_check_night_moves(int color)
 //     reverse = reverse - vertical_flip(bishop); // o'-2s'
 //     forward = forward ^ vertical_flip(reverse);
 
-//     return pre_check_one_bishop_attacks_ANTI(bishop, right_diag) | (forward & line_mask);      // mask the line again
+//     return one_bishop_attacks_ANTI(bishop, right_diag) | (forward & line_mask);      // mask the line again
 // }
 
 
 
 
 // bishops may be missing the ANTI diagonal: https://chessprogramming.wikispaces.com/Hyperbola+Quintessence
-U64 Engine::pre_check_one_bishop_attacks_ANTI(U64 bishop, int square)
+U64 Engine::one_bishop_attacks_ANTI(U64 bishop, int square)
 {
     U64 line_mask = square_masks[square].right_diag_mask_excluded; // excludes square of slider
 
@@ -224,7 +224,7 @@ U64 Engine::pre_check_one_bishop_attacks_ANTI(U64 bishop, int square)
 }
 
 
-U64 Engine::pre_check_one_bishop_attacks(U64 bishop)
+U64 Engine::one_bishop_attacks(U64 bishop)
 {
     int square = bitboard_to_square(bishop);
 
@@ -237,10 +237,10 @@ U64 Engine::pre_check_one_bishop_attacks(U64 bishop)
     reverse = reverse - vertical_flip(bishop); // o'-2s'
     forward = forward ^ vertical_flip(reverse);
 
-    return pre_check_one_bishop_attacks_ANTI(bishop, square) | (forward & line_mask);      // mask the line again
+    return one_bishop_attacks_ANTI(bishop, square) | (forward & line_mask);      // mask the line again
 }
 
-U64 Engine::pre_check_bishop_attacks(U64 bishops)
+U64 Engine::bishop_attacks(U64 bishops)
 {
     U64 one_bishop;
     U64 bishop_attacks = 0;
@@ -248,17 +248,17 @@ U64 Engine::pre_check_bishop_attacks(U64 bishops)
     {
         one_bishop = lsb_board(bishops);
         bishops = bishops & ~one_bishop;
-        bishop_attacks = bishop_attacks | pre_check_one_bishop_attacks(one_bishop);
+        bishop_attacks = bishop_attacks | one_bishop_attacks(one_bishop);
     }
     return bishop_attacks;
 }
 
-U64 Engine::pre_check_one_bishop_moves(U64 bishop, U64 all_occupied, U64 own_occupied)
+U64 Engine::one_bishop_moves(U64 bishop, U64 all_occupied, U64 own_occupied)
 {
-    return pre_check_one_bishop_attacks(bishop) & ~own_occupied;
+    return one_bishop_attacks(bishop) & ~own_occupied;
 }
 
-U64 Engine::pre_check_bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied)
+U64 Engine::bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupied)
 {
     U64 one_bishop;
     U64 bishop_moves = 0;
@@ -266,32 +266,32 @@ U64 Engine::pre_check_bishop_moves(U64 bishops, U64 all_occupied, U64 own_occupi
     {
         one_bishop = lsb_board(bishops);
         bishops = bishops & ~one_bishop;
-        bishop_moves = bishop_moves | pre_check_one_bishop_moves(one_bishop, all_occupied, own_occupied);
+        bishop_moves = bishop_moves | one_bishop_moves(one_bishop, all_occupied, own_occupied);
     }
     return bishop_moves;
 }
 
-U64 Engine::pre_check_bishop_moves(int color)
+U64 Engine::bishop_moves(int color)
 {
     if(color == 1)
     {
-        return pre_check_bishop_moves(pos.white_bishops, color);
+        return bishop_moves(pos.white_bishops, color);
     }
     else
     {
-        return pre_check_bishop_moves(pos.black_bishops, color);
+        return bishop_moves(pos.black_bishops, color);
     }
 }
 
-U64 Engine::pre_check_bishop_moves(U64 bishop, int color)
+U64 Engine::bishop_moves(U64 bishop, int color)
 {
     if(color == 1)
     {
-        return(pre_check_bishop_moves(bishop, get_all(), get_all_white()));
+        return(bishop_moves(bishop, get_all(), get_all_white()));
     }
     else
     {
-        return(pre_check_bishop_moves(bishop, get_all(), get_all_black()));
+        return(bishop_moves(bishop, get_all(), get_all_black()));
     }
 }
 
@@ -301,7 +301,7 @@ U64 Engine::pre_check_bishop_moves(U64 bishop, int color)
 
 
 //old
-U64 Engine::pre_check_one_rook_attacks(U64 rook)
+U64 Engine::one_rook_attacks(U64 rook)
 {
     U64 row = get_rank(rook);
     U64 col = get_file(rook);
@@ -328,8 +328,24 @@ U64 Engine::pre_check_one_rook_attacks(U64 rook)
     return(hori | vert);
 }
 
+// U64 Engine::one_rook_attacks(U64 rook, U64 o, int square)
+// {
+//     U64 o_rev = reverse_64_bits(o);
+//     U64 s_rev = reverse_64_bits(rook);
 
-// U64 Engine::pre_check_one_rook_attacks(U64 rook)
+//     U64 hori = (o - 2*rook) ^ reverse_64_bits(o_rev - 2*s_rev);
+//     hori = hori & square_masks[square].rank_mask;
+
+//     U64 o_mask = o & square_masks[square].file_mask;
+//     U64 o_rev_mask = reverse_64_bits(o_mask);
+//     U64 vert = (o_mask - 2*rook) ^ reverse_64_bits(o_rev_mask - 2*s_rev);
+//     vert = vert & square_masks[square].file_mask;
+
+//     return(hori | vert);
+// }
+
+
+// U64 Engine::one_rook_attacks(U64 rook)
 // {
 //     int square = bitboard_to_square(rook);
 //     U64 occ = get_all();
@@ -355,7 +371,7 @@ U64 Engine::pre_check_one_rook_attacks(U64 rook)
 // }
 
 
-U64 Engine::pre_check_rook_attacks(U64 rooks)
+U64 Engine::rook_attacks(U64 rooks)
 {
     U64 one_rook;
     U64 rook_attacks = 0;
@@ -363,17 +379,17 @@ U64 Engine::pre_check_rook_attacks(U64 rooks)
     {
         one_rook = lsb_board(rooks);
         rooks = rooks & ~one_rook;
-        rook_attacks = rook_attacks | pre_check_one_rook_attacks(one_rook);
+        rook_attacks = rook_attacks | one_rook_attacks(one_rook);
     }
     return rook_attacks;
 }
 
-U64 Engine::pre_check_one_rook_moves(U64 rook, U64 all_occupied, U64 own_occupied)
+U64 Engine::one_rook_moves(U64 rook, U64 all_occupied, U64 own_occupied)
 {
-    return pre_check_one_rook_attacks(rook) & ~own_occupied;
+    return one_rook_attacks(rook) & ~own_occupied;
 }
 
-U64 Engine::pre_check_rook_moves(U64 rooks, U64 all_occupied, U64 own_occupied)
+U64 Engine::rook_moves(U64 rooks, U64 all_occupied, U64 own_occupied)
 {
     U64 one_rook;
     U64 rook_moves = 0;
@@ -381,32 +397,32 @@ U64 Engine::pre_check_rook_moves(U64 rooks, U64 all_occupied, U64 own_occupied)
     {
         one_rook = lsb_board(rooks);
         rooks = rooks & ~one_rook;
-        rook_moves = rook_moves | pre_check_one_rook_moves(one_rook, all_occupied, own_occupied);
+        rook_moves = rook_moves | one_rook_moves(one_rook, all_occupied, own_occupied);
     }
     return rook_moves;
 }
 
-U64 Engine::pre_check_rook_moves(int color)
+U64 Engine::rook_moves(int color)
 {
     if(color == 1)
     {
-        return pre_check_rook_moves(pos.white_rooks, color);
+        return rook_moves(pos.white_rooks, color);
     }
     else
     {
-        return pre_check_rook_moves(pos.black_rooks, color);
+        return rook_moves(pos.black_rooks, color);
     }
 }
 
-U64 Engine::pre_check_rook_moves(U64 rook, int color)
+U64 Engine::rook_moves(U64 rook, int color)
 {
     if(color == 1)
     {
-        return(pre_check_rook_moves(rook, get_all(), get_all_white()));
+        return(rook_moves(rook, get_all(), get_all_white()));
     }
     else
     {
-        return(pre_check_rook_moves(rook, get_all(), get_all_black()));
+        return(rook_moves(rook, get_all(), get_all_black()));
     }
 }
 
@@ -415,13 +431,13 @@ U64 Engine::pre_check_rook_moves(U64 rook, int color)
 /////QUEENS//////
 
 
-U64 Engine::pre_check_one_queen_attacks(U64 queen)
+U64 Engine::one_queen_attacks(U64 queen)
 {
-    return pre_check_one_bishop_attacks(queen) |
-            pre_check_one_rook_attacks(queen);
+    return one_bishop_attacks(queen) |
+            one_rook_attacks(queen);
 }
 
-U64 Engine::pre_check_queen_attacks(U64 queens)
+U64 Engine::queen_attacks(U64 queens)
 {
     U64 one_queen;
     U64 queen_attacks = 0;
@@ -429,17 +445,17 @@ U64 Engine::pre_check_queen_attacks(U64 queens)
     {
         one_queen = lsb_board(queens);
         queens = queens & ~one_queen;
-        queen_attacks = queen_attacks | pre_check_one_queen_attacks(one_queen);
+        queen_attacks = queen_attacks | one_queen_attacks(one_queen);
     }
     return queen_attacks;
 }
 
-U64 Engine::pre_check_one_queen_moves(U64 queen, U64 all_occupied, U64 own_occupied)
+U64 Engine::one_queen_moves(U64 queen, U64 all_occupied, U64 own_occupied)
 {
-    return pre_check_one_queen_attacks(queen) & ~own_occupied;
+    return one_queen_attacks(queen) & ~own_occupied;
 }
 
-U64 Engine::pre_check_queen_moves(U64 queens, U64 all_occupied, U64 own_occupied)
+U64 Engine::queen_moves(U64 queens, U64 all_occupied, U64 own_occupied)
 {
     U64 one_queen;
     U64 queen_moves = 0;
@@ -447,35 +463,35 @@ U64 Engine::pre_check_queen_moves(U64 queens, U64 all_occupied, U64 own_occupied
     {
         one_queen = lsb_board(queens);
         queens = queens & ~one_queen;
-        queen_moves = queen_moves | pre_check_one_queen_moves(one_queen, all_occupied, own_occupied);
+        queen_moves = queen_moves | one_queen_moves(one_queen, all_occupied, own_occupied);
     }
     return queen_moves;
 }
 
 
-U64 Engine::pre_check_queen_moves(int color)
+U64 Engine::queen_moves(int color)
 {
     if(color == 1)
     {
-        return pre_check_queen_moves(pos.white_queens, color);
+        return queen_moves(pos.white_queens, color);
     }
     else
     {
-        return pre_check_queen_moves(pos.black_queens, color);
+        return queen_moves(pos.black_queens, color);
     }
 }
 
-U64 Engine::pre_check_queen_moves(U64 queen, int color)
+U64 Engine::queen_moves(U64 queen, int color)
 {
     if(color == 1)
     {
-        return pre_check_bishop_moves(queen, get_all(), get_all_white()) | 
-            pre_check_rook_moves(queen, get_all(), get_all_white());
+        return bishop_moves(queen, get_all(), get_all_white()) | 
+            rook_moves(queen, get_all(), get_all_white());
     }
     else
     {
-        return pre_check_bishop_moves(queen, get_all(), get_all_black()) | 
-            pre_check_rook_moves(queen, get_all(), get_all_black());
+        return bishop_moves(queen, get_all(), get_all_black()) | 
+            rook_moves(queen, get_all(), get_all_black());
     }
 }
 

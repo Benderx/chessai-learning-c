@@ -1044,7 +1044,7 @@ bool Engine::get_in_check(int color)
         enemy_queens = pos.black_queens;
         enemy_kings = pos.black_kings;
 
-        pawn_attackers = pre_check_white_pawn_attacks(my_king) & enemy_pawns;
+        pawn_attackers = white_pawn_attacks(my_king) & enemy_pawns;
     }
     else
     {
@@ -1057,7 +1057,7 @@ bool Engine::get_in_check(int color)
         enemy_queens = pos.white_queens;
         enemy_kings = pos.white_kings;
 
-        pawn_attackers = pre_check_black_pawn_attacks(my_king) & enemy_pawns;
+        pawn_attackers = black_pawn_attacks(my_king) & enemy_pawns;
     }
 
     if(pawn_attackers)
@@ -1065,25 +1065,25 @@ bool Engine::get_in_check(int color)
         return true;
     }
 
-    rook_attackers = pre_check_one_rook_attacks(my_king) & (enemy_rooks | enemy_queens);
+    rook_attackers = one_rook_attacks(my_king) & (enemy_rooks | enemy_queens);
     if(rook_attackers)
     {
         return true;
     }
 
-    night_attackers = pre_check_night_attacks(my_king) & enemy_nights;
+    night_attackers = night_attacks(my_king) & enemy_nights;
     if(night_attackers)
     {
         return true;
     }
 
-    bishop_attackers = pre_check_one_bishop_attacks(my_king) & (enemy_bishops | enemy_queens);
+    bishop_attackers = one_bishop_attacks(my_king) & (enemy_bishops | enemy_queens);
     if(bishop_attackers)
     {
         return true;
     }
 
-    king_attackers = pre_check_king_attacks(my_king) & enemy_kings;
+    king_attackers = king_attacks(my_king) & enemy_kings;
     if(king_attackers)
     {
         return true;
@@ -1112,7 +1112,7 @@ unsigned long long* Engine::get_attackers_blocks(int const color)
         enemy_bishops = pos.black_bishops;
         enemy_queens = pos.black_queens;
 
-        pawn_attackers = pre_check_white_pawn_attacks(my_king) & enemy_pawns;
+        pawn_attackers = white_pawn_attacks(my_king) & enemy_pawns;
     }
     else
     {
@@ -1124,7 +1124,7 @@ unsigned long long* Engine::get_attackers_blocks(int const color)
         enemy_bishops = pos.white_bishops;
         enemy_queens = pos.white_queens;
 
-        pawn_attackers = pre_check_black_pawn_attacks(my_king) & enemy_pawns;
+        pawn_attackers = black_pawn_attacks(my_king) & enemy_pawns;
     }
 
     // i believe it is impossible to hit more than one check with any of these 4 ifs
@@ -1135,32 +1135,32 @@ unsigned long long* Engine::get_attackers_blocks(int const color)
         info[1] = pawn_attackers;
     }
 
-    card_attacks = pre_check_one_rook_attacks(my_king);
+    card_attacks = one_rook_attacks(my_king);
     rook_attackers = card_attacks & (enemy_rooks | enemy_queens);
     if(rook_attackers)
     {
         info[0]++;
         info[1] = rook_attackers;
-        info[2] = card_attacks & pre_check_one_rook_attacks(rook_attackers);
+        info[2] = card_attacks & one_rook_attacks(rook_attackers);
     }
 
-    diag_attacks = pre_check_one_bishop_attacks(my_king);
+    diag_attacks = one_bishop_attacks(my_king);
     bishop_attackers = diag_attacks & (enemy_bishops | enemy_queens);
     if(bishop_attackers)
     {
         info[0]++;
         info[1] = bishop_attackers;
-        info[2] = diag_attacks & pre_check_one_bishop_attacks(bishop_attackers);
+        info[2] = diag_attacks & one_bishop_attacks(bishop_attackers);
     }
 
-    night_attackers = pre_check_night_attacks(my_king) & enemy_nights;
+    night_attackers = night_attacks(my_king) & enemy_nights;
     if(night_attackers)
     {
         info[0]++;
         info[1] = night_attackers;
     }
     
-    // king_attackers = pre_check_king_attacks(my_king) & enemy_kings;
+    // king_attackers = king_attacks(my_king) & enemy_kings;
     
     return(info);
 }
