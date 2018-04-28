@@ -80,6 +80,7 @@ class Engine
         void print_chess_rep(unsigned long long num);
         void print_chess_char();
         void write_move_to_file(int file_num);
+        void delete_file_if_present(int file_num);
 
 
         // TEMPORARILY PUBLIC
