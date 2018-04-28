@@ -582,7 +582,7 @@ std::string Engine::piece_type_to_string(int const piece)
 // Takes in a move to be added to the move stack
 // Returns nothing
 // Alters the move stack and stack_index value
-void Engine::stack_push(int move)
+void Engine::stack_push(int const move)
 {
     // get pointer to stack index
     // get pointer to move_stack
@@ -604,13 +604,13 @@ int Engine::stack_pop()
 void Engine::push_psuedo_move(int move)
 {
     stack_push(move);
-    int start = decode_from(move);
-    int end = decode_to(move);
+    int original_square = decode_from(move);
+    int end_square = decode_to(move);
     int taken_piece_type = decode_piece(move);
     int color;
 
-    unsigned long long curr_piece_loc = square_to_bitboard(start);
-    unsigned long long taken_piece_loc = square_to_bitboard(end);
+    unsigned long long curr_piece_loc = square_to_bitboard(original_square);
+    unsigned long long taken_piece_loc = square_to_bitboard(end_square);
 
     color = decode_color(move);
 
@@ -636,13 +636,13 @@ void Engine::pop_psuedo_move()
 {
     int move = stack_pop();
 
-    int start = decode_from(move);
-    int end = decode_to(move);
+    int original_square = decode_from(move);
+    int end_square = decode_to(move);
     int taken_piece_type = decode_piece(move);
     int color;
 
-    unsigned long long curr_piece_loc = square_to_bitboard(end);
-    unsigned long long orig_piece_loc = square_to_bitboard(start);
+    unsigned long long curr_piece_loc = square_to_bitboard(end_square);
+    unsigned long long orig_piece_loc = square_to_bitboard(original_square);
 
     color = decode_color(move);
 
@@ -670,7 +670,7 @@ void Engine::compute_get_holders()
     get_all_holder = get_white_holder | get_black_holder;
 }
 
-void Engine::load_in_string(std::string rep)
+void Engine::load_in_string(std::string const rep)
 {
     int index = 63;
     unsigned long long wp = 0, bp = 0;
