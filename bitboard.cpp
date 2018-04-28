@@ -956,11 +956,11 @@ int Engine::get_color_by_bitboard(unsigned long long board)
 {
     if(board & get_all_white())
     {
-        return(1);
+        return(WHITE);
     }
     else
     {
-        return(0);
+        return(BLACK);
     }
 }
 
