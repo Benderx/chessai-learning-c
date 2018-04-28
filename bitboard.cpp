@@ -304,9 +304,8 @@ unsigned long long Engine::get_all()
 
 // Takes in a 64 bit number with single bit
 // Returns the rank piece is on 0-7, bottom to top
-// Alters nothing
 // Andrew's Linux Labtop: with flags: ~6ns without: ~16.5ns (idk why)
-int Engine::get_rank(unsigned long long num)
+int Engine::get_rank(unsigned long long const num)
 {
     unsigned long long max_rank_1_value = 128ULL; // 2^7
     if(num <= max_rank_1_value)
@@ -361,9 +360,8 @@ int Engine::get_rank(unsigned long long num)
 
 // Takes in a 64 bit number with single bit
 // Returns the file piece is on 0-7, left to right
-// Alters nothing 
 // ~9ns
-int Engine::get_file(unsigned long long num)
+int Engine::get_file(unsigned long long const num)
 {
     switch(num)
     {
@@ -461,29 +459,29 @@ int Engine::get_file(unsigned long long num)
 }
 
 // Andrew's Linux Labtop: with flags: ~6ns without: ~16ns (probs inline)
-int Engine::get_diag(int rank, int file)
+int Engine::get_diag(int const rank, int const file)
 {
-    int total_val = rank+file;
+    int rank_file_sum = rank+file;
     int right;
 
     //Total val also equals left diag index
 
     if(rank > file) //Above the middle diagonal line r = 7
     {
-        right = 7+(total_val-2*file);
+        right = 7+(rank_file_sum-2*file);
     }
     else //Below middle line
     {
-        right = 7-(total_val-2*rank);
+        right = 7-(rank_file_sum-2*rank);
     }
 
     // int* diag = (int*) malloc(2 * sizeof(int));
-    // diag[0] = total_val;
+    // diag[0] = rank_file_sum;
     // diag[1] = right;
-    // int ret_val = (total_val << 5) | (total_val << 5);
+    // int ret_val = (rank_file_sum << 5) | (rank_file_sum << 5);
 
 
-    return(total_val << 5) | (right);
+    return(rank_file_sum << 5) | (right);
 }
 
 // Takes in move information
@@ -498,8 +496,7 @@ int Engine::get_diag(int rank, int file)
 // //     promotion int 2-5 
 // Piece to promote pawn to
 // Return an int representing all above info
-// Alters nothing
-int Engine::encode_move(int start, int end, int m_type, int piece, int promotion, int color)
+int Engine::encode_move(int const start, int const end, int const m_type, int const piece, int const promotion, int const color)
 {
     int encode_start = start;
     int encode_end = end << 6;
@@ -512,53 +509,47 @@ int Engine::encode_move(int start, int end, int m_type, int piece, int promotion
 
 // Takes in an int move
 // Returns square number the moved piece originated from
-// Alters nothing
-int Engine::decode_from(int move)
+int Engine::decode_from(int const move)
 {
     return(move & 63);
 }
 
 // Takes in an int move
 // Returns square number moved piece travels to
-// Alters nothing
-int Engine::decode_to(int move)
+int Engine::decode_to(int const move)
 {
     return((move >> 6) & 63);
 }
 
 // Takes in an int move
 // Returns type of move made
-// Alters nothing
-int Engine::decode_type(int move)
+int Engine::decode_type(int const move)
 {
     return((move >> 12) & 3);
 }   
 
 // Takes in an int move
 // Returns any piece taken by move
-// Alters nothing
-int Engine::decode_piece(int move)
+int Engine::decode_piece(int const move)
 {
     return((move >> 14) & 7);
 }
 
 // Takes in an int move
 // Returns new piece pawn promoted to
-// Alters nothing
-int Engine::decode_promo(int move)
+int Engine::decode_promo(int const move)
 {
     return((move >> 17) & 3);
 }
 
 // Takes in an int move
 // Returns color
-// Alters nothing
-int Engine::decode_color(int move)
+int Engine::decode_color(int const move)
 {
     return(move >> 20);
 }
 
-std::string Engine::piece_type_to_string(int piece)
+std::string Engine::piece_type_to_string(int const piece)
 {
     if(piece == PAWN)
     {
