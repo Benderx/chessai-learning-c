@@ -6,7 +6,20 @@ REFRACTORING UPDATES
 Added bit_operations.cpp file for engine functions relying solely on bit manipulation
 Added printing.cpp file for debugging with prints and file manipulations
 Is it bad form to have bit_operations take from bitboard.h? Bitboard. h is implemented through bitboard.cpp and anouther file
+Changes to Engine::fill_diag_left_mask_arr() and Engine::fill_diag_right_mask_arr()
+Updated Engine::remove_piece logic -> Added returns, doublecheck
 
+
+READIBILITY:
+Engine::fill_square_masks() - What is temp??
+Engine::get_bitboard_of_piece is this incomplete or king specifc?
+Engine::get_piece_by_bitboard What is board? Possibly misleading. What is going on here
+Engine::get_attackers_blocks - Can probably do something about the names info[0] info[1] and info[2]
+
+
+PREFORMANCE:
+Adding const good or bad? Compiler can make assumptions buit in functions causes conversion?
+Engine::piece_type_to_string - sort cases by probability of each 
 
 
 COMPILE WITH:
