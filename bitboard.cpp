@@ -159,7 +159,7 @@ void Engine::fill_row_mask_arr()
 
 unsigned long long Engine::make_diag_left_mask(unsigned long long mask)
 {
-    unsigned long long BR_mask = ~(row_mask[0] | col_mask[7]);
+    unsigned long long BR_mask = ~(row_mask[0] | col_mask[7]); //BR standss for bottom right maybe? Look into
     for(int i = 0; i < 8; i++)
     {
         mask = mask | ((mask & BR_mask) >> 7);
@@ -187,7 +187,7 @@ void Engine::fill_diag_left_mask_arr()
         diag_left_mask[i] = make_diag_left_mask(mask_base);
         mask_base = mask_base << 8;
     }
-    
+
     diag_left_mask[7] = make_diag_left_mask(mask_base);
     mask_base = mask_base << 1;
 
@@ -201,7 +201,7 @@ void Engine::fill_diag_left_mask_arr()
 
 unsigned long long Engine::make_diag_right_mask(unsigned long long mask)
 {
-    unsigned long long TR_mask = ~((row_mask[7]) | (col_mask[7]));
+    unsigned long long TR_mask = ~((row_mask[7]) | (col_mask[7])); //TR standss for top right maybe? Look into
     for(int i = 0; i < 8; i++)
     {
         mask = mask | ((mask & TR_mask) << 9);
@@ -212,21 +212,30 @@ unsigned long long Engine::make_diag_right_mask(unsigned long long mask)
 
 void Engine::fill_diag_right_mask_arr()
 {
-    unsigned long long start = 1ULL << 7;
-    for(int i = 0; i < 8; i++)
+    unsigned long long mask_base = 1ULL << 7;
+    
+    // for(int i = 0; i < 8; i++)
+    // {
+    //     diag_right_mask[i] = make_diag_right_mask(mask_base);
+    //     if(i != 7)
+    //     {
+    //         mask_base = mask_base >> 1;
+    //     } 
+    // }
+
+    for(int i = 0; i < 6; i++)
     {
-        diag_right_mask[i] = make_diag_right_mask(start);
-        if(i != 7)
-        {
-            start = start >> 1;
-        } 
+        diag_right_mask[i] = make_diag_right_mask(mask_base);
+        mask_base = mask_base >> 1;
     }
-    start = start << 8;
+
+    diag_right_mask[7] = make_diag_right_mask(mask_base);
+    mask_base = mask_base << 8;
 
     for(int j = 8; j < 15; j++)
     {
-        diag_right_mask[j] = make_diag_right_mask(start);
-        start = start << 8;
+        diag_right_mask[j] = make_diag_right_mask(mask_base);
+        mask_base = mask_base << 8;
     }          
 }
 
