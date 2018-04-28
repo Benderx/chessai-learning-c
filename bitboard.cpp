@@ -682,62 +682,49 @@ void Engine::load_in_string(std::string const rep)
 
     for(unsigned int i = 0; i < rep.length(); i++)
     {
-        if(rep[i] == 'P')
+        switch(rep[i])
         {
-            wp = wp | 1ULL << index;
-        }
-        else if(rep[i] == 'R')
-        {
-            wr = wr | 1ULL << index;
-        }
-        else if(rep[i] == 'N')
-        {
-            wn = wn | 1ULL << index;
-        }
-        else if(rep[i] == 'B')
-        {
-            wb = wb | 1ULL << index;
-        }
-        else if(rep[i] == 'Q')
-        {
-            wq = wq | 1ULL << index;
-        }
-        else if(rep[i] == 'K')
-        {
-            wk = wk | 1ULL << index;
-        }
-
-        else if(rep[i] == 'p')
-        {
-            bp = bp | 1ULL << index;
-        }
-        else if(rep[i] == 'r')
-        {
-            br = br | 1ULL << index;
-        }
-        else if(rep[i] == 'n')
-        {
-            bn = bn | 1ULL << index;
-        }
-        else if(rep[i] == 'b')
-        {
-            bb = bb | 1ULL << index;
-        }
-        else if(rep[i] == 'q')
-        {
-            bq = bq | 1ULL << index;
-        }
-        else if(rep[i] == 'k')
-        {
-            bk = bk | 1ULL << index;
-        }
-        else if(rep[i] == '-')
-        {
-            // lol
-        }
-        else
-        {
-            index++;
+            case 'P':
+                wp = wp | 1ULL << index;
+                break;
+            case 'R':
+                wr = wr | 1ULL << index;
+                break;
+            case 'N':
+                wn = wn | 1ULL << index;
+                break;
+            case 'B':
+                wb = wb | 1ULL << index;
+                break;
+            case 'Q':
+                wq = wq | 1ULL << index;
+                break;
+            case 'K':
+                wk = wk | 1ULL << index;
+                break;
+            case 'p':
+                bp = bp | 1ULL << index;
+                break;
+            case 'r':
+                br = br | 1ULL << index;
+                break;
+            case 'n':
+                bn = bn | 1ULL << index;
+                break;
+            case 'b':
+                bb = bb | 1ULL << index;
+                break;
+            case 'q':
+                bq = bq | 1ULL << index;
+                break;
+            case 'k':
+                bk = bk | 1ULL << index;
+                break;
+            case '-':
+                //lol
+                break;
+            default:
+                index++;
         }
         index--;
     }
