@@ -170,22 +170,31 @@ unsigned long long Engine::make_diag_left_mask(unsigned long long mask)
 
 void Engine::fill_diag_left_mask_arr()
 {
-    unsigned long long start = 1;
+    unsigned long long mask_base = 1;
 
-    for(int i = 0; i < 8; i++)
+    // for(int i = 0; i < 8; i++)
+    // {
+    //     diag_left_mask[i] = make_diag_left_mask(mask_base);
+    //     if(i != 7)
+    //     {
+    //         mask_base = mask_base << 8;
+    //     }
+    // }
+    // mask_base = mask_base << 1;
+
+    for(int i = 0; i < 6; i++)
     {
-        diag_left_mask[i] = make_diag_left_mask(start);
-        if(i != 7)
-        {
-            start = start << 8;
-        }
+        diag_left_mask[i] = make_diag_left_mask(mask_base);
+        mask_base = mask_base << 8;
     }
-    start = start << 1;
+    
+    diag_left_mask[7] = make_diag_left_mask(mask_base);
+    mask_base = mask_base << 1;
 
     for(int j = 8; j < 15; j++)
     {
-        diag_left_mask[j] = make_diag_left_mask(start);
-        start = start << 1;
+        diag_left_mask[j] = make_diag_left_mask(mask_base);
+        mask_base = mask_base << 1;
     }
 }
 
