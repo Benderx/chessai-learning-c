@@ -45,7 +45,7 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves, int game_
 
         term = e->is_terminal(color, move_list);
         e->write_move_to_file(game_num);
-        std::cout << "We are on: "<< moves_made << "/"<< max_moves <<std::endl;
+        std::cout << "We are on: "<< moves_made+1 << "/"<< max_moves <<std::endl;
         
         if(term == 2)
         {
