@@ -5,14 +5,14 @@
 #include <strings.h>
 #include <fstream>
 
-Engine::Engine()
-{
+Engine::Engine() :
+max_move_length(500), move_arr_size(500) {
     init_position();
     init_engine();
 }
 
-Engine::Engine(unsigned long long* board_data)
-{
+Engine::Engine(unsigned long long* board_data) :
+max_move_length(500), move_arr_size(500) {
     init_position(board_data);
     init_engine();
 }
@@ -20,8 +20,6 @@ Engine::Engine(unsigned long long* board_data)
 void Engine::init_engine()
 {
     compute_get_holders();
-    max_move_length = 500; // This assumes there are only 500 possible legal moves at any one time (affects move array intilization)
-    move_arr_size = 500; // how many legal moves can be filled
     move_list = (int*) malloc(move_arr_size * sizeof(int));
 
     move_stack = (int*) malloc((max_move_length + 1) * sizeof(int)); // +1 because pushing moves is nesseccary to chekc fo legality
