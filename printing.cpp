@@ -20,6 +20,25 @@ void Engine::print_move_info(int move)
                 " and taking " << piece_taken_name << " move_type: " << move_type << std::endl;
 }
 
+void Engine::print_masks()
+{
+    printf("printing diag_left_mask\n");
+    for(int i = 0; i < 15; i++)
+    {
+        print_chess_rep(diag_left_mask[i]);
+        printf("\n");
+    }
+
+    printf("printing diag_right_mask\n");
+    for(int i = 0; i < 15; i++)
+    {
+        printf("%i\n", i);
+        print_chess_rep(diag_right_mask[i]);
+        printf("\n");
+    }
+    printf("\n");
+}
+
 //REWRITE
 void Engine::print_chess_rep(unsigned long long board)
 {

@@ -182,7 +182,7 @@ void Engine::fill_diag_left_mask_arr()
     // }
     // mask_base = mask_base << 1;
 
-    for(int i = 0; i < 6; i++)
+    for(int i = 0; i < 7; i++)
     {
         diag_left_mask[i] = make_diag_left_mask(mask_base);
         mask_base = mask_base << 8;
@@ -223,7 +223,7 @@ void Engine::fill_diag_right_mask_arr()
     //     } 
     // }
 
-    for(int i = 0; i < 6; i++)
+    for(int i = 0; i < 7; i++)
     {
         diag_right_mask[i] = make_diag_right_mask(mask_base);
         mask_base = mask_base >> 1;
@@ -261,6 +261,7 @@ void Engine::fill_square_masks()
         // print_bit_rep(square_masks[i].left_diag_mask_excluded);
     }
 }
+
 int Engine::get_max_move_length()
 {
     return(max_move_length);

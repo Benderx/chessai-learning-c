@@ -93,6 +93,7 @@ class Engine
         U64 get_all();
 
         //printing
+        void print_masks();
         void print_chess_rep(U64 num);
         void print_chess_char();
         void write_move_to_file(int file_num);

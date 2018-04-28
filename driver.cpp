@@ -61,8 +61,8 @@ void test_pawn_moves(Engine* e)
     print_pieces(e, "white", "pawns", e->pos.white_pawns);
     print_pieces(e, "black", "pawns", e->pos.black_pawns);
 
-    print_pieces(e, "white", "pawn moves", e->pre_check_white_pawn_moves(e->pos.white_pawns, e->get_all(), e->get_all_black()));
-    print_pieces(e, "black", "pawn moves", e->pre_check_black_pawn_moves(e->pos.black_pawns, e->get_all(), e->get_all_white()));
+    print_pieces(e, "white", "pawn moves", e->white_pawn_moves(e->pos.white_pawns, e->get_all(), e->get_all_black()));
+    print_pieces(e, "black", "pawn moves", e->black_pawn_moves(e->pos.black_pawns, e->get_all(), e->get_all_white()));
 }
 
 void test_king_moves(Engine* e)
@@ -73,8 +73,8 @@ void test_king_moves(Engine* e)
     print_pieces(e, "white", "kings", e->pos.white_kings);
     print_pieces(e, "black", "kings", e->pos.black_kings);
 
-    print_pieces(e, "white", "king moves", e->pre_check_king_moves(1));
-    print_pieces(e, "black", "king moves", e->pre_check_king_moves(0));
+    print_pieces(e, "white", "king moves", e->king_moves(1));
+    print_pieces(e, "black", "king moves", e->king_moves(0));
 }
 
 void test_night_moves(Engine* e)
@@ -85,8 +85,8 @@ void test_night_moves(Engine* e)
     print_pieces(e, "white", "nights", e->pos.white_nights);
     print_pieces(e, "black", "nights", e->pos.black_nights);
 
-    print_pieces(e, "white", "night moves", e->pre_check_night_moves(1));
-    print_pieces(e, "black", "night moves", e->pre_check_night_moves(0));
+    print_pieces(e, "white", "night moves", e->night_moves(1));
+    print_pieces(e, "black", "night moves", e->night_moves(0));
 }
 
 void test_bishop_moves(Engine* e)
@@ -99,8 +99,8 @@ void test_bishop_moves(Engine* e)
     print_pieces(e, "white", "bishops", e->pos.white_bishops);
     print_pieces(e, "black", "bishops", e->pos.black_bishops);
 
-    print_pieces(e, "white", "bishop moves", e->pre_check_one_bishop_attacks(0b0000000000000001000000000000000000000000000000000000000000000000));
-    // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+    print_pieces(e, "white", "bishop moves", e->one_bishop_attacks(0b0000000000000001000000000000000000000000000000000000000000000000));
+    // print_pieces(e, "black", "bishop moves", e->bishop_moves(0));
 }
 
 void test_black_pawn_moves(Engine* e)
@@ -113,8 +113,8 @@ void test_black_pawn_moves(Engine* e)
     // print_pieces(e, "white", "bishops", e->pos.white_bishops);
     // print_pieces(e, "black", "bishops", e->pos.black_bishops);
 
-    print_pieces(e, "black", "pawn attacks", e->pre_check_white_pawn_attacks(e->pos.white_pawns));
-    // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+    print_pieces(e, "black", "pawn attacks", e->white_pawn_attacks(e->pos.white_pawns));
+    // print_pieces(e, "black", "bishop moves", e->bishop_moves(0));
 }
 
 // void test_bishop_bug_moves(Engine* e)
@@ -135,7 +135,7 @@ void test_black_pawn_moves(Engine* e)
 
 //     e->print_chess_char();
 
-//     print_pieces(e, "bishop moves", "from king", e->pre_check_one_bishop_attacks(e->pos.black_kings));
+//     print_pieces(e, "bishop moves", "from king", e->one_bishop_attacks(e->pos.black_kings));
 //     std::cout << "chess rep of black kings" << std::endl;
 //     e->print_chess_rep(e->pos.black_kings);
 //     std::cout << "rank" << e->get_rank(e->pos.black_kings) << std::endl;
@@ -143,7 +143,7 @@ void test_black_pawn_moves(Engine* e)
 //     std::cout << "diag0" << e->get_diag(e->get_rank(e->pos.black_kings), e->get_file(e->pos.black_kings))[0] << 
 //                 " diag1 " << e->get_diag(e->get_rank(e->pos.black_kings), e->get_file(e->pos.black_kings))[1] << std::endl; 
 //     // print_pieces(e, "", "check legal", e->check_legal(move, 1));
-//     // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+//     // print_pieces(e, "black", "bishop moves", e->bishop_moves(0));
 // }
 
 // void test_rook_moves(Engine* e)
@@ -154,8 +154,8 @@ void test_black_pawn_moves(Engine* e)
 //     print_pieces(e, "white", "rooks", e->pos.white_rooks);
 //     print_pieces(e, "black", "rooks", e->pos.black_rooks);
 
-//     print_pieces(e, "white", "rook moves", e->pre_check_rook_moves(1));
-//     print_pieces(e, "black", "rook moves", e->pre_check_rook_moves(0));
+//     print_pieces(e, "white", "rook moves", e->rook_moves(1));
+//     print_pieces(e, "black", "rook moves", e->rook_moves(0));
 // }
 
 void test_queen_moves(Engine* e)
@@ -166,8 +166,8 @@ void test_queen_moves(Engine* e)
     print_pieces(e, "white", "queens", e->pos.white_queens);
     print_pieces(e, "black", "queens", e->pos.black_queens);
 
-    print_pieces(e, "white", "queen moves", e->pre_check_queen_moves(1));
-    print_pieces(e, "black", "queen moves", e->pre_check_queen_moves(0));
+    print_pieces(e, "white", "queen moves", e->queen_moves(1));
+    print_pieces(e, "black", "queen moves", e->queen_moves(0));
 }
 
 void test_white_moves(Engine* e)
@@ -259,23 +259,27 @@ void very_strange_check_glitch(Engine* e)
     // print_pieces(e, "white", "bishops", e->pos.white_bishops);
     // print_pieces(e, "black", "bishops", e->pos.black_bishops);
 
-    // print_pieces(e, "white", "bishop moves", e->pre_check_one_bishop_attacks(0b0000000000000001000000000000000000000000000000000000000000000000));
-    // print_pieces(e, "black", "bishop moves", e->pre_check_bishop_moves(0));
+    // print_pieces(e, "white", "bishop moves", e->one_bishop_attacks(0b0000000000000001000000000000000000000000000000000000000000000000));
+    // print_pieces(e, "black", "bishop moves", e->bishop_moves(0));
 }
 
 int main()
 {
     Engine* e = new Engine();
+
+
+    e->print_masks();
+
+
+
     // print_all_pieces(e);
 
-    std::ofstream* file = new std::ofstream();
-    file->open("games/game0.txt");
+    // std::ofstream* file = new std::ofstream();
+    // file->open("games/game0.txt");
 
 
 
-    test_rook_moves(e);
-
-
+    // test_rook_moves(e);
 
     // test_mask_check(e);
     // e->reset_engine();
@@ -302,6 +306,6 @@ int main()
     // e->print_chess_char();
     
 
-    file->close();
+    // file->close();
     return 0;
 }
