@@ -41,8 +41,7 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves, int game_
     int move;
     int* move_list;
 
-    // e->print_chess_char();
-    // std::cout << std::endl;
+    e->delete_file_if_present(game_num);
 
     while(moves_made < max_moves)
     {
