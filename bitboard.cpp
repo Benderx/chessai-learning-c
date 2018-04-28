@@ -551,37 +551,31 @@ int Engine::decode_color(int const move)
 
 std::string Engine::piece_type_to_string(int const piece)
 {
-    if(piece == PAWN)
+    switch(piece)
     {
-        return("pawn");
-    }
-    else if(piece == ROOK)
-    {
-        return("rook");
-    }
-    else if(piece == NIGHT)
-    {
-        return("night");
-    }
-    else if(piece == BISHOP)
-    {
-    return("bishop");
-    }
-    else if(piece == QUEEN)
-    {
-        return("queen");
-    }
-    else if(piece == KING)
-    {
-        return("king");
-    }
-    else if(piece == NONE)
-    {
-        return("nothing");
-    }
-    else
-    {
-        return("WARNING, PIECE INFO IS GARBAGE");
+        case PAWN:
+            return("pawn");
+
+        case ROOK:
+            return("rook");
+
+        case NIGHT:
+            return("night");
+
+        case BISHOP:
+            return("bishop");
+
+        case QUEEN:
+            return("queen");
+
+        case KING:
+            return("king");
+
+        case NONE:
+            return("nothing");
+
+        default:
+            return("WARNING, PIECE INFO IS GARBAGE");
     }
 }
 
