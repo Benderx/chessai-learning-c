@@ -328,10 +328,12 @@ U64 Engine::bishop_moves(U64 bishop, int color)
 //     return(hori | vert);
 // }
 
-U64 Engine::one_rook_attacks(U64 rook, int square)
+U64 Engine::one_rook_attacks(U64 rook)
 {
     U64 o = get_all();
-    
+
+    int square = bitboard_to_square(rook);
+
     U64 o_rev = reverse_64_bits(o);
     U64 s_rev = reverse_64_bits(rook);
 

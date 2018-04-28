@@ -242,6 +242,7 @@ void Engine::fill_diag_right_mask_arr()
 void Engine::fill_square_masks()
 {
     U64 temp;
+
     for(int i = 0; i < 64; i++)
     {
         temp = 1ULL << i;
@@ -250,17 +251,16 @@ void Engine::fill_square_masks()
         int left_diag = diag >> 5;
         int right_diag = diag & 0x000000000000000F;
 
-
         square_masks[i].left_diag_mask_excluded = ~temp & diag_left_mask[left_diag];
         square_masks[i].right_diag_mask_excluded = ~temp & diag_right_mask[right_diag];
-        square_masks[i].file_mask_excluded = ~temp & (col_mask[get_file(temp)] | row_mask[get_rank(temp)]);
+        square_masks[i].file_mask_excluded = ~temp & col_mask[get_file(temp)];
 
-        // printf("square: %i\n", i);
-        // print_chess_rep(square_masks[i].file_mask_excluded);
+        square_masks[i].file_mask = col_mask[get_file(temp)];
+        square_masks[i].rank_mask = row_mask[get_rank(temp)];
+        // printf("\n");
+        // print_bit_rep(square_masks[i].left_diag_mask_excluded);
     }
-    // exit(0);
 }
-
 int Engine::get_max_move_length()
 {
     return(max_move_length);

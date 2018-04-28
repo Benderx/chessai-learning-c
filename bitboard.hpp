@@ -71,10 +71,9 @@ struct precomputed_masks
    U64 left_diag_mask_excluded;
    U64 right_diag_mask_excluded;
    U64 file_mask_excluded;
-}; // 2 KByte
-
-
-
+   U64 file_mask;
+   U64 rank_mask;
+};
 
 
 class Engine
