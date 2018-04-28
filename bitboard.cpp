@@ -749,15 +749,15 @@ void Engine::print_chess_rep(unsigned long long board)
     }
 }
 
+
 //Takes in a file number
 //Writes the boardstate to file
 //Consider open and close functions
 void Engine::write_move_to_file(int file_num)
 {
-    std::string file_name = ".\\games\\game";
-    file_name += std::to_string(file_num) + ".txt";
-
+    std::string file_name = ".\\games\\game" + std::to_string(file_num) + ".txt";
     std::ofstream file;
+
     file.open(file_name, std::fstream::in | std::fstream::out | std::fstream::app);
 
     file << pos.white_pawns << ", ";
@@ -774,6 +774,13 @@ void Engine::write_move_to_file(int file_num)
     file << pos.black_kings << std::endl;
 
     file.close();
+}
+
+void Engine::delete_file_if_present(int file_num)
+{
+    std::string file_name_string = ".\\games\\game" + std::to_string(file_num) + ".txt";
+    char const *file_name_char_arr = file_name_string.c_str();
+    std::remove(file_name_char_arr);
 }
 
 void Engine::load_in_string(std::string rep)
