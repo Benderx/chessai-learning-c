@@ -2,11 +2,20 @@ general notes:
     white is 1
     black is 0
 
+REFRACTORING UPDATES
+Added bit_operations.cpp file for engine functions relying solely on bit manipulation
+Added printing.cpp file for debugging with prints and file manipulations
+
+
+
+
+
 look into this https://stackoverflow.com/questions/25802605/what-does-performing-a-byteswap-mean
 
 Compile:
-g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp move_generation.cpp piece_logic.cpp -std=c++14 -O3 -funroll-loops -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized  -o run
+g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp move_generation.cpp piece_logic.cpp bit_operations.cpp printing.cpp -std=c++14 -O3 -funroll-loops -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized  -o run
 
+Is it bad form to have bit_operations take from bitboard.h? Bitboard. h is implemented through bitboard.cpp and anouther file
 
 First square (bottom left) is square 0
 
