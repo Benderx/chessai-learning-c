@@ -904,56 +904,50 @@ void Engine::place_piece(int color, int type, unsigned long long board)
 {
     if(color == WHITE)
     {
-        if(type == PAWN)
+        switch(type)
         {
-            pos.white_pawns = pos.white_pawns | board;
-        }
-        else if(type == ROOK)
-        {
-            pos.white_rooks = pos.white_rooks | board;
-        }
-        else if(type == NIGHT)
-        {
-            pos.white_nights = pos.white_nights | board;
-        }
-        else if(type == BISHOP)
-        {
-            pos.white_bishops = pos.white_bishops | board;
-        }
-        else if(type == QUEEN)
-        {
-            pos.white_queens = pos.white_queens | board;
-        }
-        else
-        {
-            pos.white_kings = pos.white_kings | board;
+            case PAWN:
+                pos.white_pawns = pos.white_pawns | board;
+                return;
+            case ROOK:
+                pos.white_rooks = pos.white_rooks | board;
+                return;
+            case NIGHT:
+                pos.white_nights = pos.white_nights | board;
+                return;
+            case BISHOP:
+                pos.white_bishops = pos.white_bishops | board;
+                return;
+            case QUEEN:
+                pos.white_queens = pos.white_queens | board;
+                return;
+            case KING:
+                pos.white_kings = pos.white_kings | board;
+                return;
         }
     }
     else
     {
-        if(type == PAWN)
+        switch(type)
         {
-            pos.black_pawns = pos.black_pawns | board;
-        }
-        else if(type == ROOK)
-        {
-            pos.black_rooks = pos.black_rooks | board;
-        }
-        else if(type == NIGHT)
-        {
-            pos.black_nights = pos.black_nights | board;
-        }
-        else if(type == BISHOP)
-        {
-            pos.black_bishops = pos.black_bishops | board;
-        }
-        else if(type == QUEEN)
-        {
-            pos.black_queens = pos.black_queens | board;
-        }
-        else
-        {
-            pos.black_kings = pos.black_kings | board;
+            case PAWN:
+                pos.black_pawns = pos.black_pawns | board;
+                return;
+            case ROOK:
+                pos.black_rooks = pos.black_rooks | board;
+                return;
+            case NIGHT:
+                pos.black_nights = pos.black_nights | board;
+                return;
+            case BISHOP:
+                pos.black_bishops = pos.black_bishops | board;
+                return;
+            case QUEEN:
+                pos.black_queens = pos.black_queens | board;
+                return;
+            case KING:
+                pos.black_kings = pos.black_kings | board;
+                return;
         }
     }
 }
