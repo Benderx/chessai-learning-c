@@ -301,48 +301,50 @@ U64 Engine::bishop_moves(U64 bishop, int color)
 
 
 //old
-U64 Engine::one_rook_attacks(U64 rook)
-{
-    U64 row = get_rank(rook);
-    U64 col = get_file(rook);
-
-    U64 o = get_all();
-
-    U64 o_rev = vertical_flip(o);
-    U64 s_rev = vertical_flip(rook);
-
-    U64 hori = (o - 2*rook) ^ vertical_flip(o_rev - 2*s_rev);
-    printf("hori\n");
-    print_chess_rep(hori);
-    printf("hori flipped\n");
-    print_chess_rep(vertical_flip(hori));
-    hori = hori & row_mask[row];
-
-
-    // U64 o_mask = o;
-    U64 o_mask = o & col_mask[col];
-    U64 o_rev_mask = vertical_flip(o_mask);
-    U64 vert = (o_mask - 2*rook) ^ vertical_flip(o_rev_mask - 2*s_rev);
-    vert = vert & col_mask[col];
-
-    return(hori | vert);
-}
-
-// U64 Engine::one_rook_attacks(U64 rook, U64 o, int square)
+// U64 Engine::one_rook_attacks(U64 rook)
 // {
-//     U64 o_rev = reverse_64_bits(o);
-//     U64 s_rev = reverse_64_bits(rook);
+//     U64 row = get_rank(rook);
+//     U64 col = get_file(rook);
 
-//     U64 hori = (o - 2*rook) ^ reverse_64_bits(o_rev - 2*s_rev);
-//     hori = hori & square_masks[square].rank_mask;
+//     U64 o = get_all();
 
-//     U64 o_mask = o & square_masks[square].file_mask;
-//     U64 o_rev_mask = reverse_64_bits(o_mask);
-//     U64 vert = (o_mask - 2*rook) ^ reverse_64_bits(o_rev_mask - 2*s_rev);
-//     vert = vert & square_masks[square].file_mask;
+//     U64 o_rev = vertical_flip(o);
+//     U64 s_rev = vertical_flip(rook);
+
+//     U64 hori = (o - 2*rook) ^ vertical_flip(o_rev - 2*s_rev);
+//     printf("hori\n");
+//     print_chess_rep(hori);
+//     printf("hori flipped\n");
+//     print_chess_rep(vertical_flip(hori));
+//     hori = hori & row_mask[row];
+
+
+//     // U64 o_mask = o;
+//     U64 o_mask = o & col_mask[col];
+//     U64 o_rev_mask = vertical_flip(o_mask);
+//     U64 vert = (o_mask - 2*rook) ^ vertical_flip(o_rev_mask - 2*s_rev);
+//     vert = vert & col_mask[col];
 
 //     return(hori | vert);
 // }
+
+U64 Engine::one_rook_attacks(U64 rook, int square)
+{
+    U64 o = get_all();
+    
+    U64 o_rev = reverse_64_bits(o);
+    U64 s_rev = reverse_64_bits(rook);
+
+    U64 hori = (o - 2*rook) ^ reverse_64_bits(o_rev - 2*s_rev);
+    hori = hori & square_masks[square].rank_mask;
+
+    U64 o_mask = o & square_masks[square].file_mask;
+    U64 o_rev_mask = reverse_64_bits(o_mask);
+    U64 vert = (o_mask - 2*rook) ^ reverse_64_bits(o_rev_mask - 2*s_rev);
+    vert = vert & square_masks[square].file_mask;
+
+    return(hori | vert);
+}
 
 
 // U64 Engine::one_rook_attacks(U64 rook)
