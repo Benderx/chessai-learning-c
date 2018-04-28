@@ -8,11 +8,6 @@
 #include <chrono>
 #include <vector>
 
-// g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp move_generation.cpp piece_logic.cpp -std=c++14 -o run
-
-//optimized
-// g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp move_generation.cpp piece_logic.cpp -std=c++14 -O3 -funroll-loops -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized  -o run
-
 std::string color_to_string(int color)
 {
     if(color == 1)
