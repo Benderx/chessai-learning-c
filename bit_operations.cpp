@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include <cmath>
 #include <strings.h>
-#include <fstream>
 
 // Takes in a bitboard and will return the bitboard representing only the least significant bit.
 // Example: the initial white_nights bitboard, the least significant 1 occurs at index 1 (...00001000010)
