@@ -952,7 +952,7 @@ void Engine::place_piece(int color, int type, unsigned long long board)
     }
 }
 
-int Engine::get_color_by_bitboard(unsigned long long board)
+int Engine::get_color_by_bitboard(unsigned long long const board)
 {
     if(board & get_all_white())
     {
@@ -1013,7 +1013,8 @@ bool Engine::check_legal(int move, int color)
 // 2 for draw
 int Engine::is_terminal(int color, int* move_list)
 {
-    if(move_list[0] == 0)
+    int number_of_possible_moves = move_list[0];
+    if(number_of_possible_moves == 0)
     {
         // std::cout << "TERM > " << color << " is out of moves.\n";
         if(get_in_check(color))
