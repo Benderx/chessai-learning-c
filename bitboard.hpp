@@ -253,8 +253,8 @@ class Engine
 
 
     private: 
-        int max_move_length;
-        int move_arr_size;
+        int const max_move_length // This assumes there are only 500 possible legal moves at any one time (affects move array intilization); 
+        int const move_arr_size // how many legal moves can be filled;
 
         int stack_index;
         int* move_stack; 
