@@ -308,50 +308,50 @@ unsigned long long Engine::get_all()
 // Andrew's Linux Labtop: with flags: ~6ns without: ~16.5ns (idk why)
 int Engine::get_rank(unsigned long long num)
 {
-    unsigned long long max0 = 128ULL; // 2^7
-    if(num <= max0)
+    unsigned long long max_rank_1_value = 128ULL; // 2^7
+    if(num <= max_rank_1_value)
     {
         return(0);
     }
 
-    unsigned long long max1 = 32768ULL; // 2^15
-    if(num <= max1)
+    unsigned long long max_rank_2_value = 32768ULL; // 2^15
+    if(num <= max_rank_2_value)
     {
         return(1);
     }
 
-    unsigned long long max2 = 8388608ULL; // 2^23
-    if(num <= max2)
+    unsigned long long max_rank_3_value = 8388608ULL; // 2^23
+    if(num <= max_rank_3_value)
     {
         return(2);
     }
 
-    unsigned long long max3 = 2147483648ULL; // 2^31
-    if(num <= max3)
+    unsigned long long max_rank_4_value = 2147483648ULL; // 2^31
+    if(num <= max_rank_4_value)
     {
         return(3);
     }
 
-    unsigned long long max4 = 549755813888ULL; // 2^39
-    if(num <= max4)
+    unsigned long long max_rank_5_value = 549755813888ULL; // 2^39
+    if(num <= max_rank_5_value)
     {
         return(4);
     }
 
-    unsigned long long max5 = 140737488355328ULL; // 2^47
-    if(num <= max5)
+    unsigned long long max_rank_6_value = 140737488355328ULL; // 2^47
+    if(num <= max_rank_6_value)
     {
         return(5);
     }
 
-    unsigned long long max6 = 36028797018963968ULL; // 2^55
-    if(num <= max6)
+    unsigned long long max_rank_7_value = 36028797018963968ULL; // 2^55
+    if(num <= max_rank_7_value)
     {
         return(6);
     }
 
-    unsigned long long max7 = 9223372036854775808ULL; // 2^63
-    if(num <= max7)
+    unsigned long long max_rank_8_value = 9223372036854775808ULL; // 2^63
+    if(num <= max_rank_8_value)
     {
         return(7);
     }
