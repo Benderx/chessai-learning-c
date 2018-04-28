@@ -754,15 +754,15 @@ void Engine::load_in_string(std::string const rep)
 // Northeast << 9
 
 // ~3ns
-unsigned long long Engine::square_to_bitboard(int square)
+unsigned long long Engine::square_to_bitboard(int const square)
 {
     return(1ULL << square);
 }
 
 // ~3ns
-unsigned long long Engine::get_bitboard_of_piece(Piece piece, int color)
+unsigned long long Engine::get_bitboard_of_piece(Piece piece, int const color)
 {
-    if(color == 1)
+    if(color == WHITE)
     {
         if(piece == KING)
         {
@@ -793,7 +793,7 @@ unsigned long long Engine::get_bitboard_of_piece(Piece piece, int color)
 Piece Engine::get_piece_by_bitboard(int color, unsigned long long board)
 {
     unsigned long long pawns, rooks, nights, bishops, queens, kings;
-    if(color == 1)
+    if(color == WHITE)
     {
         pawns = pos.white_pawns;
         rooks = pos.white_rooks;
@@ -850,7 +850,7 @@ Piece Engine::get_piece_by_bitboard(unsigned long long board)
 
 void Engine::remove_piece(int color, int type, unsigned long long board)
 {
-    if(color == 1)
+    if(color == WHITE)
     {
         if(type == PAWN)
         {
@@ -908,7 +908,7 @@ void Engine::remove_piece(int color, int type, unsigned long long board)
 
 void Engine::place_piece(int color, int type, unsigned long long board)
 {
-    if(color == 1)
+    if(color == WHITE)
     {
         if(type == PAWN)
         {
@@ -1044,7 +1044,7 @@ bool Engine::get_in_check(int color)
     unsigned long long enemy_pawns, enemy_rooks, enemy_nights, enemy_bishops, enemy_queens, enemy_kings;
     unsigned long long pawn_attackers, rook_attackers, night_attackers, bishop_attackers, king_attackers;
 
-    if(color == 1)
+    if(color == WHITE)
     {
         my_king = pos.white_kings;
 
@@ -1113,7 +1113,7 @@ unsigned long long* Engine::get_attackers_blocks(int color)
 
     unsigned long long* info = (unsigned long long*) calloc(3, sizeof(unsigned long long));
 
-    if(color == 1)
+    if(color == WHITE)
     {
         my_king = pos.white_kings;
 
