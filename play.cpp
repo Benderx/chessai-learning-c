@@ -10,7 +10,7 @@
 
 std::string color_to_string(int color)
 {
-    if(color == 1)
+    if(color == WHITE)
     {
         return("White");
     }
@@ -55,7 +55,7 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves, int game_
         if(term != -1)
         {
             // e->print_chess_char();
-            std::cout << "The winner is: " << term << std::endl;
+            std::cout << "The winner is: " << color_to_string(term) << std::endl;
             e->print_chess_char();
             return(term);
         }

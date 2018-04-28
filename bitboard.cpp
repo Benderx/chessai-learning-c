@@ -1093,7 +1093,7 @@ bool Engine::get_in_check(int color)
 
 
 // will store how many attackers in info[0], attacker squares in info[1], and blocking squares in info[2]
-unsigned long long* Engine::get_attackers_blocks(int color)
+unsigned long long* Engine::get_attackers_blocks(int const color)
 {
     unsigned long long my_king;
     unsigned long long enemy_pawns, enemy_rooks, enemy_nights, enemy_bishops, enemy_queens;
