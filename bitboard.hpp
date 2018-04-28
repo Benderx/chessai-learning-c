@@ -31,6 +31,12 @@ enum MoveType
     PROMOTION = 3
 };
 
+enum Color
+{
+    BLACK = 0,
+    WHITE = 1
+};
+
 struct position
 {
     U64 white_pawns; // 65280
