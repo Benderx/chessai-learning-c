@@ -8,10 +8,20 @@
 #include <chrono>
 #include <vector>
 
-// g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp move_generation.cpp piece_logic.cpp -std=c++14 -o run
+// g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp -std=c++14 -o run
 
 //optimized
-// g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp move_generation.cpp piece_logic.cpp -std=c++14 -O3 -funroll-loops -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized  -o run
+// g++ bitboard.hpp bitboard.cpp player.hpp player.cpp play.cpp -std=c++14 -O3 -funroll-loops -Wall -Wno-unused-variable -Wno-unused-value -Wno-comment -Wno-unused-but-set-variable -Wno-maybe-uninitialized  -o run
+
+
+// to profile: valgrind --tool=callgrind ./play
+// more profiling info: http://zariko.taba.free.fr/c++/callgrind_profile_only_a_part.html
+
+//memleaks and stuff: valgrind --tool=memcheck --leak-check=yes --log-file=out.log ./play
+
+// cache misses: valgrind --tool=cachegrind ./play
+// cachegrind read: cg_annotate cachegrind.out.601
+
 
 std::string color_to_string(int color)
 {
@@ -32,7 +42,7 @@ std::chrono::duration<double, std::nano> cast_nano(std::chrono::duration<double>
 }
 
 
-int play_game(Engine* e, std::vector<Player*> players, int* num_moves, int game_num)
+int play_game(Engine* e, std::vector<Player*> players, int* num_moves)
 {
     int max_moves  = e->get_max_move_length();
     int moves_made = 0;
@@ -49,47 +59,37 @@ int play_game(Engine* e, std::vector<Player*> players, int* num_moves, int game_
         move_list = e->generate_legal_moves(color);
 
         term = e->is_terminal(color, move_list);
-        e->write_move_to_file(game_num);
-        std::cout << "We are on: "<< moves_made << "/"<< max_moves <<std::endl;
-        
-        if(term == 2)
-        {
-            break;
-        }
-
         if(term != -1)
         {
+            // std::cout << "game over, result is: " << term << " in " << moves_made  << " moves" << std::endl;
             // e->print_chess_char();
-            std::cout << "The winner is: " << term << std::endl;
-            e->print_chess_char();
             return(term);
         }
 
-        std::cout << color_to_string(color) << " to move." << std::endl;
-        std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
+        // std::cout << color_to_string(color) << " to move." << std::endl;
+        // std::cout <<  "moves avaliable: " << move_list[0] << std::endl;
         move = players[color]->move(move_list);
-        std::cout <<  "making move: " << move << std::endl;
-        e->print_move_info(move);
+        // std::cout <<  "making move: " << move << std::endl;
+        // e->print_move_info(move);
         e->push_move(move);
         num_moves[0]++;
-
-        e->print_chess_char();
-        std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
+        // exit(0);
+        // return(2);
+        // e->print_chess_char();
+        // std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
 
         moves_made++;
-
         color = 1-color;
     }
 
-    std::cout << "There is a draw" << std::endl;
+
+    // std::cout << "game over, result is draw from making max moves: " << max_moves << std::endl;
     return(2); // draw
 }
 
 
 int main()
 {
-    int games_to_play = 1;
-
     srand(time(NULL));
     Engine* e = new Engine();
     
@@ -110,10 +110,13 @@ int main()
 
     num_moves[0] = 0;
     t1 = std::chrono::system_clock::now();
+
+
+    // result = play_game(e, players, num_moves);
     
-    for(int i = 0; i < games_to_play; i++)
+    for(int i = 0; i < 10; i++)
     {
-        result = play_game(e, players, num_moves,i);
+        result = play_game(e, players, num_moves);
         // e->print_chess_char();
         e->reset_engine();  
         // exit(0);      
@@ -144,8 +147,11 @@ int main()
     std::cout << "total moves made: " << num_moves[0] << " with " << temp << " nanoseconds per move" << std::endl;
     std::cout << "resulting in NPS of: " << 1.0 / (temp * .000000001) << std::endl;
 
-
-    free(e);
+    // delete(players[0]);
+    // delete(players[1]);
+    players.clear();
+    e->clean_up();
+    delete(e);
     free(num_moves);
     return(0);
 }

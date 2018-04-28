@@ -42,3 +42,12 @@ continue to benchmark functions
 realistic inputs
 enpassant
 castle
+
+
+
+num nodes examined at depth 3:
+    202979
+
+
+depth of 5:
+    117267714
