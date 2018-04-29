@@ -22,7 +22,6 @@
         return(lsb_lookup[lsb_board(board)]);
     }
 #else
-
 #endif
 
 

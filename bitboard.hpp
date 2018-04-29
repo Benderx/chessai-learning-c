@@ -183,6 +183,7 @@ class Engine
 
         //move gen
         void pop_and_add_regular_moves(int color, int inv_color, int* move_list, U64 board, int curr_pos);
+        void pop_and_add_promo_moves(int color, int inv_color, int* move_list, U64 board, int curr_pos);
         void generate_moves(int color, int* move_list, U64 danger, U64 pinned);
         // void generate_moves(int color, int* move_list, U64 danger);
         // void generate_moves_pinned(int color, int* move_list, U64 danger, U64 pinned);

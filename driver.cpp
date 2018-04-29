@@ -263,14 +263,36 @@ void very_strange_check_glitch(Engine* e)
     // print_pieces(e, "black", "bishop moves", e->bishop_moves(0));
 }
 
+
+
 int main()
 {
     Engine* e = new Engine();
 
 
-    e->print_masks();
+    // e->print_masks();
 
+    e->load_in_string(""
+        "r-b-kbn-"
+        "---pp--r"
+        "-p-----p"
+        "QBpP--p-"
+        "-P------"
+        "P-P-qp-P"
+        "-----PP-"
+        "RNB-K-NR");
 
+    e->compute_get_holders();
+
+    e->print_chess_char();
+    std::cout << e->get_in_check(1) << std::endl;
+    e->print_chess_rep(e->get_all());
+    printf("\n");
+
+    e->print_chess_rep(e->get_all_black());
+    printf("\n");
+    
+    e->print_chess_rep(e->one_queen_moves(e->pos.black_queens, e->get_all(), e->get_all_black()));
 
     // print_all_pieces(e);
 

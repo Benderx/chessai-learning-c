@@ -96,6 +96,81 @@ void Engine::delete_file_if_present(int file_num)
     std::remove(file_name_char_arr);
 }
 
+void Engine::load_in_string(std::string const rep)
+{
+    int index = 63;
+    unsigned long long wp = 0, bp = 0;
+    unsigned long long wr = 0, br = 0;
+    unsigned long long wn = 0, bn = 0;
+    unsigned long long wb = 0, bb = 0;
+    unsigned long long wq = 0, bq = 0;
+    unsigned long long wk = 0, bk = 0;
+
+    for(unsigned int i = 0; i < rep.length(); i++)
+    {
+        switch(rep[i])
+        {
+            case 'P':
+                wp = wp | 1ULL << index;
+                break;
+            case 'R':
+                wr = wr | 1ULL << index;
+                break;
+            case 'N':
+                wn = wn | 1ULL << index;
+                break;
+            case 'B':
+                wb = wb | 1ULL << index;
+                break;
+            case 'Q':
+                wq = wq | 1ULL << index;
+                break;
+            case 'K':
+                wk = wk | 1ULL << index;
+                break;
+            case 'p':
+                bp = bp | 1ULL << index;
+                break;
+            case 'r':
+                br = br | 1ULL << index;
+                break;
+            case 'n':
+                bn = bn | 1ULL << index;
+                break;
+            case 'b':
+                bb = bb | 1ULL << index;
+                break;
+            case 'q':
+                bq = bq | 1ULL << index;
+                break;
+            case 'k':
+                bk = bk | 1ULL << index;
+                break;
+            case '-':
+                //lol
+                break;
+            default:
+                index++;
+        }
+        index--;
+    }
+
+    pos.white_pawns = horizontal_flip(wp);
+    pos.white_rooks = horizontal_flip(wr); 
+    pos.white_nights = horizontal_flip(wn);     
+    pos.white_bishops = horizontal_flip(wb);
+    pos.white_queens = horizontal_flip(wq);
+    pos.white_kings = horizontal_flip(wk);
+
+    pos.black_pawns = horizontal_flip(bp); 
+    pos.black_rooks = horizontal_flip(br); 
+    pos.black_nights = horizontal_flip(bn); 
+    pos.black_bishops = horizontal_flip(bb);
+    pos.black_queens = horizontal_flip(bq);
+    pos.black_kings = horizontal_flip(bk);
+}
+
+
 void Engine::print_chess_char()
 {
     char* b = (char*) malloc(8*8*sizeof(char));

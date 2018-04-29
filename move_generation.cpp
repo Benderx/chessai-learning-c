@@ -43,6 +43,46 @@ void Engine::pop_and_add_regular_moves(int color, int inv_color, int* move_list,
     }
 }
 
+void Engine::pop_and_add_promo_moves(int color, int inv_color, int* move_list, unsigned long long board, int curr_pos)
+{
+    unsigned long long new_pos;
+    int piece_taken;
+    while(board)
+    {
+        // std::cout << "lmao" << std::endl;
+        // print_chess_rep(board);
+
+        new_pos = lsb_board(board);
+        piece_taken = get_piece_by_bitboard(inv_color, new_pos);
+
+        // std::cout << "okmyman " << bitboard_to_square(new_pos) << ", " << move_list[0] << std::endl;
+        // print_chess_rep(board);
+
+        // std::cout << "YABOI^2 " << bitboard_to_square(new_pos) << ", " << move_list[0] << std::endl;
+        // print_chess_rep(new_pos);
+
+        move_list[++move_list[0]] = encode_move(curr_pos, bitboard_to_square(new_pos), PROMOTION, piece_taken, NIGHT, color);
+        move_list[++move_list[0]] = encode_move(curr_pos, bitboard_to_square(new_pos), PROMOTION, piece_taken, BISHOP, color);
+        move_list[++move_list[0]] = encode_move(curr_pos, bitboard_to_square(new_pos), PROMOTION, piece_taken, ROOK, color);
+        move_list[++move_list[0]] = encode_move(curr_pos, bitboard_to_square(new_pos), PROMOTION, piece_taken, QUEEN, color);
+        // std::cout << "but how: " << move_list[move_list[0]+1] << ", " << piece_type_to_string(get_piece_by_bitboard(square_to_bitboard(decode_from(move_list[move_list[0]+1])))) << std::endl;
+        // if(piece_type_to_string(get_piece_by_bitboard(square_to_bitboard(decode_from(move_list[move_list[0]+1])))) == "nothing")
+        // {
+        //     std::cout << "moves in move_list: " << move_list[0] << std::endl;
+        //     std::cout << "all_moves" << std::endl;
+        //     print_chess_rep(board);
+        //     std::cout << "one_move" << std::endl;
+        //     print_chess_rep(new_pos);
+        //     std::cout << "bitboard_to_square one move: " << bitboard_to_square(new_pos) << std::endl;
+        //     std::cout << "piece_taken: " << piece_taken << std::endl;
+        //     std::cout << "curr_pos: " << curr_pos << std::endl;
+        //     print_chess_rep(new_pos);
+        //     exit(0);
+        // }
+        board = board & ~new_pos;
+    }
+}
+
 
 // Generates and fills move_list for a color before checking checks
 // DOES NOT CHECK BOUNDS FOR move_arr_size
@@ -74,8 +114,9 @@ void Engine::generate_moves(int color, int* move_list, unsigned long long danger
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-            pop_and_add_regular_moves(color, inv_color, move_list, white_pawn_moves(one_p, 
-                all_occupied, enemy_occupied), bitboard_to_square(one_p));
+            U64 wpm = white_pawn_moves(one_p, all_occupied, enemy_occupied);
+            pop_and_add_regular_moves(color, inv_color, move_list, wpm & ~row_mask[7], bitboard_to_square(one_p));
+            pop_and_add_promo_moves(color, inv_color, move_list, wpm & row_mask[7], bitboard_to_square(one_p));
         }
 
         p = pos.white_bishops & pinned;
@@ -123,14 +164,14 @@ void Engine::generate_moves(int color, int* move_list, unsigned long long danger
                 all_occupied, own_occupied), bitboard_to_square(one_p));
         }
 
-
         p = pos.black_pawns & pinned;
         while(p)
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-            pop_and_add_regular_moves(color, inv_color, move_list, black_pawn_moves(one_p, 
-                all_occupied, enemy_occupied), bitboard_to_square(one_p));
+            U64 bpm = black_pawn_moves(one_p, all_occupied, enemy_occupied);
+            pop_and_add_regular_moves(color, inv_color, move_list, bpm & ~row_mask[0], bitboard_to_square(one_p));
+            pop_and_add_promo_moves(color, inv_color, move_list, bpm & row_mask[0], bitboard_to_square(one_p));
         }
 
         p = pos.black_bishops & pinned;
@@ -194,8 +235,9 @@ void Engine::generate_moves_single_check(int color, int* move_list, unsigned lon
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-            pop_and_add_regular_moves(color, inv_color, move_list, white_pawn_moves(one_p, 
-                all_occupied, enemy_occupied) & legal_defense, bitboard_to_square(one_p));
+            U64 wpm = white_pawn_moves(one_p, all_occupied, enemy_occupied);
+            pop_and_add_regular_moves(color, inv_color, move_list, wpm & ~row_mask[7] & legal_defense, bitboard_to_square(one_p));
+            pop_and_add_promo_moves(color, inv_color, move_list, wpm & row_mask[7] & legal_defense, bitboard_to_square(one_p));
         }
 
         p = pos.white_bishops & pinned;
@@ -249,8 +291,9 @@ void Engine::generate_moves_single_check(int color, int* move_list, unsigned lon
         {
             one_p = lsb_board(p);
             p = p & ~one_p;
-            pop_and_add_regular_moves(color, inv_color, move_list, black_pawn_moves(one_p, 
-                all_occupied, enemy_occupied) & legal_defense, bitboard_to_square(one_p));
+            U64 bpm = black_pawn_moves(one_p, all_occupied, enemy_occupied);
+            pop_and_add_regular_moves(color, inv_color, move_list, bpm & ~row_mask[0] & legal_defense, bitboard_to_square(one_p));
+            pop_and_add_promo_moves(color, inv_color, move_list, bpm & row_mask[0] & legal_defense, bitboard_to_square(one_p));
         }
 
         p = pos.black_bishops & pinned;

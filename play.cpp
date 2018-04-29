@@ -108,7 +108,7 @@ int main()
     
     for(int i = 0; i < games_to_play; i++)
     {
-        result = play_game(e, players, num_moves,i);
+        result = play_game(e, players, num_moves, i);
         // e->print_chess_char();
         e->reset_engine();  
         // exit(0);      
